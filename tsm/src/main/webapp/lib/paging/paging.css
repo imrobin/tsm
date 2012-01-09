@@ -1,0 +1,7 @@
+﻿.paging {height:18px;font-size:12px; vertical-align: m}
+.paging a{border:1px solid #dfdfdf;display:inline-block;padding:0 5px;margin:0 1px;background:#fff;line-height:18px;height:18px;text-decoration: none;}
+.paging a:hover{border:1px solid #c00;}
+.paging .clicked{color:#fff;background:blue;}
+.paging .next{background: url('pages.gif') no-repeat right -20px;padding-right:10px;}
+.paging .prev{background: url('pages.gif') no-repeat left top;padding-right:10px;}
+.paging span{margin:0 3px;}

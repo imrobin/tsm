@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+
+</head>
+<body>
+<p>感谢您注册为多应用会员!
+      您的会员名为:${user.userName} </p>
+
+<p>要启用账户并确认电子邮件地址，请点击以下链接
+  
+<a href="${dns}/html/customer/?m=regVerify&activeCode=${activeCode}&uid=${user.id}&active=email">
+	${dns}/html/customer/?m=regVerify&activeCode=${activeCode}&uid=${user.id}&active=email</p>
+</a>
+<p>(请在48小时内完成确认，48小时后邮件失效，您将需要重新填写注册信息)</p>
+
+<p>如果通过点击以上链接无法访问，请将该网址复制并粘贴至新的浏览器窗口中。
+      如果您错误地收到了此电子邮件，无需执行操作来取消账户！此账户将不会启用。</p>
+ 
+<p>---结行移动---</p>
+
+<p>(这是一封自动产生的email，请勿回复。)</p>
+
+-------------------------------------
+</body>
+</html>

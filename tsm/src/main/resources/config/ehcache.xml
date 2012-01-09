@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+
+	
+	<diskStore path="java.io.tmpdir/hibernate/tsm" />
+	
+	<defaultCache maxElementsInMemory="10000" overflowToDisk="true" eternal="false"
+		memoryStoreEvictionPolicy="LRU" maxElementsOnDisk="10000000" diskExpiryThreadIntervalSeconds="600"
+		timeToIdleSeconds="60" timeToLiveSeconds="120" diskPersistent="false" />
+
+</ehcache>

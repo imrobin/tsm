@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd 
+	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd 
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd"
+	default-autowire="byName">
+
+	   <!--  <task:scheduled-tasks scheduler="feeScheduler"> <task:scheduled ref="feeStatTask" 
+		method="genFeeStatByMonth" cron="0/30 * * * * ?" fixed-delay="2000" /> </task:scheduled-tasks> 
+		<task:scheduler id="feeScheduler" pool-size="10" /> <bean id="feeStatTask" 
+		class="com.justinmobile.tsm.schedule.FeeStatTask" lazy-init="false"></bean> -->  
+		
+ 	  <bean id="executor"
+		class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+		<property name="corePoolSize" value="10" />
+		<property name="maxPoolSize" value="10" />
+		<property name="queueCapacity" value="50" />
+	</bean>
+   
+	<bean name="feeStatJob" class="com.justinmobile.tsm.schedule.FeeStatTask"
+		lazy-init="false" autowire="no" />
+	
+	<bean id="jobDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"
+		lazy-init="false" autowire="no">
+		
+		<property name="targetObject">
+			<ref bean="feeStatJob" />
+		</property>
+		
+		<property name="targetMethod">
+			<value>genFeeStatByMonth</value>
+		</property>
+		<property name="concurrent" value="false" />
+	</bean>
+
+	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean"
+		lazy-init="false" autowire="no">
+		<property name="jobDetail">
+			<ref bean="jobDetail" />
+		</property>
+		
+		<property name="cronExpression" value="0 * * 1 * ?" />
+	</bean>
+
+	<bean id="scheduler"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean"
+		lazy-init="false" autowire="no">
+		<property name="triggers">
+			<list>
+				<ref local="cronTrigger" />
+			</list>
+		</property>
+		 <property name="taskExecutor" ref="executor" />
+	</bean>  
+
+
+</beans>

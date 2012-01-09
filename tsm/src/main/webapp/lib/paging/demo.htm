@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>分页控件演示</title>
+    <script type="text/javascript" src="../mootools/mootools-core-1.3.2.js"></script>  
+    <script type="text/javascript" src="paging.js"></script>
+    
+    <link href="paging.css" rel="stylesheet" type="text/css" />
+    
+    <script type="text/javascript">
+        window.addEvent('domready', function(){
+            new JIM.UI.Paging({
+                url:'data.js',
+                head:{el:'demo1-paging',showNumber:true},   
+                onAfterLoad: function(data){
+                    $('demo1-list').set('html',data.items)
+                }
+            }).load();
+            
+            new JIM.UI.Paging({
+                url:'data.js',
+                head:{el:'demo2-paging1'},
+                foot:{el:'demo2-paging2'},      
+                onAfterLoad: function(data){
+                    $('demo2-list').set('html',data.items)
+                }
+            }).load();
+            
+            new JIM.UI.Paging({
+                url:'data.js',
+                head:{el:'demo3-paging1',showNumber:true},
+                foot:{el:'demo3-paging2',showText:true},      
+                onAfterLoad: function(data){
+                    $('demo3-list').set('html',data.items)
+                }
+            }).load();
+        });
+    </script>
+</head>
+<body>
+    <p>Demo1</p>
+    <ul id="demo1-list"></ul>
+    <div id="demo1-paging"></div>
+    <p>Demo2</p>
+    <div id="demo2-paging1"></div>
+    <ul id="demo2-list"></ul>
+    <div id="demo2-paging2"></div>
+    <p>Demo3</p>
+    <div id="demo3-paging1"></div>
+    <ul id="demo3-list"></ul>
+    <div id="demo3-paging2"></div>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Basic LightFace Test</title>
+	<style>
+		@import "../assets/LightFace.css";
+	</style>
+	<link rel="stylesheet" href="../assets/lightface.css" />
+	<script src="../../mootools/mootools-core-1.3.2.js"></script>
+	<script src="mootools-more-drag.js"></script>
+	<script src="../LightFace.js"></script>
+	<script src="../LightFace.IFrame.js"></script>
+	<script src="../LightFace.Image.js"></script>
+	<script src="../LightFace.Request.js"></script>
+	<script src="../LightFace.Static.js"></script>
+	<script>
+		window.addEvent('domready',function(){
+			
+			document.id('start').addEvent('click',function() {
+				
+				light = new LightFace.IFrame({ height:400, width:800, url: 'http://sina.com.cn', title: 'Google!' }).addButton('Close', function() { light.close(); },true).open();
+				
+			});
+			
+		});
+	</script>
+</head>
+<body>
+	
+	<h3>IFrame Demo</h3>
+	<p>
+		Click the button below to launch it and make it happen.
+	</p>
+	
+	<button id="start">IFrame Google</button>
+
+</body>
+</html>

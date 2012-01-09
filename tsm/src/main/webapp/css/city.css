@@ -1,0 +1,96 @@
+/* 显示城市列表的CSS*/
+#city .c2 {
+	width: 45px;
+	color: #369;
+	padding: 1px 0 0 4px;
+	margin: 0 2px 0 0;
+	text-align: left;
+	float: none;
+	/* background: url(../images/dot.gif) left no-repeat; */
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	-o-text-overflow: ellipsis
+}
+#province dl{
+	width:400px;
+	height:auto
+	}
+#city dl{
+	width:400px;
+	height:auto
+	}	
+#province dd {
+	display: block;
+	text-align: left;
+	width: 45px;
+	overflow: hidden;
+	float: left;
+	height: 23px;
+	margin: 0 2px;
+}
+
+#city dd {
+	float: left;
+	width: 60px;
+	padding: 2px;
+	overflow: hidden;
+	height: 20px;
+}
+
+#showBox {
+	width: 400px;
+	height: auto
+}
+
+#city a:visited,province a:visited {
+	display: block;
+	height: 23px;
+	line-height: 23px;
+	padding: 0 10px
+}
+
+#cityBox {
+	display: block;
+	text-align: left;
+	background: #fff;
+	border-top: 1px solid #6699cc;
+	border-bottom: 1px solid #6699cc;
+	padding: 10px 15px;
+	margin-top: 15px;
+	overflow: auto;
+	float:left;
+	white-space: nowrap;
+	height: auto;
+	width: 400px;
+}
+
+#provinceBox {
+	display: block;
+	float:left;
+	text-align: left
+}
+#province a:hover {
+	background: #DD0000;
+	text-decoration: none;
+	color: #FFF
+}
+
+#city a:hover {
+	background: #DD0000;
+	color: #FFF;
+	text-decoration: none
+}
+
+ #province .c1 {
+	width: 30px;
+	color: #369;
+	padding: 1px 0 0 4px;
+	margin: 0 2px 0 0;
+/* 	float: none;
+	//background: url(../images/dot.gif) left no-repeat;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	-o-text-overflow: ellipsis */
+} 

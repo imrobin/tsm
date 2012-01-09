@@ -1,0 +1,1 @@
+2011/4/22 10:25  customerCardInfo表添加STATUS字段.表示当前用户卡片业务状态 BY WLQ

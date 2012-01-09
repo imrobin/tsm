@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:s="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd"
+	default-lazy-init="true">
+
+	<description>SpringSecurity安全配置</description>
+
+	<!-- http安全配置 -->
+	<s:http auto-config="true" >
+		<s:intercept-url pattern="/css/**" filters="none" />
+		<s:intercept-url pattern="/images/**" filters="none" />
+		<s:intercept-url pattern="/libs/**" filters="none" />
+
+		<s:form-login login-page="/html/login/" 
+			authentication-failure-handler-ref="failAuthenticationDispatcher"
+			authentication-success-handler-ref="authenticationDispatcher" />
+		<s:logout logout-success-url="/html/login/" />
+		<s:access-denied-handler error-page="/html/login/?m=deniedAccess"/>
+		
+		<!-- 增加一个filter，这点与Spring Security 2是不一样的，不能修改默认的filter了，这个filter位于FILTER_SECURITY_INTERCEPTOR之前 -->
+		<s:custom-filter before="FILTER_SECURITY_INTERCEPTOR" ref="dbSecurityFilter" />
+	</s:http>
+
+	<bean id="dbSecurityFilter" class="com.justinmobile.security.intercept.web.DataBaseFilterSecurityInterceptor">
+		<!-- 认证配置，主要跟userDetailsService相关 -->
+		<property name="authenticationManager" ref="authenticationManager" />
+		<!-- 投票机制 -->
+		<property name="accessDecisionManager" ref="affirmativeBased" />
+		<!-- URL拦截器，从数据库中取url，跟后台返回的进行比对 -->
+		<property name="dbSecurityMetadataSource" ref="dbSecurityMetadataSource" />
+	</bean>
+
+	<!-- 认证配置, 使用userDetailsService提供的用户信息 -->
+	<s:authentication-manager alias="authenticationManager">
+		<s:authentication-provider user-service-ref="userDetailsService">
+			<s:password-encoder hash="md5">
+				<s:salt-source user-property="salt"/>
+			</s:password-encoder>
+		</s:authentication-provider>
+	</s:authentication-manager>
+
+	<!-- 项目实现的用户查询服务 -->
+	<bean id="userDetailsService" class="com.justinmobile.security.details.UserDetailServiceImpl" />
+
+	<!-- 投票机制，权限的开头去掉ROLE_ -->
+	<bean id="affirmativeBased" class="org.springframework.security.access.vote.AffirmativeBased">
+		<property name="allowIfAllAbstainDecisions" value="false" />
+		<property name="decisionVoters">
+			<list>
+				<bean class="org.springframework.security.access.vote.RoleVoter">
+					<property name="rolePrefix" value="" />
+				</bean>
+				<bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
+			</list>
+		</property>
+	</bean>
+	<!-- 拦截URL，数据库中将所有的需要拦截的URL放到MAP中 -->
+	<bean id="dbSecurityMetadataSource" class="com.justinmobile.security.intercept.web.DataBaseFilterInvocationSecurityMetadataSource">
+		<property name="urlMatcher" ref="urlMatcher" />
+	</bean>
+
+	<!-- URL比较类，默认将所有URL小写 -->
+	<bean id="urlMatcher" class="org.springframework.security.web.util.AntUrlPathMatcher">
+		<property name="requiresLowerCaseUrl" value="false"></property>
+	</bean>
+
+	<bean id="authenticationDispatcher" class="com.justinmobile.security.intercept.web.LoginAuthenticationSuccessHandler" />
+</beans>

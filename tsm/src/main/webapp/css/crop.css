@@ -1,0 +1,105 @@
+.changePtohoBox {
+	padding: 10px 10px 10px 300px;
+	height: 100%;
+	clear: both;
+}
+.none{
+    display:none!important;
+}
+.changePtohoBoxInner {
+	float: left;
+	width: 280px;
+	margin-left: -280px;
+	margin-left: -140px;
+	height: 320px;
+	overflow: hidden;
+}
+
+.changeImageBox {
+	height: 200px;
+	width: 260px;
+	overflow: hidden;
+	position: relative;
+	z-index: 3;
+	background: #ccc;
+}
+
+.controlCursor {
+	height: 186px;
+	width: 120px;
+	overflow: hidden;
+	float: left;
+	background: url(image/changebox.jpg)
+		no-repeat;
+	position: relative;
+}
+.bigLink {
+	height: 20px;
+	line-height: 20px;
+	margin-top: 10px
+}
+
+.bigLink a,.bigLink input {
+	display: inline-block;
+	height: 20px;
+	padding: 0 10px;
+	background: #7092da;
+	font-size: 14px;
+	text-decoration: none !important;
+	color: #fff;
+	margin-right: 10px;
+	cursor: pointer;
+	border: 0
+}
+
+.controlCursor input {
+	border: 0px;
+	background: transparent;
+}
+
+.controlCursor label,.sbbutton {
+	display: inline-block;
+	width: 120px;
+	height: 33px;
+	position: absolute;
+	top: 0px;
+	cursor: pointer;
+}
+
+.controlCursor label input {
+	visibility: hidden;
+	width: 120px;
+	height: 33px;
+}
+
+.controlCursor .sbbutton {
+	bottom: 0px;
+	top: auto;
+}
+
+#headlogo {
+	filter: Alpha(opacity = 0);
+	opacity: 0;
+	cursor: pointer;
+	font-size: 28px;
+	outline: none;
+	hide-focus: expression(this.hideFocus = true);
+	left: -295px;
+	top: 0px;
+	position: absolute;
+	cursor: pointer;
+}
+
+.controlCursor a {
+	color: #fff;
+	font-size: 14px;
+	font-weight: bold;
+	display: block;
+	height: 32px;
+	line-height: 32px;
+	text-align: center;
+	text-decoration: none;
+}
+.dragging {
+	border: solid 2px red;
+}
