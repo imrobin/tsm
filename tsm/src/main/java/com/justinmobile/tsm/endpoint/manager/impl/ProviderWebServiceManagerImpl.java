@@ -1,5 +1,8 @@
 package com.justinmobile.tsm.endpoint.manager.impl;
 
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +15,8 @@ import com.justinmobile.tsm.card.domain.CardApplication;
 import com.justinmobile.tsm.card.manager.CardApplicationManager;
 import com.justinmobile.tsm.cms2ac.domain.ProviderProcess;
 import com.justinmobile.tsm.cms2ac.domain.ProviderProcess.BusinessEvent;
+import com.justinmobile.tsm.customer.domain.CustomerCardInfo;
+import com.justinmobile.tsm.customer.manager.CustomerCardInfoManager;
 import com.justinmobile.tsm.endpoint.manager.ProviderWebServiceManager;
 import com.justinmobile.tsm.fee.manager.FeeStatManager;
 import com.justinmobile.tsm.history.manager.SubscribeHistoryManager;
@@ -29,6 +34,9 @@ public class ProviderWebServiceManagerImpl implements ProviderWebServiceManager 
 
 	@Autowired
 	private SubscribeHistoryManager subscribeHistoryManager;
+
+	@Autowired
+	private CustomerCardInfoManager customerCardManager;
 
 	@Override
 	public void businessEventNotify(ProviderProcess process) {
@@ -60,10 +68,22 @@ public class ProviderWebServiceManagerImpl implements ProviderWebServiceManager 
 
 	private void unsubcribeBusiness(String aid, String cardNo, String mobileNo) {
 		CardApplication cardApplication = cardApplicationManager.getByCardNoAid(cardNo, aid);
-		if (null != cardApplication && CardApplication.STATUS_AVAILABLE.intValue() == cardApplication.getStatus().intValue()) {
+		if (null != cardApplication
+				&& ((CardApplication.STATUS_AVAILABLE.intValue() == cardApplication.getStatus().intValue()) || (CardApplication.STATUS_LOSTED
+						.intValue() == cardApplication.getStatus().intValue()))) {
 			cardApplication.setStatus(CardApplication.STATUS_INSTALLED);
 			feeStatManager.unSubscribeAppStatRecord(aid, cardNo, mobileNo);
 			subscribeHistoryManager.unsubscribeApplication(cardApplication.getCardInfo(), cardApplication.getApplicationVersion());
+
+			// 判断终端是否已经挂失
+			CustomerCardInfo customerCard = customerCardManager.getByCardNoThatStatusLost(cardNo);
+			if (null != customerCard) {// 如果绑定记录不为空，说明终端已经挂失
+				List<CardApplication> cardApplications = cardApplicationManager.getByCardAndStatus(customerCard.getCard(),
+						CardApplication.STATUS_LOSTED);
+				if (CollectionUtils.isEmpty(cardApplications)) {// 如果卡上没有状态为“已挂失”的应用，将绑定关系重置为能够绑定的状态
+					customerCard.resetStatusToBindable();
+				}
+			}
 		} else {
 			throw new PlatformException(PlatformErrorCode.CARD_APP_ERROR_STATUS);
 		}
