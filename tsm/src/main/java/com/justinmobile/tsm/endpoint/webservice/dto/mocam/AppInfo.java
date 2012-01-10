@@ -290,14 +290,14 @@ public class AppInfo {
 	public void build(Application app, String sysType, Integer isUpdatable) {
 		this.buildInfo(app, sysType, isUpdatable);
 		if(app.getLastestAppVersion()!=null){
-			this.setAppVersion(app.getLastestVersion().replace(".", ""));
+			this.setAppVersion(app.getLastestVersion());
 		}
 	}
 
 	public void build(ApplicationVersion av, String sysType, Integer isUpdatable) {
 		this.buildInfo(av.getApplication(), sysType, isUpdatable);
 		if(av.getVersionNo()!=null){
-		this.setAppVersion(av.getVersionNo().replace(".",""));
+		this.setAppVersion(av.getVersionNo());
 		}
 	}
 	private void buildInfo(Application app, String sysType, Integer isUpdatable){
