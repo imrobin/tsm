@@ -482,4 +482,11 @@ public interface CustomerCardInfoManager extends EntityManager<CustomerCardInfo>
 	 *         null-如果指定卡号的卡未绑定或绑定了但未挂失
 	 */
 	CustomerCardInfo getByCardNoThatStatusLost(String cardNo);
+	
+	
+	/**
+	 * 保证注销后CUSTOMERCARDINFO与正常注销黑名单状态一致
+	 * @param cci
+	 */
+	void sysnLostToCancel(CustomerCardInfo cci);
 }
