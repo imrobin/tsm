@@ -112,6 +112,7 @@ public class CardApplication extends AbstractEntity {
 		STATUS_SHOWABLE.add(STATUS_PERSONALIZED);
 		STATUS_SHOWABLE.add(STATUS_AVAILABLE);
 		STATUS_SHOWABLE.add(STATUS_LOCKED);
+		STATUS_SHOWABLE.add(STATUS_LOSTED);
 	}
 
 	/** 可使用集合 */
