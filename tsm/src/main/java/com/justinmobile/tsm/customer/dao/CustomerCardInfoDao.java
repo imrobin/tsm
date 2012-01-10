@@ -211,4 +211,12 @@ public interface CustomerCardInfoDao extends EntityDao<CustomerCardInfo, Long> {
 	 *         null-如果指定卡号的卡未绑定或绑定了但未挂失
 	 */
 	CustomerCardInfo getByCardNoThatStatusLost(String cardNo);
+	
+	/**
+	 * 根据用户获取正常和挂失的终端
+	 * 
+	 * @param customer
+	 * @return
+	 */
+	List<CustomerCardInfo> getCustomerCardByCustomerThatNormAndLostAndNotUse(Customer customer);
 }

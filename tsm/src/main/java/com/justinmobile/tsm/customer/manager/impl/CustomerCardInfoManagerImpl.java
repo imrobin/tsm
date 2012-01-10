@@ -231,7 +231,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 		try {
 			CustomerCardInfo cci = customerCardInfoDao.load(ccId);
 			if (null != cci) {
-				if(cci.getStatus().intValue() != CustomerCardInfo.STATUS_NORMAL) {
+				if(cci.getStatus().intValue() == CustomerCardInfo.STATUS_NORMAL) {
 					List<CardApplication> caList = cardApplicationManager.getForLostListByCardInfo(cci.getCard());
 					if(CollectionUtils.isNotEmpty(caList)){
 						saveCCiInBlackForLost(cci);
@@ -2383,7 +2383,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 		try {
 			Customer customer = customerManager.getCustomerByUserName(userName);
 			Application queryApp = applicationManager.load(appId);
-			List<CustomerCardInfo> cciList = customerCardInfoDao.getCustomerCardByCustomerThatNormAndLost(customer);
+			List<CustomerCardInfo> cciList = customerCardInfoDao.getCustomerCardByCustomerThatNormAndLostAndNotUse(customer);
 			if (CollectionUtils.isNotEmpty(cciList)) {
 				for (CustomerCardInfo cci : cciList) {
 					List<CardApplication> cardAppList = cardApplicationDao.getCardApplicationByUserAndAppId(cci.getCard(), queryApp);

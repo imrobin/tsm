@@ -41,7 +41,7 @@ TermOpt = new Class({
 						}
 					}).info("操作成功");
 				} else {
-					new LightFace.MessageBox().error("请重试");
+					new LightFace.MessageBox().error(resp.message);
 				}
 			}
 		}).get();
