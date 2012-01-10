@@ -4,6 +4,7 @@ import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
@@ -17,6 +18,7 @@ import com.justinmobile.tsm.customer.domain.CustomerCardInfo;
 import com.justinmobile.tsm.customer.manager.CustomerCardInfoManager;
 
 @Service("cardInfoManager")
+@Transactional
 public class CardInfoManagerImpl extends EntityManagerImpl<CardInfo, CardInfoDao> implements CardInfoManager {
 
 	@Autowired
