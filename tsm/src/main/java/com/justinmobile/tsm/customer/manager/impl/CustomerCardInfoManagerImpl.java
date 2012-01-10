@@ -232,11 +232,11 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 		try {
 			CustomerCardInfo cci = customerCardInfoDao.load(ccId);
 			if (null != cci) {
-				saveCCiInBlackForLost(cci);
-				cearteBlackListWithLost(ccId);
-				// 保存挂失前每个应用的状态
 				List<CardApplication> caList = cardApplicationManager.getForLostListByCardInfo(cci.getCard());
 				if(CollectionUtils.isNotEmpty(caList)){
+					saveCCiInBlackForLost(cci);
+					cearteBlackListWithLost(ccId);
+					// 保存挂失前每个应用的状态
 					for (CardApplication ca : caList) {
 						ca.setOriginalStatus(ca.getStatus());
 						ca.setStatus(CardApplication.STATUS_LOSTED);
