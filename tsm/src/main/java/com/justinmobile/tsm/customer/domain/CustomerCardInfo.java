@@ -276,4 +276,21 @@ public class CustomerCardInfo extends AbstractEntity {
 	public boolean isInBlackList() {
 		return CustomerCardInfo.STATUS_NORMAL != status.intValue() || CustomerCardInfo.INBLACK == inBlack.intValue();
 	}
+	
+	/**
+	 *  是否已经挂失
+	 * @return 挂失返回TRUE,为挂范围FALSE
+	 */
+	@Transient
+	public boolean isLosted() {
+		return CustomerCardInfo.STATUS_LOST == status.intValue();
+	}
+	
+	/**
+	 * 重置可以从新绑定
+	 */
+	public void resetStatusToBindable() {
+		this.status = CustomerCardInfo.STATUS_CANCEL;
+	}
+	
 }

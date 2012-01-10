@@ -1155,6 +1155,9 @@ public class SpBaseInfoController {
 			Map<String, Object> mappedSp = rs.toMap(null, "sp.name sp.id sp.locationNo");
 			mappedSp.put("availableApplicationSize",rs.getSp().getAvailableApplicationSize());
 			mappedSp.put("hasLogo",		ArrayUtils.isNotEmpty(rs.getSp().getFirmLogo()));
+			if(rs.getSp().getAvailableApplicationSize() < 1) {
+				continue;
+			}
 			mappedSps.add(mappedSp);
 		}
 		return mappedSps;

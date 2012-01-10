@@ -201,6 +201,7 @@ public enum PlatformErrorCode {
 	CARD_BASE_SD_NOT_EXIST_FOR_PUBLISH_FILE("900057", "文件\"{0}\"该版本所属安全域尚未在批次\"{1}\"预置"),
 	CARD_NOT_CANCEL_FOR_APP("900058","卡上有应用，不能注销"),
 	BIND_CARD_SMS_ERROR("900058","绑定终端激活码发送失败，请到终端管理页面单独激活"),
+	TERM_STATUS_IS_ANOMALOUS("900058","终端状态异常"),
 	
 	PROCESSING_TIMEOUT("1000", "业务处理时间超时"),
 	DATA_ACCESS_ERROR("1001", "数据库操作失败"),

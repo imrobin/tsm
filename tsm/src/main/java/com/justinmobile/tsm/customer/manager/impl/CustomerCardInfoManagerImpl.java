@@ -231,18 +231,22 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 		try {
 			CustomerCardInfo cci = customerCardInfoDao.load(ccId);
 			if (null != cci) {
-				List<CardApplication> caList = cardApplicationManager.getForLostListByCardInfo(cci.getCard());
-				if (CollectionUtils.isNotEmpty(caList)) {
-					saveCCiInBlackForLost(cci);
-					cearteBlackListWithLost(ccId);
-					// 保存挂失前每个应用的状态
-					for (CardApplication ca : caList) {
-						ca.setOriginalStatus(ca.getStatus());
-						ca.setStatus(CardApplication.STATUS_LOSTED);
-						cardApplicationManager.saveOrUpdate(ca);
+				if(cci.getStatus().intValue() != CustomerCardInfo.STATUS_NORMAL) {
+					List<CardApplication> caList = cardApplicationManager.getForLostListByCardInfo(cci.getCard());
+					if(CollectionUtils.isNotEmpty(caList)){
+						saveCCiInBlackForLost(cci);
+						cearteBlackListWithLost(ccId);
+						// 保存挂失前每个应用的状态
+						for (CardApplication ca : caList) {
+							ca.setOriginalStatus(ca.getStatus());
+							ca.setStatus(CardApplication.STATUS_LOSTED);
+							cardApplicationManager.saveOrUpdate(ca);
+						}
+					}else{
+						finashCancel(ccId);
 					}
-				} else {
-					finashCancel(ccId);
+				} else{
+					throw new PlatformException(PlatformErrorCode.TERM_STATUS_IS_ANOMALOUS);
 				}
 			} else {
 				throw new PlatformException(PlatformErrorCode.CUSTOMER_CARD_NOT_EXIST);
