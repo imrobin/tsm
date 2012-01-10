@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
+import com.justinmobile.core.utils.ConvertUtils;
 import com.justinmobile.tsm.card.domain.CardInfo;
 import com.justinmobile.tsm.card.manager.CardInfoManager;
 import com.justinmobile.tsm.endpoint.webservice.NameSpace;
@@ -22,27 +23,33 @@ public class SmsWebServiceImpl implements SmsWebService {
 
 	@Override
 	public Status hanldeMessage(String content, String mobileNo) {
-		Status status = new Status();
-		try {
-			String seId = content.substring(0, 20);
-			String imsi = content.substring(20, 38);
-			String challengeNo = content.substring(38, 44);
+		  Status status = new Status();
+		  content = new String(ConvertUtils.hexString2ByteArray(content));
+	      String command = content.substring(0,4);
+	      if(command.equalsIgnoreCase("1001")){
+	    	 register(status,content,mobileNo);
+	      }
+	      return status;
+	}
+	private Status register(Status status,String content,String mobileNo){
+		try{
+		String seId = content.substring(4, 24);
+		String imsi = content.substring(24, 42);
+		String challengeNo = content.substring(42, 48);
+		// 如果卡未注册，注册卡
+		CardInfo card = cardManager.buildCardInfoIfNotExist(seId);
 
-			// 如果卡未注册，注册卡
-			CardInfo card = cardManager.buildCardInfoIfNotExist(seId);
-
-			// ismi不用但手机号相同，换卡不换号
-			if (!imsi.equals(card.getImsi()) && mobileNo.equals(card.getMobileNo())) {
-				card.setRegisterable(CardInfo.REGISTERABLE_CHANGE_SIM);
-			} else {
-				card.setRegisterable(CardInfo.REGISTERABLE_NEW);
-			}
-			card.setImsi(imsi);
-			card.setMobileNo(mobileNo);
-			card.setChallengeNo(challengeNo);
-
-			cardManager.generateToken(card);
-		} catch (PlatformException e) {
+		// ismi不用但手机号相同，换卡不换号
+		if (!imsi.equals(card.getImsi()) && mobileNo.equals(card.getMobileNo())) {
+			card.setRegisterable(CardInfo.REGISTERABLE_CHANGE_SIM);
+		} else {
+			card.setRegisterable(CardInfo.REGISTERABLE_NEW);
+		}
+		card.setImsi(imsi);
+		card.setMobileNo(mobileNo);
+		card.setChallengeNo(challengeNo);
+		cardManager.generateToken(card);
+		}catch (PlatformException e) {
 			e.printStackTrace();
 			status.setStatusCode(e.getErrorCode().getErrorCode());
 			status.setStatusDescription(e.getMessage());
