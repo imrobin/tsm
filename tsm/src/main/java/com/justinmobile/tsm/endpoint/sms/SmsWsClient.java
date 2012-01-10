@@ -21,4 +21,16 @@ public interface SmsWsClient {
 			@WebParam(name="messageFormat")Integer messageFormat, 
 			@WebParam(name="apdu")String apdu
 	);
+	@WebResult(name="success")
+	boolean sendPushSms(
+			@WebParam(name="mobileNo")String mobileNo, 
+			@WebParam(name="messageFormat")Integer messageFormat,
+			//目标端口
+			@WebParam(name="daPort")String daPort,
+			//源端口
+			@WebParam(name="srcPort")String srcPort,
+			@WebParam(name="clientId")String clientId,
+			@WebParam(name="seId")String seId,
+			@WebParam(name="pushSerial")String pushSerial
+	);
 }

@@ -7,4 +7,7 @@ public interface SmsEndpoint {
 	
 	boolean pushMessage(String mobileNo, String smsContent);
 	
+	boolean pushMessage(String mobileNo, Integer messageFormat, String daPort, String srcPort, String clientId, String seId,
+			String pushSerial);
+	
 }

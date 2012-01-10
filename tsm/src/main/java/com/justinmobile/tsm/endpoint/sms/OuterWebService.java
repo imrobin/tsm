@@ -25,5 +25,17 @@ public interface OuterWebService {
 	public boolean smsPushUser(
 			@WebParam(name = "mobileNo", targetNamespace = NameSpace.CM) String mobileNo,
 			@WebParam(name = "message", targetNamespace = NameSpace.CM) String message
-		);
+	);
+	@WebResult(name="success")
+	boolean sendPushSms(
+			@WebParam(name="mobileNo")String mobileNo, 
+			@WebParam(name="messageFormat")Integer messageFormat,
+			//目标端口
+			@WebParam(name="daPort")String daPort,
+			//源端口
+			@WebParam(name="srcPort")String srcPort,
+			@WebParam(name="clientId")String clientId,
+			@WebParam(name="seId")String seId,
+			@WebParam(name="pushSerial")String pushSerial
+	);
 }

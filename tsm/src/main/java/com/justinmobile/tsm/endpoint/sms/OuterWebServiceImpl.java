@@ -23,5 +23,14 @@ public class OuterWebServiceImpl implements OuterWebService {
 	public boolean smsPushUser(String mobileNo, String message) {
 		return smsEndpoint.pushMessage(mobileNo, message);
 	}
+   
+	@Override
+	public boolean sendPushSms(String mobileNo, Integer messageFormat, String daPort, String srcPort, String clientId,
+			String seId, String pushSerial) {
+		
+		return smsEndpoint.pushMessage(mobileNo, messageFormat, daPort, srcPort, clientId, seId, pushSerial);
+	}
+    
+	
 
 }

@@ -79,7 +79,39 @@ public class Cmpp3SmsEndpoint implements SmsEndpoint {
 			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
 		}
 	}
-
+     
+	@Override
+	public boolean pushMessage(String mobileNo, Integer messageFormat, String daPort, String srcPort, String clientId, String seId,
+			String pushSerial) {
+		try {
+			String connect = rb.getString("sms.connect");
+			if ("local".equals(connect)) {
+				String url = rb.getString("sms.url");
+				String serviceName = rb.getString("sms.service.name");
+				String qName = rb.getString("sms.service.qname");
+				ProxyServiceFactory factory = new ProxyServiceFactory(url, serviceName, qName);
+				SmsWsClient client = factory.getHttpPort(SmsWsClient.class);
+				Client clientProxy = ClientProxy.getClient(client);
+				setTimeOut(clientProxy);
+				return client.sendPushSms(mobileNo, messageFormat, daPort, srcPort, clientId, seId, pushSerial);
+			} else if ("remote".equals(connect)) {
+				String url = rb.getString("sms.remote.url");
+				String serviceName = rb.getString("sms.remote.service.name");
+				String qName = rb.getString("sms.remote.service.qname");
+				ProxyServiceFactory factory = new ProxyServiceFactory(url, serviceName, qName);
+				SmsWsClient client = factory.getHttpPort(SmsWsClient.class);
+				Client clientProxy = ClientProxy.getClient(client);
+				setTimeOut(clientProxy);
+				return client.sendPushSms(mobileNo, messageFormat, daPort, srcPort, clientId, seId, pushSerial);
+			} else {
+				return false;
+			}
+		} catch (PlatformException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
+		}
+	}
 	private void setTimeOut(Client clientProxy) {
 		HTTPConduit httpConduit = (HTTPConduit) clientProxy.getConduit();
 		HTTPClientPolicy policy = new HTTPClientPolicy();
