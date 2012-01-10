@@ -472,4 +472,14 @@ public interface CustomerCardInfoManager extends EntityManager<CustomerCardInfo>
 	 *            卡号
 	 */
 	void bindCardAsActivedAndCreatCustomerIfNeed(String mobileNo, String cardNo);
+
+	/**
+	 * 根据卡号获取状态为“已挂失”的绑定关系
+	 * 
+	 * @param cardNo
+	 *            卡号
+	 * @return 绑定关系<br\>
+	 *         null-如果指定卡号的卡未绑定或绑定了但未挂失
+	 */
+	CustomerCardInfo getByCardNoThatStatusLost(String cardNo);
 }

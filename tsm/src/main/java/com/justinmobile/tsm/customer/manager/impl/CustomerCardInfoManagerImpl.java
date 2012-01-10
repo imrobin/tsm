@@ -39,7 +39,6 @@ import com.justinmobile.tsm.application.domain.SecurityDomain;
 import com.justinmobile.tsm.application.domain.Space;
 import com.justinmobile.tsm.application.domain.SpecialMobile;
 import com.justinmobile.tsm.application.manager.ApplicationManager;
-import com.justinmobile.tsm.application.manager.SecurityDomainManager;
 import com.justinmobile.tsm.card.dao.CardApplicationDao;
 import com.justinmobile.tsm.card.dao.CardBaseApplicationDao;
 import com.justinmobile.tsm.card.dao.CardBaseInfoDao;
@@ -157,7 +156,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 
 	@Autowired
 	private SysRoleManager roleManager;
-	
+
 	@Autowired
 	private SubscribeHistoryManager subscribeHistoryManager;
 
@@ -233,7 +232,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 			CustomerCardInfo cci = customerCardInfoDao.load(ccId);
 			if (null != cci) {
 				List<CardApplication> caList = cardApplicationManager.getForLostListByCardInfo(cci.getCard());
-				if(CollectionUtils.isNotEmpty(caList)){
+				if (CollectionUtils.isNotEmpty(caList)) {
 					saveCCiInBlackForLost(cci);
 					cearteBlackListWithLost(ccId);
 					// 保存挂失前每个应用的状态
@@ -242,7 +241,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 						ca.setStatus(CardApplication.STATUS_LOSTED);
 						cardApplicationManager.saveOrUpdate(ca);
 					}
-				}else{
+				} else {
 					finashCancel(ccId);
 				}
 			} else {
@@ -269,39 +268,38 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	/**
 	 * @Title: addDesitredOption
 	 * @Description: 添加预制任务
-	 
-	private void addDesitredOptionLost(Long ccId) {
-		try {
-			CustomerCardInfo customerCard = customerCardInfoDao.load(ccId);
-			SecurityDomain sd = securityDomainManager.getIsd();
-			DesiredOperation desiredOpt = buildeDesireOperation(customerCard, sd);
-			desiredOperationManager.saveOrUpdate(desiredOpt);
-		} catch (PlatformException pe) {
-			throw pe;
-		} catch (HibernateException e) {
-			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
-		} catch (Exception e) {
-			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
-		}
-
-	}
-
-	/**
+	 * 
+	 *               private void addDesitredOptionLost(Long ccId) { try {
+	 *               CustomerCardInfo customerCard =
+	 *               customerCardInfoDao.load(ccId); SecurityDomain sd =
+	 *               securityDomainManager.getIsd(); DesiredOperation desiredOpt
+	 *               = buildeDesireOperation(customerCard, sd);
+	 *               desiredOperationManager.saveOrUpdate(desiredOpt); } catch
+	 *               (PlatformException pe) { throw pe; } catch
+	 *               (HibernateException e) { throw new
+	 *               PlatformException(PlatformErrorCode.DB_ERROR, e); } catch
+	 *               (Exception e) { throw new
+	 *               PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e); }
+	 * 
+	 *               }
+	 * 
+	 *               /**
 	 * @param customerCard
 	 * @param sd
 	 * @return
-	 
-	private DesiredOperation buildeDesireOperation(CustomerCardInfo customerCard, SecurityDomain sd) {
-		DesiredOperation desiredOpt = new DesiredOperation();
-		desiredOpt.setAid(sd.getAid());
-		desiredOpt.setCustomer(customerCard.getCustomer());
-		desiredOpt.setCustomerCardId(customerCard.getId());
-		desiredOpt.setIsExcuted(DesiredOperation.NOT_EXCUTED);
-		desiredOpt.setIsPrompt(DesiredOperation.NOT_PROMPTED);
-		desiredOpt.setPreProcess(DesiredOperation.PREPROCESS_TURE);
-		desiredOpt.setProcedureName(LocalTransaction.Operation.valueOf(LocalTransaction.Operation.LOCK_CARD.getType()));
-		return desiredOpt;
-	}*/
+	 * 
+	 *         private DesiredOperation buildeDesireOperation(CustomerCardInfo
+	 *         customerCard, SecurityDomain sd) { DesiredOperation desiredOpt =
+	 *         new DesiredOperation(); desiredOpt.setAid(sd.getAid());
+	 *         desiredOpt.setCustomer(customerCard.getCustomer());
+	 *         desiredOpt.setCustomerCardId(customerCard.getId());
+	 *         desiredOpt.setIsExcuted(DesiredOperation.NOT_EXCUTED);
+	 *         desiredOpt.setIsPrompt(DesiredOperation.NOT_PROMPTED);
+	 *         desiredOpt.setPreProcess(DesiredOperation.PREPROCESS_TURE);
+	 *         desiredOpt.setProcedureName(LocalTransaction.Operation.valueOf(
+	 *         LocalTransaction.Operation.LOCK_CARD.getType())); return
+	 *         desiredOpt; }
+	 */
 
 	/**
 	 * @Title: getBlackListWithLost
@@ -464,15 +462,15 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 					CardBaseApplication cba = cardBaseApplicationManager.getByCardBaseAndApplicationThatPreset(cardInfo.getCardBaseInfo(),
 							ca.getApplicationVersion().getApplication());
 					if (null == cba) {
-							CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
-							cba = cardBaseApplicationDao.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
-							if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
-									&& ca.getApplicationVersion().getApplication().getDeleteRule().intValue() == Application.DELETE_RULE_CAN_NOT) {
-								resultMap.put("showRule", true);
-								resultMap.put("show", false);
-							}else{
-								resultMap.put("showRule", false);
-							}
+						CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
+						cba = cardBaseApplicationDao.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
+						if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
+								&& ca.getApplicationVersion().getApplication().getDeleteRule().intValue() == Application.DELETE_RULE_CAN_NOT) {
+							resultMap.put("showRule", true);
+							resultMap.put("show", false);
+						} else {
+							resultMap.put("showRule", false);
+						}
 					} else {
 						resultMap.put("showRule", true);
 						if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_CREATE) {
@@ -1471,7 +1469,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 			cardBlackList.setReason("终端解挂自动移除黑名单");
 			cardBlackListDao.saveOrUpdate(cardBlackList);
 			customerCardInfoDao.saveOrUpdate(cci);
-			//3.讲CARDAPPLICATION9的变为6
+			// 3.讲CARDAPPLICATION9的变为6
 			List<CardApplication> caList = cardApplicationManager.getByCardAndStatus(cci.getCard(), CardApplication.STATUS_LOSTED);
 			for (CardApplication ca : caList) {
 				ca.setStatus(CardApplication.STATUS_INSTALLED);
@@ -1845,8 +1843,8 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 				boolean showRule = false;
 				boolean show = false;
 				if (ca.getStatus().intValue() == CardApplication.STATUS_DOWNLOADED) {
-					CardBaseApplication checkCBA = cardBaseApplicationManager.getByCardBaseAndApplicationThatPreset(
-							card.getCardBaseInfo(), ca.getApplicationVersion().getApplication());
+					CardBaseApplication checkCBA = cardBaseApplicationManager.getByCardBaseAndApplicationThatPreset(card.getCardBaseInfo(),
+							ca.getApplicationVersion().getApplication());
 					if (null == checkCBA) {
 						showRule = false;
 					} else {
@@ -1854,8 +1852,8 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 						show = false;
 					}
 				} else if (ca.getStatus().intValue() == CardApplication.STATUS_INSTALLED) {
-					CardBaseApplication checkCBA = cardBaseApplicationManager.getByCardBaseAndApplicationThatPreset(
-							card.getCardBaseInfo(), ca.getApplicationVersion().getApplication());
+					CardBaseApplication checkCBA = cardBaseApplicationManager.getByCardBaseAndApplicationThatPreset(card.getCardBaseInfo(),
+							ca.getApplicationVersion().getApplication());
 					if (null == checkCBA) {
 						showRule = false;
 					} else {
@@ -1868,7 +1866,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 						}
 					}
 				}
-				
+
 				if (!showRule) {
 					if (CardApplication.STATUS_DELETEABLE.contains(ca.getStatus())) {
 						return false;
@@ -1883,15 +1881,16 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 					} else if (ca.getStatus().intValue() == CardApplication.STATUS_INSTALLED) {
 						CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
 						CardBaseApplication cba = cardBaseApplicationDao.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
-						if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY && ca.getApplicationVersion().getApplication().getDeleteRule().intValue() == Application.DELETE_RULE_CAN_NOT) {
+						if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
+								&& ca.getApplicationVersion().getApplication().getDeleteRule().intValue() == Application.DELETE_RULE_CAN_NOT) {
 							return true;
-						} 
+						}
 						if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
 								|| cba.getPresetMode().intValue() == CardBaseApplication.MODE_CREATE) {
 							return false;
 						}
 					}
-				}  else if (showRule && show) {
+				} else if (showRule && show) {
 					return false;
 				}
 			}
@@ -2327,7 +2326,8 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 							if (ca.getStatus().intValue() != CardApplication.STATUS_UNDOWNLOAD) {
 								if (ca.getStatus().intValue() == CardApplication.STATUS_DOWNLOADED) {
 									CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
-									CardBaseApplication cba = cardBaseApplicationDao.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
+									CardBaseApplication cba = cardBaseApplicationDao
+											.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
 									Application app = ca.getApplicationVersion().getApplication();
 									if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
 											&& app.getDeleteRule().intValue() == Application.DELETE_RULE_DELETE_ALL) {
@@ -2337,7 +2337,8 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 									}
 								} else if (ca.getStatus().intValue() == CardApplication.STATUS_INSTALLED) {
 									CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
-									CardBaseApplication cba = cardBaseApplicationDao.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
+									CardBaseApplication cba = cardBaseApplicationDao
+											.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
 									if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
 											&& ca.getApplicationVersion().getApplication().getDeleteRule().intValue() == Application.DELETE_RULE_CAN_NOT) {
 										continue;
@@ -2354,7 +2355,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 									list.add(map);
 								}
 							}
-						}else if (showRule && show) {
+						} else if (showRule && show) {
 							Map<String, Object> map = buildAppMap(ca);
 							buildCCIInfo(cci, map);
 							list.add(map);
@@ -2410,12 +2411,13 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 								}
 							}
 						}
-						
+
 						if (!showRule) {
 							if (ca.getStatus().intValue() != CardApplication.STATUS_UNDOWNLOAD) {
 								if (ca.getStatus().intValue() == CardApplication.STATUS_DOWNLOADED) {
 									CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
-									CardBaseApplication cba = cardBaseApplicationDao.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
+									CardBaseApplication cba = cardBaseApplicationDao
+											.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
 									Application app = ca.getApplicationVersion().getApplication();
 									if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
 											&& app.getDeleteRule().intValue() == Application.DELETE_RULE_DELETE_ALL) {
@@ -2425,7 +2427,8 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 									}
 								} else if (ca.getStatus().intValue() == CardApplication.STATUS_INSTALLED) {
 									CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
-									CardBaseApplication cba = cardBaseApplicationDao.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
+									CardBaseApplication cba = cardBaseApplicationDao
+											.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
 									if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
 											&& ca.getApplicationVersion().getApplication().getDeleteRule().intValue() == Application.DELETE_RULE_CAN_NOT) {
 										continue;
@@ -2490,6 +2493,19 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 			CardInfo card = customerCard.getCard();
 			card.setRegisterable(null);
 			cardManager.saveOrUpdate(card);
+		} catch (PlatformException pe) {
+			throw pe;
+		} catch (HibernateException e) {
+			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
+		}
+	}
+
+	@Override
+	public CustomerCardInfo getByCardNoThatStatusLost(String cardNo) {
+		try {
+			return customerCardInfoDao.getByCardNoThatStatusLost(cardNo);
 		} catch (PlatformException pe) {
 			throw pe;
 		} catch (HibernateException e) {

@@ -179,8 +179,10 @@ public interface CustomerCardInfoDao extends EntityDao<CustomerCardInfo, Long> {
 	 * @return
 	 */
 	CustomerCardInfo getByCardThatStatusNormalOrLostOrNotUse(CardInfo card);
+
 	/**
 	 * 根据卡查询状态不为"注销"或"已替换"
+	 * 
 	 * @param card
 	 * @return 返回唯一结果<br/>
 	 *         null-满足条件的记录不存在
@@ -194,8 +196,19 @@ public interface CustomerCardInfoDao extends EntityDao<CustomerCardInfo, Long> {
 
 	/**
 	 * 根据用户获取正常和挂失的终端
+	 * 
 	 * @param customer
 	 * @return
 	 */
 	List<CustomerCardInfo> getCustomerCardByCustomerThatNormAndLost(Customer customer);
+
+	/**
+	 * 根据卡号获取状态为“已挂失”的绑定关系
+	 * 
+	 * @param cardNo
+	 *            卡号
+	 * @return 绑定关系<br\>
+	 *         null-如果指定卡号的卡未绑定或绑定了但未挂失
+	 */
+	CustomerCardInfo getByCardNoThatStatusLost(String cardNo);
 }

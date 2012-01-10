@@ -194,7 +194,7 @@ public class CustomerCardInfoDaoHibernate extends EntityDaoHibernate<CustomerCar
 
 		return findUnique(hql, values);
 	}
-    
+
 	@Override
 	public CustomerCardInfo getByCard(CardInfo card) {
 		StringBuilder hql = new StringBuilder();
@@ -203,25 +203,27 @@ public class CustomerCardInfoDaoHibernate extends EntityDaoHibernate<CustomerCar
 		hql.append("select cci from ").append(CustomerCardInfo.class.getName()).append(" as cci");
 		hql.append(" where cci.card=:card and cci.status<>").append(CustomerCardInfo.STATUS_CANCEL);
 		hql.append(" and cci.status<>").append(CustomerCardInfo.STATUS_REPLACING);
-		return findUnique(hql.toString(),values);
+		return findUnique(hql.toString(), values);
 	}
 
 	@Override
 	public CustomerCardInfo getCCIByCustomerAndCard(Customer customer, CardInfo card) {
 		Session session = this.getSessionFactory().openSession();
-		String hql = "select max(cci.bindingDate) from " +  CustomerCardInfo.class.getName() + " as cci where cci.customer = ? and cci.card = ?";
+		String hql = "select max(cci.bindingDate) from " + CustomerCardInfo.class.getName()
+				+ " as cci where cci.customer = ? and cci.card = ?";
 		Query query = session.createQuery(hql);
 		query.setEntity(0, customer);
 		query.setEntity(1, card);
 		Object date = query.uniqueResult();
 		session.close();
-		String hql2 = "from " +  CustomerCardInfo.class.getName() + " as cci where cci.customer = ? and cci.card = ? and cci.bindingDate = ?";
-		return this.findUniqueEntity(hql2, customer,card,date);
+		String hql2 = "from " + CustomerCardInfo.class.getName()
+				+ " as cci where cci.customer = ? and cci.card = ? and cci.bindingDate = ?";
+		return this.findUniqueEntity(hql2, customer, card, date);
 	}
 
 	@Override
 	public List<CustomerCardInfo> getCustomerCardLikeCustomerAndCCName(Customer customer, String phoneName) {
-		String hql = "from " +  CustomerCardInfo.class.getName() + " as cci where cci.customer = ? and cci.name like '%" + phoneName + "%'";
+		String hql = "from " + CustomerCardInfo.class.getName() + " as cci where cci.customer = ? and cci.name like '%" + phoneName + "%'";
 		return this.find(hql, customer);
 	}
 
@@ -229,5 +231,11 @@ public class CustomerCardInfoDaoHibernate extends EntityDaoHibernate<CustomerCar
 	public List<CustomerCardInfo> getCustomerCardByCustomerThatNormAndLost(Customer customer) {
 		String hql = "from " + CustomerCardInfo.class.getName() + " as cci where cci.customer = ? and cci.status = ? or cci.status = ?";
 		return this.find(hql, customer, CustomerCardInfo.STATUS_NORMAL, CustomerCardInfo.STATUS_LOST);
+	}
+
+	@Override
+	public CustomerCardInfo getByCardNoThatStatusLost(String cardNo) {
+		String hql = "from " + CustomerCardInfo.class.getName() + " as cci where cci.card.cardNo = ? and cci.status = ?";
+		return this.findUniqueEntity(hql, cardNo, CustomerCardInfo.STATUS_LOST);
 	}
 }
