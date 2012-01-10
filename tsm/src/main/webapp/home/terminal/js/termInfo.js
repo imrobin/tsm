@@ -153,7 +153,7 @@ TermInfo = new Class({
 							if (item.statusOriginal != 1) {
 								if ((item.statusOrg == 6 && item.presetMode != 3)
 										|| (item.statusOrg == 4 && item.presetMode == 1 && item.delRule == 1) || item.statusOrg == 2
-										|| item.statusOrg == 3 || item.statusOrg == 5 || item.statusOrg == 7 || item.statusOrg == 8) {
+										|| item.statusOrg == 3 || item.statusOrg == 5 || item.statusOrg == 7 || item.statusOrg == 8 || item.statusOrg == 9) {
 									if (terStatus == 1 || terStatus == 2) {
 										optHtml += '<a class="bu4" href="javascript:termInfo.delApp(\'' + item.aid
 												+ '\');void(0);">删 除</a>';

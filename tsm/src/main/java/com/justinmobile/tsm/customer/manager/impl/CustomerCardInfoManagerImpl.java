@@ -71,6 +71,7 @@ import com.justinmobile.tsm.customer.domain.MobileType;
 import com.justinmobile.tsm.customer.manager.CustomerCardInfoManager;
 import com.justinmobile.tsm.customer.manager.CustomerManager;
 import com.justinmobile.tsm.endpoint.sms.SmsEndpoint;
+import com.justinmobile.tsm.history.manager.SubscribeHistoryManager;
 import com.justinmobile.tsm.system.manager.MobileSectionManager;
 import com.justinmobile.tsm.transaction.domain.DesiredOperation;
 import com.justinmobile.tsm.transaction.domain.LocalTransaction;
@@ -128,9 +129,6 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	private SmsEndpoint smsEndpoint;
 
 	@Autowired
-	private SecurityDomainManager securityDomainManager;
-
-	@Autowired
 	private CardSecurityDomainManager cardSecurityDomainManager;
 
 	@Autowired
@@ -159,6 +157,9 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 
 	@Autowired
 	private SysRoleManager roleManager;
+	
+	@Autowired
+	private SubscribeHistoryManager subscribeHistoryManager;
 
 	@Override
 	public List<CustomerCardInfo> getCustomerCardByCustomerName(String userName, Integer status) throws PlatformException {
@@ -1475,6 +1476,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 			for (CardApplication ca : caList) {
 				ca.setStatus(CardApplication.STATUS_INSTALLED);
 				cardApplicationManager.saveOrUpdate(ca);
+				subscribeHistoryManager.unsubscribeApplication(ca.getCardInfo(), ca.getApplicationVersion());
 			}
 		} catch (PlatformException pe) {
 			throw pe;
