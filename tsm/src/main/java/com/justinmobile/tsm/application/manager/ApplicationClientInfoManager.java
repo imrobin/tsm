@@ -9,6 +9,7 @@ import com.justinmobile.core.dao.support.Page;
 import com.justinmobile.core.manager.EntityManager;
 import com.justinmobile.tsm.application.domain.ApplicationClientInfo;
 import com.justinmobile.tsm.application.domain.ApplicationVersion;
+import com.justinmobile.tsm.card.domain.CardInfo;
 
 @Transactional
 public interface ApplicationClientInfoManager extends EntityManager<ApplicationClientInfo> {
@@ -29,8 +30,8 @@ public interface ApplicationClientInfoManager extends EntityManager<ApplicationC
 	 * @param tempIconAbsPath
 	 *            图标临时文件的绝对路径
 	 */
-	void uploadApplicationClient(ApplicationClientInfo client, String tempFileAbsPath, String saveFileAbsDir, long applicationVersionId,
-			String filename, String tempIconAbsPath);
+	void uploadApplicationClient(ApplicationClientInfo client, String tempFileAbsPath, String saveFileAbsDir,
+			long applicationVersionId, String filename, String tempIconAbsPath);
 
 	/**
 	 * 找到指定应用版本的客户端
@@ -53,8 +54,8 @@ public interface ApplicationClientInfoManager extends EntityManager<ApplicationC
 	 * @param sysType
 	 *            系统类型
 	 */
-	ApplicationClientInfo getByApplicationVersionSysTypeSysRequirementFileType(ApplicationVersion appVer, String sysType,
-			String sysRequirment, String fileType);
+	ApplicationClientInfo getByApplicationVersionSysTypeSysRequirementFileType(ApplicationVersion appVer,
+			String sysType, String sysRequirment, String fileType);
 
 	/**
 	 * 根据系统类型和平台信息查找应用管理器
@@ -75,7 +76,8 @@ public interface ApplicationClientInfoManager extends EntityManager<ApplicationC
 	 *            分页参数
 	 * @param Map参数
 	 */
-	Page<ApplicationClientInfo> getApplicationClientInfoForIndex(final Page<ApplicationClientInfo> page, Map<String, Object> values);
+	Page<ApplicationClientInfo> getApplicationClientInfoForIndex(final Page<ApplicationClientInfo> page,
+			Map<String, Object> values);
 
 	/**
 	 * 根据系统类型和文件类型查找应用管理器
@@ -114,15 +116,26 @@ public interface ApplicationClientInfoManager extends EntityManager<ApplicationC
 	Integer getMaxVersionCodeByAppVer(Integer busiType, String sysType, String sysRequirement, Long appVerId);
 
 	/**
-	 *  根据aid cardNo获取应用客户端的最大开发版本, android和j2me有就都返回
+	 * 根据aid cardNo获取应用客户端的最大开发版本, android和j2me有就都返回
+	 * 
 	 * @param aid
 	 * @param cardNo
 	 * @return
 	 */
 	List<ApplicationClientInfo> getByAidAndCardNo(String aid, String cardNo);
+
 	/**
-	 *  获取手机钱包的最大版本号
-	 *  @param card
+	 * 获取手机钱包的最大版本号
+	 * 
+	 * @return 手机钱包的最大版本号
 	 */
 	String getMocamMaxVersion();
+
+	/**
+	 * 获取该卡上安装的所有客户端
+	 * 
+	 * @param card
+	 * @return 该卡上的应用客户端集合
+	 */
+	List<ApplicationClientInfo> getClientByCard(CardInfo card);
 }

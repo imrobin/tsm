@@ -34,6 +34,7 @@ import com.justinmobile.tsm.application.domain.ApplicationVersion;
 import com.justinmobile.tsm.application.manager.ApplicationClientInfoManager;
 import com.justinmobile.tsm.application.manager.ApplicationVersionManager;
 import com.justinmobile.tsm.card.domain.CardApplication;
+import com.justinmobile.tsm.card.domain.CardInfo;
 import com.justinmobile.tsm.card.manager.CardApplicationManager;
 import com.justinmobile.tsm.customer.domain.CustomerCardInfo;
 import com.justinmobile.tsm.customer.domain.MobileType;
@@ -146,19 +147,21 @@ public class ApplicationClientInfoManagerImpl extends
 					if (mt.getOriginalOsKey().equals(ac.getSysRequirment())) {
 						// 应用详情-下载客户端：当同一手机型号对应了多个版本的Android客户端时
 						// ，应该下载当前手机型号对应的最高版本的客户端，以版本号来判断，而不是上传时间。
-						if (androidTemp == null || SpringMVCUtils.compareVersion(ac.getVersion(), androidTemp.getVersion())) {
+						if (androidTemp == null
+								|| SpringMVCUtils.compareVersion(ac.getVersion(), androidTemp.getVersion())) {
 							androidTemp = ac;
 						}
 					} else if (mt.getJ2meKey().equals(ac.getSysRequirment())) {
-						if ((j2meacTemp == null || SpringMVCUtils.compareVersion(ac.getVersion(),j2meacTemp.getVersion()))){
+						if ((j2meacTemp == null || SpringMVCUtils.compareVersion(ac.getVersion(),
+								j2meacTemp.getVersion()))) {
 							j2meacTemp = ac;
 						}
 					}
 				}
-				if (androidTemp != null){
+				if (androidTemp != null) {
 					applicationClientInfos.add(androidTemp);
 				}
-				if (j2meacTemp != null){
+				if (j2meacTemp != null) {
 					applicationClientInfos.add(j2meacTemp);
 				}
 			}
@@ -342,6 +345,20 @@ public class ApplicationClientInfoManagerImpl extends
 
 		try {
 			return applicationClientInfoDao.getMocamMaxVersion();
+		} catch (PlatformException e) {
+			throw e;
+		} catch (HibernateException e) {
+			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
+		}
+	}
+
+	@Override
+	public List<ApplicationClientInfo> getClientByCard(CardInfo card) {
+
+		try {
+			return applicationClientInfoDao.getClientByCard(card);
 		} catch (PlatformException e) {
 			throw e;
 		} catch (HibernateException e) {

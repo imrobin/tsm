@@ -12,6 +12,8 @@ import com.justinmobile.core.dao.support.Page;
 import com.justinmobile.tsm.application.dao.ApplicationClientInfoDao;
 import com.justinmobile.tsm.application.domain.ApplicationClientInfo;
 import com.justinmobile.tsm.application.domain.ApplicationVersion;
+import com.justinmobile.tsm.card.domain.CardClient;
+import com.justinmobile.tsm.card.domain.CardInfo;
 
 @Repository("applicationClientInfoDao")
 public class ApplicationClientInfoDaoHibernate extends EntityDaoHibernate<ApplicationClientInfo, Long> implements
@@ -150,6 +152,16 @@ public class ApplicationClientInfoDaoHibernate extends EntityDaoHibernate<Applic
 		} else {
 			return result;
 		}
+	}
+
+	@Override
+	public List<ApplicationClientInfo> getClientByCard(CardInfo card) {
+
+		StringBuilder hql = new StringBuilder();
+		hql.append("select cc.client from ").append(CardClient.class.getName()).append(" as cc where cc.card = :card");
+		Map<String, Object> values = new HashMap<String, Object>(1);
+		values.put("card", card);
+		return find(hql.toString(), values);
 	}
 
 }
