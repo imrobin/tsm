@@ -47,11 +47,13 @@ import com.justinmobile.tsm.application.domain.SpecialMobile;
 import com.justinmobile.tsm.application.manager.ApplicationClientInfoManager;
 import com.justinmobile.tsm.application.manager.ApplicationCommentManager;
 import com.justinmobile.tsm.application.manager.ApplicationManager;
+import com.justinmobile.tsm.application.manager.ApplicationVersionManager;
 import com.justinmobile.tsm.application.manager.RecommendApplicationManager;
 import com.justinmobile.tsm.card.domain.CardApplication;
 import com.justinmobile.tsm.card.domain.CardBaseApplication;
 import com.justinmobile.tsm.card.domain.CardBaseInfo;
 import com.justinmobile.tsm.card.domain.CardBaseSecurityDomain;
+import com.justinmobile.tsm.card.domain.CardClient;
 import com.justinmobile.tsm.card.domain.CardInfo;
 import com.justinmobile.tsm.card.domain.CardSecurityDomain;
 import com.justinmobile.tsm.card.manager.CardApplicationManager;
@@ -159,6 +161,9 @@ public class MobileWebServiceImpl implements MobileWebService {
 
 	@Autowired
 	private CardClientManager cardClientManager;
+	
+	@Autowired
+	private ApplicationVersionManager appVerManager;
 
 	@Override
 	@OpenSession
@@ -252,9 +257,6 @@ public class MobileWebServiceImpl implements MobileWebService {
 						}
 					}
 				}
-				// if (SpringMVCUtils.compareVersion(appVersion, cardVersion)) {
-				// isUpdate = 0x01;
-				// }
 				apps.put(cardApplication, isUpdate);
 			}
 		}
@@ -813,6 +815,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 		response.setCommandID(loadClientRequest.getCommandID());
 		response.setStatus(status);
 		response.setSessionID(loadClientRequest.getSessionID());
+		//默认为不更新
+		Integer isUpdatable = 0x00;
 		try {
 			String cardNo = loadClientRequest.getCardNo();
 			String aid = loadClientRequest.getAppAId();
@@ -847,7 +851,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 					throw new PlatformException(PlatformErrorCode.APPLICAION_CLIENT_NOT_EXSIT);
 				}
 				ClientInfo ci = new ClientInfo();
-				ci.build(aid, applicationClientInfo);
+				ci.build(aid, applicationClientInfo,isUpdatable);
 				response.setClientInfo(ci);
 			} else if (loadClientRequest.getCommandID().equals(CommandID.UeUprage.getCode())) {
 				applicationClientInfo = applicationClientInfoManager.getAppManagerByTypeAndReqAndVersion("os", sysType
@@ -856,7 +860,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 					throw new PlatformException(PlatformErrorCode.APPLICAION_CLIENT_NOT_EXSIT);
 				}
 				ClientInfo ci = new ClientInfo();
-				ci.build(aid, applicationClientInfo);
+				ci.build(aid, applicationClientInfo,isUpdatable);
 				response.setClientInfo(ci);
 			}
 
@@ -880,7 +884,6 @@ public class MobileWebServiceImpl implements MobileWebService {
 		Status status = new Status();
 		res.setStatus(status);
 		String sessionId = null;
-
 		try {
 			CommandID commandId = CommandID.UserLogin;// 默认为注册
 			String cardNo = request.getCardNo();
@@ -897,19 +900,6 @@ public class MobileWebServiceImpl implements MobileWebService {
 				if (!card.getChallengeNo().equals(request.getChallengeNo())) {// 如果随机数不匹配，抛出异常
 					throw new PlatformException(PlatformErrorCode.MISMATCH_CHALLENGE_NO);
 				}
-				// if (null != customerCard &&
-				// !customerCard.getMobileNo().equals(card.getMobileNo())) {//
-				// 如果当前手机已经绑定到其他手机号，抛出异常
-				// throw new PlatformException(PlatformErrorCode.CARD_IS_EXIST);
-				// } else {
-				// message = PlatformMessage.MOBILE_REGISTER;
-				// status.setStatusCode(message.getCode());
-				// status.setStatusDescription(message.getDefaultMessage());
-				// card.setRegisterable(CardInfo.REGISTERABLE_READY);
-				// cardInfoManager.saveOrUpdate(card);
-				// processTrans(request, resAPDU, res, cardNo);
-				// }
-
 				card.setRegisterable(CardInfo.REGISTERABLE_READY);
 
 				if (null == customerCard) {// 如终端未绑定，开始注册新用户
@@ -926,19 +916,18 @@ public class MobileWebServiceImpl implements MobileWebService {
 				break;
 			}
 			case UserLogin: {
+				String sysType = StringUtils.substringBefore(
+						StringUtils.substringAfter(request.getCommonType(), "-"), "-");
 				if (null == customerCard) {// 如果当前终端未绑定，则抛出异常
 					throw new PlatformException(PlatformErrorCode.CARD_NO_UNEXIST);
 				} else {
 					processTrans(request, resAPDU, res, cardNo);
 				}
+				res.setAppInfoList(upAppInfo(card,sysType));
+				res.setClientInfoList(upClientInfo(card));
 				break;
 			}
 			case NotifyImsi: {
-				// if (null != customerCard) {// 当前手机已经绑定
-				// // message = "";
-				// }
-				// status.setStatusCode(message.getCode());
-				// status.setStatusDescription(message.getDefaultMessage());
 
 				// 客户端在发送CommandID.NotifyImsi之前一定会发送上行短信，因此先验证上行短信
 				PlatformMessage message;
@@ -959,7 +948,6 @@ public class MobileWebServiceImpl implements MobileWebService {
 						}
 					}
 				}
-
 				status.setStatusCode(message.getCode());
 				status.setStatusDescription(message.getDefaultMessage());
 				break;
@@ -1128,5 +1116,47 @@ public class MobileWebServiceImpl implements MobileWebService {
 				}
 			}
 		}
+	}
+	private AppInfoList upAppInfo(CardInfo card,String sysType){
+		List<CardApplication> cardAppList = cardApplicationManager.getByCardAndStatus(card, CardApplication.STATUS_AVAILABLE);
+		List<Application> updateAppList = new ArrayList<Application>();
+		AppInfoList appList = new AppInfoList();
+		Integer isUpdatable = 0x01;
+		for(CardApplication cardApp:cardAppList){
+		     ApplicationVersion installedVersion = cardApp.getApplicationVersion();
+		     ApplicationVersion lastedVersion = appVerManager.getLastestAppVersionSupportCard(card, cardApp.getApplicationVersion().getApplication());
+		     if(!installedVersion.getVersionNo().equals(lastedVersion.getVersionNo())){
+		    	 updateAppList.add(lastedVersion.getApplication());
+		     }
+		}
+		appList.addAll(updateAppList, sysType, isUpdatable);
+		return appList;
+	}
+	private ClientInfoList upClientInfo(CardInfo card){
+		Integer isUpdatable;
+		ClientInfoList ciList = new ClientInfoList();
+		//获取卡上安装的所有应用
+		List<CardApplication> cardAppList = cardApplicationManager.getByCardAndStatus(card, CardApplication.STATUS_AVAILABLE);
+		for  (CardApplication ca:cardAppList){
+			Application app = ca.getApplicationVersion().getApplication();
+			//根据应用和卡片获取CardClient
+			List<CardClient> ccList = cardClientManager.getByCardAndApplication(card, app);
+			if(null!=ccList && ccList.size()>0){
+			ApplicationClientInfo aci = ccList.get(0).getClient();
+			//获取该卡上可以安装应用的最大版本
+		    List<ApplicationClientInfo> maxAciList = applicationClientInfoManager.getByAidAndCardNo(app.getAid(), card.getCardNo());
+			inner:  
+		    for(ApplicationClientInfo ac:maxAciList){
+				   if(SpringMVCUtils.compareVersion(ac.getVersion(), aci.getVersion())){
+					   isUpdatable = 0x01;
+					   ClientInfo ci = new ClientInfo();
+					   ci.build(app.getAid(), ac, isUpdatable);
+					   ciList.addClientInfo(ci);
+					   break inner;
+				   }
+			   }
+			}
+		}
+		return ciList;
 	}
 }
