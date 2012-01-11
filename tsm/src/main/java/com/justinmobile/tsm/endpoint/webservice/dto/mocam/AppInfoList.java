@@ -36,7 +36,7 @@ public class AppInfoList {
 		if (CollectionUtils.isNotEmpty(apps)) {
 			for (Application app : apps) {
 				AppInfo info = new AppInfo();
-				info.build(app, sysType, isUpdatable);
+				info.buildSimple(app, sysType, isUpdatable);
 				this.add(info);
 			}
 		}

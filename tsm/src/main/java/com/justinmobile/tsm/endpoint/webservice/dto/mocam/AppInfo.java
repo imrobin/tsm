@@ -286,7 +286,9 @@ public class AppInfo {
 	public void setClientID(String clientId) {
 		this.clientId = clientId;
 	}
-
+    public void buildSimple(Application app,String sysType,Integer isUpdatable){
+    	this.buildSimpleInfo(app, sysType, isUpdatable);
+    }
 	public void build(Application app, String sysType, Integer isUpdatable) {
 		this.buildInfo(app, sysType, isUpdatable);
 		if(app.getLastestAppVersion()!=null){
@@ -300,24 +302,16 @@ public class AppInfo {
 		this.setAppVersion(av.getVersionNo());
 		}
 	}
-	private void buildInfo(Application app, String sysType, Integer isUpdatable){
-		this.setAppAid(app.getAid());
-		this.setRemark(app.getDescription());
-		this.setAppType(app.getForm());
-		this.setAppName(app.getName());
-		this.setAppDesc(app.getDescription());
-		this.setAppProvider(app.getSp().getName());
-		this.setProvince(app.getLocation());
-		this.setAppDownloadCount(app.getDownloadCount());
-		this.setAppStatus(app.getStatus());
-		if (app.getPublishDate() != null) {
-			this.setAppIssuingDate(CalendarUtils.parsefomatCalendar(app.getPublishDate(), CalendarUtils.SHORT_FORMAT_LINE));
+	public void buildSimple(ApplicationVersion av,String sysType,Integer isUpdatable){
+		this.buildSimpleInfo(av.getApplication(), sysType, isUpdatable);
+		if(av.getVersionNo()!=null){
+			this.setAppVersion(av.getVersionNo());
 		}
+	}
+	private void buildSimpleInfo(Application app,String sysType,Integer isUpdatable){
+		this.setAppAid(app.getAid());
+		this.setAppName(app.getName());
 		this.setAppCharge("0");
-		Space appSpace = app.getLastestSpace();
-		this.setAppNvm(appSpace.getNvm());
-		this.setAppRam(appSpace.getRam());
-		this.setCommentTotalCount(app.getComments().size());
 		GradeStatistics statistics = app.getStatistics();
 		if (statistics == null) {
 			this.setCountGrade(0);
@@ -333,13 +327,30 @@ public class AppInfo {
 			}
 		}
 		this.setAppClassify(app.getChildType().getName());
+		this.setAppLogoURL(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppPcImg&appId="+app.getId());
+		this.setAppDesc(app.getDescription());
+	}
+	private void buildInfo(Application app, String sysType, Integer isUpdatable){
+		this.buildSimpleInfo(app, sysType, isUpdatable);
+		this.setRemark(app.getDescription());
+		this.setAppType(app.getForm());
+		this.setAppProvider(app.getSp().getName());
+		this.setProvince(app.getLocation());
+		this.setAppDownloadCount(app.getDownloadCount());
+		this.setAppStatus(app.getStatus());
+		if (app.getPublishDate() != null) {
+			this.setAppIssuingDate(CalendarUtils.parsefomatCalendar(app.getPublishDate(), CalendarUtils.SHORT_FORMAT_LINE));
+		}
+		Space appSpace = app.getLastestSpace();
+		this.setAppNvm(appSpace.getNvm());
+		this.setAppRam(appSpace.getRam());
+		this.setCommentTotalCount(app.getComments().size());
 		this.setSmallCardURL(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppMobileImgByAid&aId="+app.getAid());
 		pictureUrlList = new PictureURLList();
 		for(ApplicationImage appi:app.getApplicationImages()){
 			pictureUrlList.add(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppImg&appImgId="+appi.getId());
 		}
 		this.setPictureURLList(pictureUrlList);
-		this.setAppLogoURL(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppPcImg&appId="+app.getId());
 		StringBuilder sb  = new StringBuilder();
 		for(ApplicationStyle as:app.getApplicationStyle()){
 			sb.append(as.getStyleUrl()).append(",");
