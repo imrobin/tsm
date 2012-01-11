@@ -10,7 +10,6 @@ import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
 import com.justinmobile.core.manager.EntityManagerImpl;
 import com.justinmobile.tsm.application.domain.Application;
-import com.justinmobile.tsm.application.domain.ApplicationClientInfo;
 import com.justinmobile.tsm.card.dao.CardClientDao;
 import com.justinmobile.tsm.card.domain.CardClient;
 import com.justinmobile.tsm.card.domain.CardInfo;
@@ -21,19 +20,6 @@ public class CardClientManagerImpl extends EntityManagerImpl<CardClient, CardCli
 
 	@Autowired
 	private CardClientDao cardClientDao;
-
-	@Override
-	public List<ApplicationClientInfo> getClientByCard(CardInfo card) {
-		try {
-			return cardClientDao.getClientByCard(card);
-		} catch (PlatformException e) {
-			throw e;
-		} catch (HibernateException e) {
-			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
-		} catch (Exception e) {
-			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
-		}
-	}
 
 	@Override
 	public List<CardClient> getByCardAndApplication(CardInfo card, Application application) {
@@ -48,12 +34,11 @@ public class CardClientManagerImpl extends EntityManagerImpl<CardClient, CardCli
 		}
 	}
 
-	  
 	@Override
 	public CardClient getByCardAndApplicationAndSysType(CardInfo card, Application application, String sysType) {
-		
+
 		try {
-			return cardClientDao.getByCardAndApplicationAndSysType(card, application,sysType);
+			return cardClientDao.getByCardAndApplicationAndSysType(card, application, sysType);
 		} catch (PlatformException e) {
 			throw e;
 		} catch (HibernateException e) {
