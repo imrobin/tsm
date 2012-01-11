@@ -2538,7 +2538,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 				CardBlackList cardBlackList = new CardBlackList();
 				cardBlackList.setCustomerCardInfo(cci);
 				cardBlackList.setOperateDate(Calendar.getInstance());
-				cardBlackList.setType(CardBlackList.TYPE_CUSTOMER_REMOVE);
+				cardBlackList.setType(CardBlackList.TYPE_FOR_LOST_TO_CANCEL);
 				cardBlackList.setReason("挂失后退订所有应用，自动注销移出黑名单");
 				this.saveOrUpdate(cci);
 				cardBlackListDao.saveOrUpdate(cardBlackList);
