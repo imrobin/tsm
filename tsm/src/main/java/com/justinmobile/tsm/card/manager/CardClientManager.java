@@ -21,4 +21,14 @@ public interface CardClientManager extends EntityManager<CardClient> {
 	 * @return 查找结果
 	 */
 	List<CardClient> getByCardAndApplication(CardInfo card, Application application);
+	
+	/**
+	 * 根据卡，应用，系统类型查找终端上客户端的记录
+	 * 
+	 * @param card 卡
+	 * @application 应用
+	 * @sysType 区分操作系统还是J2ME
+	 * @return 查找结果
+	 */
+	CardClient getByCardAndApplicationAndSysType(CardInfo card, Application application,String sysType);
 }

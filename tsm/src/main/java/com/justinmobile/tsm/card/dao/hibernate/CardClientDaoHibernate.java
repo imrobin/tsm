@@ -27,7 +27,8 @@ public class CardClientDaoHibernate extends EntityDaoHibernate<CardClient, Long>
 
 	@Override
 	public List<CardClient> getByCardAndApplication(CardInfo card, Application application) {
-		String hql = "select cc from " + CardClient.class.getName()
+		String hql = "select cc from "
+				+ CardClient.class.getName()
 				+ " as cc left join cc.client.applicationVersions as avs where avs.application = :application and cc.card = :card";
 
 		Map<String, Object> values = new HashMap<String, Object>();
@@ -36,4 +37,20 @@ public class CardClientDaoHibernate extends EntityDaoHibernate<CardClient, Long>
 
 		return find(hql, values);
 	}
+
+	@Override
+	public CardClient getByCardAndApplicationAndSysType(CardInfo card, Application application, String sysType) {
+		StringBuilder hql = new StringBuilder();
+		hql.append("select cc from ").append(CardClient.class.getName());
+		hql.append(" as cc left join cc.client.applicationVersions as avs where avs.application = :application and cc.card = :card");
+		hql.append(" and cc.client.sysType=:sysType");
+
+		Map<String, Object> values = new HashMap<String, Object>();
+		values.put("card", card);
+		values.put("application", application);
+		values.put("sysType", sysType);
+
+		return findUnique(hql.toString(), values);
+	}
+
 }

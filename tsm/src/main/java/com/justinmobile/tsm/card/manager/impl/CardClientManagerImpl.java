@@ -48,4 +48,19 @@ public class CardClientManagerImpl extends EntityManagerImpl<CardClient, CardCli
 		}
 	}
 
+	  
+	@Override
+	public CardClient getByCardAndApplicationAndSysType(CardInfo card, Application application, String sysType) {
+		
+		try {
+			return cardClientDao.getByCardAndApplicationAndSysType(card, application,sysType);
+		} catch (PlatformException e) {
+			throw e;
+		} catch (HibernateException e) {
+			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
+		}
+	}
+
 }
