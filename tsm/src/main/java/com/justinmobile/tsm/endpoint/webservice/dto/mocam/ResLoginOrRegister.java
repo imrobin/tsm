@@ -43,6 +43,12 @@ public class ResLoginOrRegister {
 
 	@XmlElement(name = "ApduName", namespace = NameSpace.CM)
 	private String apduName;
+	
+	@XmlElement(namespace = NameSpace.CM, name="AppInfoList")
+	private AppInfoList appInfoList;
+
+	@XmlElement(namespace = NameSpace.CM, name="ClientInfoList")
+	private ClientInfoList clientInfoList;
 
 	public String getCommandID() {
 		return commandID;
@@ -127,6 +133,23 @@ public class ResLoginOrRegister {
 	public void setUrl(String url) {
 		this.url = url;
 	}
+
+	public AppInfoList getAppInfoList() {
+		return appInfoList;
+	}
+
+	public void setAppInfoList(AppInfoList appInfoList) {
+		this.appInfoList = appInfoList;
+	}
+
+	public ClientInfoList getClientInfoList() {
+		return clientInfoList;
+	}
+
+	public void setClientInfoList(ClientInfoList clientInfoList) {
+		this.clientInfoList = clientInfoList;
+	}
+	
 	
 
 }
