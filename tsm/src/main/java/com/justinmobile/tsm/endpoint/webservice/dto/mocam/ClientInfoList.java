@@ -28,6 +28,10 @@ public class ClientInfoList {
 	public void setClientInfo(List<ClientInfo> clientInfo) {
 		this.clientInfo = clientInfo;
 	}
+    
+	public void addClientInfo(ClientInfo clientInfo){
+		this.clientInfo.add(clientInfo);
+	}
 	
 	public void addAll(List<ApplicationClientInfo> result,String aid) {
 		if (CollectionUtils.isNotEmpty(result)) {
