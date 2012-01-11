@@ -1462,23 +1462,27 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	public void cancelLost(Long ccid) {
 		try {
 			CustomerCardInfo cci = customerCardInfoDao.load(ccid);
-			// 1.改变CCI的状态
-			cci.setStatus(CustomerCardInfo.STATUS_NORMAL);
-			cci.setInBlack(CustomerCardInfo.NOT_INBLACK);
-			// 2.从黑名单中移除
-			CardBlackList cardBlackList = new CardBlackList();
-			cardBlackList.setCustomerCardInfo(cci);
-			cardBlackList.setType(CardBlackList.TYPE_CUSTOMER_REMOVE);
-			cardBlackList.setOperateDate(Calendar.getInstance());
-			cardBlackList.setReason("终端解挂自动移除黑名单");
-			cardBlackListDao.saveOrUpdate(cardBlackList);
-			customerCardInfoDao.saveOrUpdate(cci);
-			// 3.讲CARDAPPLICATION9的变为6
-			List<CardApplication> caList = cardApplicationManager.getByCardAndStatus(cci.getCard(), CardApplication.STATUS_LOSTED);
-			for (CardApplication ca : caList) {
-				ca.setStatus(CardApplication.STATUS_INSTALLED);
-				cardApplicationManager.saveOrUpdate(ca);
-				subscribeHistoryManager.unsubscribeApplication(ca.getCardInfo(), ca.getApplicationVersion());
+			if (cci.getStatus().intValue() == CustomerCardInfo.STATUS_LOST) {
+				// 1.改变CCI的状态
+				cci.setStatus(CustomerCardInfo.STATUS_NORMAL);
+				cci.setInBlack(CustomerCardInfo.NOT_INBLACK);
+				// 2.从黑名单中移除
+				CardBlackList cardBlackList = new CardBlackList();
+				cardBlackList.setCustomerCardInfo(cci);
+				cardBlackList.setType(CardBlackList.TYPE_CUSTOMER_REMOVE);
+				cardBlackList.setOperateDate(Calendar.getInstance());
+				cardBlackList.setReason("终端解挂自动移除黑名单");
+				cardBlackListDao.saveOrUpdate(cardBlackList);
+				customerCardInfoDao.saveOrUpdate(cci);
+				// 3.讲CARDAPPLICATION9的变为6
+				List<CardApplication> caList = cardApplicationManager.getByCardAndStatus(cci.getCard(), CardApplication.STATUS_LOSTED);
+				for (CardApplication ca : caList) {
+					ca.setStatus(CardApplication.STATUS_INSTALLED);
+					cardApplicationManager.saveOrUpdate(ca);
+					subscribeHistoryManager.unsubscribeApplication(ca.getCardInfo(), ca.getApplicationVersion());
+				}
+			} else {
+				throw new PlatformException(PlatformErrorCode.TERM_STATUS_IS_ANOMALOUS);
 			}
 		} catch (PlatformException pe) {
 			throw pe;
