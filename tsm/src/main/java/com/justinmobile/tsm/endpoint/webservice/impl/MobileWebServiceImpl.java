@@ -161,7 +161,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 
 	@Autowired
 	private CardClientManager cardClientManager;
-	
+
 	@Autowired
 	private ApplicationVersionManager appVerManager;
 
@@ -526,7 +526,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 				if (card == null) {
 					throw new PlatformException(PlatformErrorCode.CARD_NOT_FOUND);
 				}
-				List<ApplicationClientInfo> clients = cardClientManager.getClientByCard(card);
+				List<ApplicationClientInfo> clients = applicationClientInfoManager.getClientByCard(card);
 				ClientInfoList clist = new ClientInfoList();
 				clist.addAll(clients, appAID);
 				info.setClientInfoList(clist);
@@ -815,7 +815,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		response.setCommandID(loadClientRequest.getCommandID());
 		response.setStatus(status);
 		response.setSessionID(loadClientRequest.getSessionID());
-		//默认为不更新
+		// 默认为不更新
 		Integer isUpdatable = 0x00;
 		try {
 			String cardNo = loadClientRequest.getCardNo();
@@ -825,9 +825,9 @@ public class MobileWebServiceImpl implements MobileWebService {
 			// 目前测试为Android系统
 			String sysType = loadClientRequest.getMobileOs();
 			String sysRequirment = loadClientRequest.getOsVersion();
-			//出除多余的版本编号;如2.3.3-[Mr.Koo-N835]这种格式
-			if(sysRequirment.length()>3){
-				sysRequirment = sysRequirment.substring(0,3);
+			// 出除多余的版本编号;如2.3.3-[Mr.Koo-N835]这种格式
+			if (sysRequirment.length() > 3) {
+				sysRequirment = sysRequirment.substring(0, 3);
 			}
 			String fileType = null;
 			ApplicationClientInfo applicationClientInfo = null;
@@ -851,7 +851,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 					throw new PlatformException(PlatformErrorCode.APPLICAION_CLIENT_NOT_EXSIT);
 				}
 				ClientInfo ci = new ClientInfo();
-				ci.build(aid, applicationClientInfo,isUpdatable);
+				ci.build(aid, applicationClientInfo, isUpdatable);
 				response.setClientInfo(ci);
 			} else if (loadClientRequest.getCommandID().equals(CommandID.UeUprage.getCode())) {
 				applicationClientInfo = applicationClientInfoManager.getAppManagerByTypeAndReqAndVersion("os", sysType
@@ -860,7 +860,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 					throw new PlatformException(PlatformErrorCode.APPLICAION_CLIENT_NOT_EXSIT);
 				}
 				ClientInfo ci = new ClientInfo();
-				ci.build(aid, applicationClientInfo,isUpdatable);
+				ci.build(aid, applicationClientInfo, isUpdatable);
 				response.setClientInfo(ci);
 			}
 
@@ -916,15 +916,15 @@ public class MobileWebServiceImpl implements MobileWebService {
 				break;
 			}
 			case UserLogin: {
-				String sysType = StringUtils.substringBefore(
-						StringUtils.substringAfter(request.getCommonType(), "-"), "-");
+				String sysType = StringUtils.substringBefore(StringUtils.substringAfter(request.getCommonType(), "-"),
+						"-");
 				if (null == customerCard) {// 如果当前终端未绑定，则抛出异常
 					throw new PlatformException(PlatformErrorCode.CARD_NO_UNEXIST);
 				} else {
 					processTrans(request, resAPDU, res, cardNo);
 				}
-				res.setAppInfoList(upAppInfo(card,sysType));
-				res.setClientInfoList(upClientInfo(card));
+				res.setAppInfoList(upAppInfo(card, sysType));
+				res.setClientInfoList(upClientInfo(card, sysType));
 				break;
 			}
 			case NotifyImsi: {
@@ -1117,44 +1117,47 @@ public class MobileWebServiceImpl implements MobileWebService {
 			}
 		}
 	}
-	private AppInfoList upAppInfo(CardInfo card,String sysType){
-		List<CardApplication> cardAppList = cardApplicationManager.getByCardAndStatus(card, CardApplication.STATUS_AVAILABLE);
+
+	private AppInfoList upAppInfo(CardInfo card, String sysType) {
+		List<CardApplication> cardAppList = cardApplicationManager.getByCardAndStatus(card,
+				CardApplication.STATUS_AVAILABLE);
 		List<Application> updateAppList = new ArrayList<Application>();
 		AppInfoList appList = new AppInfoList();
 		Integer isUpdatable = 0x01;
-		for(CardApplication cardApp:cardAppList){
-		     ApplicationVersion installedVersion = cardApp.getApplicationVersion();
-		     ApplicationVersion lastedVersion = appVerManager.getLastestAppVersionSupportCard(card, cardApp.getApplicationVersion().getApplication());
-		     if(!installedVersion.getVersionNo().equals(lastedVersion.getVersionNo())){
-		    	 updateAppList.add(lastedVersion.getApplication());
-		     }
+		for (CardApplication cardApp : cardAppList) {
+			ApplicationVersion installedVersion = cardApp.getApplicationVersion();
+			ApplicationVersion lastedVersion = appVerManager.getLastestAppVersionSupportCard(card, cardApp
+					.getApplicationVersion().getApplication());
+			if (!installedVersion.getVersionNo().equals(lastedVersion.getVersionNo())) {
+				updateAppList.add(lastedVersion.getApplication());
+			}
 		}
 		appList.addAll(updateAppList, sysType, isUpdatable);
 		return appList;
 	}
-	private ClientInfoList upClientInfo(CardInfo card){
+
+	private ClientInfoList upClientInfo(CardInfo card, String sysType) {
 		Integer isUpdatable;
 		ClientInfoList ciList = new ClientInfoList();
-		//获取卡上安装的所有应用
-		List<CardApplication> cardAppList = cardApplicationManager.getByCardAndStatus(card, CardApplication.STATUS_AVAILABLE);
-		for  (CardApplication ca:cardAppList){
+		// 获取卡上安装的所有应用
+		List<CardApplication> cardAppList = cardApplicationManager.getByCardAndStatus(card,
+				CardApplication.STATUS_AVAILABLE);
+		for (CardApplication ca : cardAppList) {
 			Application app = ca.getApplicationVersion().getApplication();
-			//根据应用和卡片获取CardClient
-			List<CardClient> ccList = cardClientManager.getByCardAndApplication(card, app);
-			if(null!=ccList && ccList.size()>0){
-			ApplicationClientInfo aci = ccList.get(0).getClient();
-			//获取该卡上可以安装应用的最大版本
-		    List<ApplicationClientInfo> maxAciList = applicationClientInfoManager.getByAidAndCardNo(app.getAid(), card.getCardNo());
-			inner:  
-		    for(ApplicationClientInfo ac:maxAciList){
-				   if(SpringMVCUtils.compareVersion(ac.getVersion(), aci.getVersion())){
-					   isUpdatable = 0x01;
-					   ClientInfo ci = new ClientInfo();
-					   ci.build(app.getAid(), ac, isUpdatable);
-					   ciList.addClientInfo(ci);
-					   break inner;
-				   }
-			   }
+			// 根据应用和卡片获取CardClient
+			CardClient cc = cardClientManager.getByCardAndApplicationAndSysType(card, app, sysType);
+			ApplicationClientInfo aci = cc.getClient();
+			// 获取该卡上可以安装应用的最大版本
+			List<ApplicationClientInfo> maxAciList = applicationClientInfoManager.getByAidAndCardNo(app.getAid(),
+					card.getCardNo());
+			inner: for (ApplicationClientInfo ac : maxAciList) {
+				if (SpringMVCUtils.compareVersion(ac.getVersion(), aci.getVersion())) {
+					isUpdatable = 0x01;
+					ClientInfo ci = new ClientInfo();
+					ci.build(app.getAid(), ac, isUpdatable);
+					ciList.addClientInfo(ci);
+					break inner;
+				}
 			}
 		}
 		return ciList;
