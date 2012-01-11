@@ -82,6 +82,7 @@ public class ProviderWebServiceManagerImpl implements ProviderWebServiceManager 
 						CardApplication.STATUS_LOSTED);
 				if (CollectionUtils.isEmpty(cardApplications)) {// 如果卡上没有状态为“已挂失”的应用，将绑定关系重置为能够绑定的状态
 					customerCard.resetStatusToBindable();
+					customerCardManager.sysnLostToCancel(customerCard);
 				}
 			}
 		} else {

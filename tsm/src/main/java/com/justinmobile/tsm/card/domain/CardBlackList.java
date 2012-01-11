@@ -31,6 +31,11 @@ public class CardBlackList extends AbstractEntity{
 	
 	/** 用户解挂移除黑名单 */
 	public static final int TYPE_CUSTOMER_REMOVE = 4;
+	
+	/**
+	 * 挂失后退订所有应用，自动注销移出黑名单
+	 */
+	public static final int TYPE_FOR_LOST_TO_CANCEL = 5;
 
 	private static final long serialVersionUID = -671489043L;
 

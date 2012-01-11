@@ -2538,11 +2538,28 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 				CardBlackList cardBlackList = new CardBlackList();
 				cardBlackList.setCustomerCardInfo(cci);
 				cardBlackList.setOperateDate(Calendar.getInstance());
-				cardBlackList.setType(CardBlackList.TYPE_REMOVE);
-				cardBlackList.setReason("同步挂失终端到注销时从黑名单移除");
+				cardBlackList.setType(CardBlackList.TYPE_CUSTOMER_REMOVE);
+				cardBlackList.setReason("挂失后退订所有应用，自动注销移出黑名单");
 				this.saveOrUpdate(cci);
 				cardBlackListDao.saveOrUpdate(cardBlackList);
 			}
+		} catch (PlatformException pe) {
+			throw pe;
+		} catch (HibernateException e) {
+			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
+		}
+	}
+
+	@Override
+	public CustomerCardInfo getByCardNoThatNormalOrLosted(String cardNo) {
+		try {
+			CardInfo cardInfo = cardInfoDao.findUniqueByProperty("cardNo", cardNo);
+			if (null == cardInfo) {
+				throw new PlatformException(PlatformErrorCode.OPERATION_NOT_BELONG_THIS_TERMINAL);
+			}
+			return customerCardInfoDao.findByCardNoThatNormalOrLosted(cardInfo);
 		} catch (PlatformException pe) {
 			throw pe;
 		} catch (HibernateException e) {

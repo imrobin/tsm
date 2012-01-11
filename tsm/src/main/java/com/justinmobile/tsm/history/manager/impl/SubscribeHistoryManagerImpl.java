@@ -130,7 +130,7 @@ public class SubscribeHistoryManagerImpl extends EntityManagerImpl<SubscribeHist
 	@Override
 	public void unsubscribeApplication(CardInfo card, ApplicationVersion applicationVersion) {
 		try {
-			CustomerCardInfo customerCard = customerCardInfoManager.getByCardNo(card.getCardNo());
+			CustomerCardInfo customerCard = customerCardInfoManager.getByCardNoThatNormalOrLosted(card.getCardNo());
 			SubscribeHistory subscribeHistory = getLastSubscribeHistoryByCustomerCardAndApplicationVersion(customerCard, applicationVersion);
 			if (null != subscribeHistory) {
 				subscribeHistory.setUnsubscribeDate(Calendar.getInstance());

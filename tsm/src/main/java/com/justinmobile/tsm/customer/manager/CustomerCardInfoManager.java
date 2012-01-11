@@ -489,4 +489,11 @@ public interface CustomerCardInfoManager extends EntityManager<CustomerCardInfo>
 	 * @param cci
 	 */
 	void sysnLostToCancel(CustomerCardInfo cci);
+
+	/**
+	 * 根据卡号查找正常或挂失状态的终端
+	 * @param cardNo
+	 * @return
+	 */
+	public CustomerCardInfo getByCardNoThatNormalOrLosted(String cardNo);
 }

@@ -219,4 +219,11 @@ public interface CustomerCardInfoDao extends EntityDao<CustomerCardInfo, Long> {
 	 * @return
 	 */
 	List<CustomerCardInfo> getCustomerCardByCustomerThatNormAndLostAndNotUse(Customer customer);
+
+	/**
+	 * 根据CARDINFO查找正常或者挂失的终端
+	 * @param cardInfo
+	 * @return
+	 */
+	CustomerCardInfo findByCardNoThatNormalOrLosted(CardInfo cardInfo);
 }

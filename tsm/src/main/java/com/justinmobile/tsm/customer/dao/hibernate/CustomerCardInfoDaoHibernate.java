@@ -244,4 +244,10 @@ public class CustomerCardInfoDaoHibernate extends EntityDaoHibernate<CustomerCar
 		String hql = "from " + CustomerCardInfo.class.getName() + " as cci where cci.customer = ? and cci.status = ? or cci.status = ? or cci.status = ?";
 		return this.find(hql, customer, CustomerCardInfo.STATUS_NORMAL, CustomerCardInfo.STATUS_LOST, CustomerCardInfo.STATUS_NOT_USE);
 	}
+
+	@Override
+	public CustomerCardInfo findByCardNoThatNormalOrLosted(CardInfo cardInfo) {
+		String hql = "from " + CustomerCardInfo.class.getName() + " as cci where cci.card = ? and (cci.status = ? or cci.status = ?)";
+		return this.findUniqueEntity(hql, cardInfo, CustomerCardInfo.STATUS_LOST , CustomerCardInfo.STATUS_NORMAL);
+	}
 }
