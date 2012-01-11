@@ -112,14 +112,14 @@ public class ClientInfo {
 		this.clientPackageName = clientPackageName;
 	}
 
-	public void  build(String aid, ApplicationClientInfo applicationClientInfo) {
+	public void  build(String aid, ApplicationClientInfo applicationClientInfo,Integer isUpdatable) {
 		this.setAppAID(aid);
 		this.setClientID(String.valueOf(applicationClientInfo.getId()));
 		this.setClientLoadURL(SystemConfigUtils.getServiceUrl()+applicationClientInfo.getFileUrl());
 		this.setClientName(applicationClientInfo.getName());
 		this.setClientSize(applicationClientInfo.getSize());
 		this.setClientVersion(applicationClientInfo.getVersionCode().longValue());
-		this.setIsUpdatable(0x00);
+		this.setIsUpdatable(isUpdatable);
 		this.setClientClassName(applicationClientInfo.getClientClassName());
 		this.setClientPackageName(applicationClientInfo.getClientPackageName());
 	}
