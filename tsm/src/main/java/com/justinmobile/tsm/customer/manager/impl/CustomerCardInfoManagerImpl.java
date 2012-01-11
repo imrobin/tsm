@@ -70,6 +70,7 @@ import com.justinmobile.tsm.customer.domain.MobileType;
 import com.justinmobile.tsm.customer.manager.CustomerCardInfoManager;
 import com.justinmobile.tsm.customer.manager.CustomerManager;
 import com.justinmobile.tsm.endpoint.sms.SmsEndpoint;
+import com.justinmobile.tsm.history.domain.SubscribeHistory;
 import com.justinmobile.tsm.history.manager.SubscribeHistoryManager;
 import com.justinmobile.tsm.system.manager.MobileSectionManager;
 import com.justinmobile.tsm.transaction.domain.DesiredOperation;
@@ -1479,6 +1480,12 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 				for (CardApplication ca : caList) {
 					ca.setStatus(CardApplication.STATUS_INSTALLED);
 					cardApplicationManager.saveOrUpdate(ca);
+					
+					SubscribeHistory subscribeHistory = subscribeHistoryManager.getLastSubscribeHistoryByCustomerCardAndApplicationVersion(cci, ca.getApplicationVersion());
+					if (null != subscribeHistory) {
+						subscribeHistory.setUnsubscribeDate(Calendar.getInstance());
+						subscribeHistoryManager.saveOrUpdate(subscribeHistory);
+					}
 					subscribeHistoryManager.unsubscribeApplication(ca.getCardInfo(), ca.getApplicationVersion());
 				}
 			} else {
