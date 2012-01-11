@@ -2193,7 +2193,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 		try {
 			Set<Application> appSet = new HashSet<Application>();
 			Customer customer = customerManager.getCustomerByUserName(userName);
-			List<CustomerCardInfo> cciList = customerCardInfoDao.getCustomerCardByCustomerThatNormAndLost(customer);
+			List<CustomerCardInfo> cciList = customerCardInfoDao.getCustomerCardByCustomerThatNormAndLostAndNotUse(customer);
 			if (CollectionUtils.isNotEmpty(cciList)) {
 				for (CustomerCardInfo cci : cciList) {
 					List<PropertyFilter> filters = new ArrayList<PropertyFilter>();
