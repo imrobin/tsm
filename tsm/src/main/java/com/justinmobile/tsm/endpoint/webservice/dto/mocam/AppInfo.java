@@ -287,6 +287,9 @@ public class AppInfo {
 		this.clientId = clientId;
 	}
     public void buildSimple(Application app,String sysType,Integer isUpdatable){
+    	if(app.getLastestAppVersion()!=null){
+			this.setAppVersion(app.getLastestVersion());
+		}
     	this.buildSimpleInfo(app, sysType, isUpdatable);
     }
 	public void build(Application app, String sysType, Integer isUpdatable) {
