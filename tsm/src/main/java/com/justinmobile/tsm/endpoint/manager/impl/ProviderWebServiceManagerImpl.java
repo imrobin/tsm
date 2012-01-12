@@ -67,26 +67,29 @@ public class ProviderWebServiceManagerImpl implements ProviderWebServiceManager 
 	}
 
 	private void unsubcribeBusiness(String aid, String cardNo, String mobileNo) {
-		CardApplication cardApplication = cardApplicationManager.getByCardNoAid(cardNo, aid);
-		if (null != cardApplication
-				&& ((CardApplication.STATUS_AVAILABLE.intValue() == cardApplication.getStatus().intValue()) || (CardApplication.STATUS_LOSTED
-						.intValue() == cardApplication.getStatus().intValue()))) {
-			cardApplication.setStatus(CardApplication.STATUS_INSTALLED);
-			feeStatManager.unSubscribeAppStatRecord(aid, cardNo, mobileNo);
-			subscribeHistoryManager.unsubscribeApplication(cardApplication.getCardInfo(), cardApplication.getApplicationVersion());
+		CustomerCardInfo checkCustomerCard = customerCardManager.getByCardNoThatNormalOrLosted(cardNo);
+		if(null != checkCustomerCard) {
+			CardApplication cardApplication = cardApplicationManager.getByCardNoAid(cardNo, aid);
+			if (null != cardApplication
+					&& ((CardApplication.STATUS_AVAILABLE.intValue() == cardApplication.getStatus().intValue()) || (CardApplication.STATUS_LOSTED
+							.intValue() == cardApplication.getStatus().intValue()))) {
+				cardApplication.setStatus(CardApplication.STATUS_INSTALLED);
+				feeStatManager.unSubscribeAppStatRecord(aid, cardNo, mobileNo);
+				subscribeHistoryManager.unsubscribeApplication(cardApplication.getCardInfo(), cardApplication.getApplicationVersion());
 
-			// 判断终端是否已经挂失
-			CustomerCardInfo customerCard = customerCardManager.getByCardNoThatStatusLost(cardNo);
-			if (null != customerCard) {// 如果绑定记录不为空，说明终端已经挂失
-				List<CardApplication> cardApplications = cardApplicationManager.getByCardAndStatus(customerCard.getCard(),
-						CardApplication.STATUS_LOSTED);
-				if (CollectionUtils.isEmpty(cardApplications)) {// 如果卡上没有状态为“已挂失”的应用，将绑定关系重置为能够绑定的状态
-					customerCard.resetStatusToBindable();
-					customerCardManager.sysnLostToCancel(customerCard);
+				// 判断终端是否已经挂失
+				CustomerCardInfo customerCard = customerCardManager.getByCardNoThatStatusLost(cardNo);
+				if (null != customerCard) {// 如果绑定记录不为空，说明终端已经挂失
+					List<CardApplication> cardApplications = cardApplicationManager.getByCardAndStatus(customerCard.getCard(),
+							CardApplication.STATUS_LOSTED);
+					if (CollectionUtils.isEmpty(cardApplications)) {// 如果卡上没有状态为“已挂失”的应用，将绑定关系重置为能够绑定的状态
+						customerCard.resetStatusToBindable();
+						customerCardManager.sysnLostToCancel(customerCard);
+					}
 				}
+			} else {
+				throw new PlatformException(PlatformErrorCode.CARD_APP_ERROR_STATUS);
 			}
-		} else {
-			throw new PlatformException(PlatformErrorCode.CARD_APP_ERROR_STATUS);
 		}
 	}
 
