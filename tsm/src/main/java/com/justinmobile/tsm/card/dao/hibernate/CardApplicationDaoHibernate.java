@@ -179,7 +179,7 @@ public class CardApplicationDaoHibernate extends EntityDaoHibernate<CardApplicat
 	}
 
 	@Override
-	public List<CardApplication> getCardApplicationByUserAndAppId(CardInfo cardInfo, Application app) {
+	public List<CardApplication> getByCardAndApplication(CardInfo cardInfo, Application app) {
 		String hql = "from " + CardApplication.class.getName() + " as ca where ca.cardInfo = ? and ca.applicationVersion.application = ?";
 		return find(hql.toString(), cardInfo, app);
 	}

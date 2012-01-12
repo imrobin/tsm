@@ -60,7 +60,7 @@ public interface CardApplicationDao extends EntityDao<CardApplication, Long> {
 
 	List<CardApplication> getByLastFeeTime(Date end);
 
-	List<CardApplication> getCardApplicationByUserAndAppId(CardInfo cardInfo, Application app);
+	List<CardApplication> getByCardAndApplication(CardInfo cardInfo, Application app);
 
 	/**
 	 * 根据卡获取指定状态的记录
@@ -79,4 +79,5 @@ public interface CardApplicationDao extends EntityDao<CardApplication, Long> {
 	 * @return
 	 */
 	List<CardApplication> getForLostListByCardInfo(CardInfo card);
+
 }

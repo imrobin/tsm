@@ -67,7 +67,12 @@ public class ProviderWebServiceManagerImpl implements ProviderWebServiceManager 
 	}
 
 	private void unsubcribeBusiness(String aid, String cardNo, String mobileNo) {
-		CustomerCardInfo checkCustomerCard = customerCardManager.getByCardNoThatNormalOrLosted(cardNo);
+		CustomerCardInfo checkCustomerCard = null;
+		try {
+			checkCustomerCard = customerCardManager.getByCardNoThatNormalOrLosted(cardNo);
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.CARD_APP_ERROR_STATUS);
+		}
 		if(null != checkCustomerCard) {
 			CardApplication cardApplication = cardApplicationManager.getByCardNoAid(cardNo, aid);
 			if (null != cardApplication

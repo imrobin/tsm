@@ -123,4 +123,12 @@ public interface CardApplicationManager extends EntityManager<CardApplication> {
 	 * @return
 	 */
 	List<CardApplication> getForLostListByCardInfo(CardInfo card);
+
+	/**
+	 * 查找此卡片的同一应用下的关联记录
+	 * @param card
+	 * @param application
+	 * @return
+	 */
+	List<CardApplication> getByCardAndApplication(CardInfo card, Application application);
 }
