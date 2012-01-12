@@ -33,12 +33,11 @@ public class CardClientDaoHibernate extends EntityDaoHibernate<CardClient, Long>
 		StringBuilder hql = new StringBuilder();
 		hql.append("select cc from ").append(CardClient.class.getName());
 		hql.append(" as cc left join cc.client.applicationVersions as avs where avs.application = :application and cc.card = :card");
-		hql.append(" and cc.client.sysType=:sysType");
-
+	    hql.append(" and cc.client.sysRequirment=:sysType");
 		Map<String, Object> values = new HashMap<String, Object>();
 		values.put("card", card);
 		values.put("application", application);
-		values.put("sysType", sysType);
+		values.put("sysType",sysType);
 
 		return findUnique(hql.toString(), values);
 	}
