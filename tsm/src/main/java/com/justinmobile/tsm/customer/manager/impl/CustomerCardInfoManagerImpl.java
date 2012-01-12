@@ -235,8 +235,13 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 				if(cci.getStatus().intValue() == CustomerCardInfo.STATUS_NORMAL) {
 					List<CardApplication> caList = cardApplicationManager.getForLostListByCardInfo(cci.getCard());
 					if(CollectionUtils.isNotEmpty(caList)){
-						saveCCiInBlackForLost(cci);
-						cearteBlackListWithLost(ccId);
+						if(cci.isInBlack()){
+							cci.setStatus(CustomerCardInfo.STATUS_LOST);
+							this.saveOrUpdate(cci);
+						}else{
+							saveCCiInBlackForLost(cci);
+							cearteBlackListWithLost(ccId);
+						}
 						// 保存挂失前每个应用的状态
 						for (CardApplication ca : caList) {
 							ca.setOriginalStatus(ca.getStatus());
@@ -1466,14 +1471,16 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 			if (cci.getStatus().intValue() == CustomerCardInfo.STATUS_LOST) {
 				// 1.改变CCI的状态
 				cci.setStatus(CustomerCardInfo.STATUS_NORMAL);
-				cci.setInBlack(CustomerCardInfo.NOT_INBLACK);
-				// 2.从黑名单中移除
-				CardBlackList cardBlackList = new CardBlackList();
-				cardBlackList.setCustomerCardInfo(cci);
-				cardBlackList.setType(CardBlackList.TYPE_CUSTOMER_REMOVE);
-				cardBlackList.setOperateDate(Calendar.getInstance());
-				cardBlackList.setReason("终端解挂自动移除黑名单");
-				cardBlackListDao.saveOrUpdate(cardBlackList);
+				if(cci.isInBlack()) {
+					cci.setInBlack(CustomerCardInfo.NOT_INBLACK);
+					// 2.从黑名单中移除
+					CardBlackList cardBlackList = new CardBlackList();
+					cardBlackList.setCustomerCardInfo(cci);
+					cardBlackList.setType(CardBlackList.TYPE_CUSTOMER_REMOVE);
+					cardBlackList.setOperateDate(Calendar.getInstance());
+					cardBlackList.setReason("终端解挂自动移除黑名单");
+					cardBlackListDao.saveOrUpdate(cardBlackList);
+				}
 				customerCardInfoDao.saveOrUpdate(cci);
 				// 3.讲CARDAPPLICATION9的变为6
 				List<CardApplication> caList = cardApplicationManager.getByCardAndStatus(cci.getCard(), CardApplication.STATUS_LOSTED);
