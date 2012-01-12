@@ -336,4 +336,17 @@ public class CardApplicationManagerImpl extends EntityManagerImpl<CardApplicatio
 			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
 		}
 	}
+
+	@Override
+	public List<CardApplication> getByCardAndApplication(CardInfo card, Application application) {
+		try {
+			return cardApplicationDao.getByCardAndApplication(card,application);
+		} catch (PlatformException e) {
+			throw e;
+		} catch (HibernateException e) {
+			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
+		}
+	}
 }
