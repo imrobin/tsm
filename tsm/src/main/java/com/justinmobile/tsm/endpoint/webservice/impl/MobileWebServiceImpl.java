@@ -264,7 +264,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		if (MapUtils.isNotEmpty(apps)) {
 			for (Map.Entry<CardApplication, Integer> entry : apps.entrySet()) {
 				AppInfo info = new AppInfo();
-				info.build(entry.getKey().getApplicationVersion(), sysType, entry.getValue());
+				info.buildSimple(entry.getKey().getApplicationVersion(), sysType, entry.getValue());
 				int status = entry.getKey().getStatus();
 				if (status == CardApplication.STATUS_LOCKED) {
 					status = 2;
@@ -1124,11 +1124,13 @@ public class MobileWebServiceImpl implements MobileWebService {
 		List<Application> updateAppList = new ArrayList<Application>();
 		AppInfoList appList = new AppInfoList();
 		Integer isUpdatable = 0x01;
+		
 		for (CardApplication cardApp : cardAppList) {
 			ApplicationVersion installedVersion = cardApp.getApplicationVersion();
 			ApplicationVersion lastedVersion = appVerManager.getLastestAppVersionSupportCard(card, cardApp
 					.getApplicationVersion().getApplication());
-			if (!installedVersion.getVersionNo().equals(lastedVersion.getVersionNo())) {
+			//如果最新版本大于已安装版本则该应用需要更新
+			if (SpringMVCUtils.compareVersion(lastedVersion.getVersionNo(), installedVersion.getVersionNo())) {
 				updateAppList.add(lastedVersion.getApplication());
 			}
 		}
@@ -1137,7 +1139,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 	}
 
 	private ClientInfoList upClientInfo(CardInfo card, String sysType) {
-		Integer isUpdatable;
+		Integer isUpdatable = 0x01;;
 		ClientInfoList ciList = new ClientInfoList();
 		// 获取卡上安装的所有应用
 		List<CardApplication> cardAppList = cardApplicationManager.getByCardAndStatus(card,
@@ -1146,19 +1148,20 @@ public class MobileWebServiceImpl implements MobileWebService {
 			Application app = ca.getApplicationVersion().getApplication();
 			// 根据应用和卡片获取CardClient
 			CardClient cc = cardClientManager.getByCardAndApplicationAndSysType(card, app, sysType);
+			if(null!=cc){
 			ApplicationClientInfo aci = cc.getClient();
 			// 获取该卡上可以安装应用的最大版本
 			List<ApplicationClientInfo> maxAciList = applicationClientInfoManager.getByAidAndCardNo(app.getAid(),
 					card.getCardNo());
 			inner: for (ApplicationClientInfo ac : maxAciList) {
 				if (SpringMVCUtils.compareVersion(ac.getVersion(), aci.getVersion())) {
-					isUpdatable = 0x01;
 					ClientInfo ci = new ClientInfo();
 					ci.build(app.getAid(), ac, isUpdatable);
 					ciList.addClientInfo(ci);
 					break inner;
 				}
 			}
+		}
 		}
 		return ciList;
 	}
