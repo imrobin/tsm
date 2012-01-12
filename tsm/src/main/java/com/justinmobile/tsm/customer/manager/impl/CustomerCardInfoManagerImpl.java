@@ -936,7 +936,10 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 				if (isExist) {
 					continue;
 				}
+				//判断数据库是否已经有记录
 				CardApplication ca = cardApplicationManager.getByCardAndAppver(cci.getCard(), cba.getApplicationVersion());
+//				List<CardApplication> caList = cardApplicationManager.getByCardAndApplication(cci.getCard(), cba.getApplicationVersion().getApplication());
+//				if (caList.size() > 0) {
 				if (null != ca) {
 					continue;
 				} else {
@@ -2404,7 +2407,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 			List<CustomerCardInfo> cciList = customerCardInfoDao.getCustomerCardByCustomerThatNormAndLostAndNotUse(customer);
 			if (CollectionUtils.isNotEmpty(cciList)) {
 				for (CustomerCardInfo cci : cciList) {
-					List<CardApplication> cardAppList = cardApplicationDao.getCardApplicationByUserAndAppId(cci.getCard(), queryApp);
+					List<CardApplication> cardAppList = cardApplicationDao.getByCardAndApplication(cci.getCard(), queryApp);
 					for (CardApplication ca : cardAppList) {
 						CardInfo card = ca.getCardInfo();
 						boolean showRule = false;
@@ -2564,7 +2567,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 		try {
 			CardInfo cardInfo = cardInfoDao.findUniqueByProperty("cardNo", cardNo);
 			if (null == cardInfo) {
-				throw new PlatformException(PlatformErrorCode.OPERATION_NOT_BELONG_THIS_TERMINAL);
+				throw new PlatformException(PlatformErrorCode.CARD_IS_NOT_SUPPOT);
 			}
 			return customerCardInfoDao.findByCardNoThatNormalOrLosted(cardInfo);
 		} catch (PlatformException pe) {
