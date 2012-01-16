@@ -1017,17 +1017,24 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	private void createCardLoadFile(CustomerCardInfo cci, CardBaseInfo cbi) {
 		List<CardBaseLoadFile> BaseLoadFileList = cardBaseLoadFileManager.getBaseLoadFileByCardBase(cbi);
 		for (CardBaseLoadFile cbf : BaseLoadFileList) {
-			boolean dupFlag = false;
+			boolean dupFlag = false;//是否有同一应用下的重复LOADFILE	
+			
+			List<CardLoadFile> clfList = cardLoadFileManager.getByCard(cci.getCard());
 			Set<ApplicationLoadFile> loadFiles = cbf.getLoadFileVersion().getApplicationLoadFiles();
-			List<CardApplication> caList = cardApplicationManager.getCardAppByCard(cci.getCard());
-			for(CardApplication ca : caList ) {
+			
+			for (CardLoadFile clf : clfList) {
+				Set<ApplicationLoadFile> AppverLoadFileSet = clf.getLoadFileVersion().getApplicationLoadFiles();
+				for (ApplicationLoadFile alf : AppverLoadFileSet) {
+					Application application = alf.getApplicationVersion().getApplication();
 					for(ApplicationLoadFile presetAlf : loadFiles) {
 						Application preapp = presetAlf.getApplicationVersion().getApplication();
-						if(ca.getApplicationVersion().getApplication().getId().longValue() == preapp.getId().longValue()) {
+						if(application.getId().longValue() == preapp.getId().longValue()) {
 							dupFlag = true;
 						}
 					}
+				}
 			}
+			
 			if (dupFlag) {
 				continue;
 			} else {
