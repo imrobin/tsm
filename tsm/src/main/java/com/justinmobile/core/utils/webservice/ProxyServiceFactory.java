@@ -25,12 +25,15 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsClientProxy;
 import org.apache.cxf.transport.http.HTTPConduit;
 
 import com.justinmobile.tsm.endpoint.webservice.NameSpace;
+import com.justinmobile.tsm.endpoint.webservice.log.LoggingFormatInInterceptor;
+import com.justinmobile.tsm.endpoint.webservice.log.LoggingFormatOutInterceptor;
 
 /**
  * 根据wsdl文件解析，获取实现方法
@@ -169,7 +172,10 @@ public class ProxyServiceFactory {
 	public <T> T getHttpPort(Class<T> serviceClass, Map<String, String> namespaceMap) {
 		T port = service.getPort(httpPortName, serviceClass);
 
-		org.apache.cxf.service.Service s = ((JaxWsClientProxy) Proxy.getInvocationHandler(port)).getClient().getEndpoint().getService();
+		Endpoint endpoint = ((JaxWsClientProxy) Proxy.getInvocationHandler(port)).getClient().getEndpoint();
+		endpoint.getInInterceptors().add(new LoggingFormatInInterceptor());
+		endpoint.getOutInterceptors().add(new LoggingFormatOutInterceptor());
+		org.apache.cxf.service.Service s = endpoint.getService();
 		if (s.getDataBinding() instanceof JAXBDataBinding && null != namespaceMap) {
 			((JAXBDataBinding) s.getDataBinding()).setNamespaceMap(namespaceMap);
 		}
