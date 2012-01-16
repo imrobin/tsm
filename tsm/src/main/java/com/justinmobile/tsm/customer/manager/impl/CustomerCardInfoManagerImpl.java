@@ -38,6 +38,7 @@ import com.justinmobile.tsm.application.domain.LoadFileVersion;
 import com.justinmobile.tsm.application.domain.SecurityDomain;
 import com.justinmobile.tsm.application.domain.Space;
 import com.justinmobile.tsm.application.domain.SpecialMobile;
+import com.justinmobile.tsm.application.manager.ApplicationLoadFileManager;
 import com.justinmobile.tsm.application.manager.ApplicationManager;
 import com.justinmobile.tsm.card.dao.CardApplicationDao;
 import com.justinmobile.tsm.card.dao.CardBaseApplicationDao;
@@ -148,6 +149,9 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 
 	@Autowired
 	private ApplicationManager applicationManager;
+	
+	@Autowired
+	ApplicationLoadFileManager applicationLoadFileManager;
 
 	@Autowired
 	private MobileSectionManager mobileSectionManager;
@@ -936,11 +940,8 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 				if (isExist) {
 					continue;
 				}
-				//判断数据库是否已经有记录
-				CardApplication ca = cardApplicationManager.getByCardAndAppver(cci.getCard(), cba.getApplicationVersion());
-//				List<CardApplication> caList = cardApplicationManager.getByCardAndApplication(cci.getCard(), cba.getApplicationVersion().getApplication());
-//				if (caList.size() > 0) {
-				if (null != ca) {
+				List<CardApplication> caList = cardApplicationManager.getByCardAndApplication(cci.getCard(), cba.getApplicationVersion().getApplication());
+				if (caList.size() > 0) {
 					continue;
 				} else {
 					createCardApp(cci, cba);
@@ -1016,11 +1017,21 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	private void createCardLoadFile(CustomerCardInfo cci, CardBaseInfo cbi) {
 		List<CardBaseLoadFile> BaseLoadFileList = cardBaseLoadFileManager.getBaseLoadFileByCardBase(cbi);
 		for (CardBaseLoadFile cbf : BaseLoadFileList) {
-			CardLoadFile clf = cardLoadFileManager.getByCardAndLoadFileVersion(cci.getCard(), cbf.getLoadFileVersion());
-			if (null != clf) {
+			boolean dupFlag = false;
+			Set<ApplicationLoadFile> loadFiles = cbf.getLoadFileVersion().getApplicationLoadFiles();
+			List<CardApplication> caList = cardApplicationManager.getCardAppByCard(cci.getCard());
+			for(CardApplication ca : caList ) {
+					for(ApplicationLoadFile presetAlf : loadFiles) {
+						Application preapp = presetAlf.getApplicationVersion().getApplication();
+						if(ca.getApplicationVersion().getApplication().getId().longValue() == preapp.getId().longValue()) {
+							dupFlag = true;
+						}
+					}
+			}
+			if (dupFlag) {
 				continue;
 			} else {
-				clf = new CardLoadFile();
+				CardLoadFile clf = new CardLoadFile();
 				clf.setCard(cci.getCard());
 				clf.setLoadFileVersion(cbf.getLoadFileVersion());
 				CardInfo card = cci.getCard();
