@@ -923,6 +923,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 				} else {
 					processTrans(request, resAPDU, res, cardNo);
 				}
+				res.setMobileNo(customerCard.getMobileNo());
 				res.setAppInfoList(upAppInfo(card, sysType));
 				res.setClientInfoList(upClientInfo(card, sysType));
 				break;
