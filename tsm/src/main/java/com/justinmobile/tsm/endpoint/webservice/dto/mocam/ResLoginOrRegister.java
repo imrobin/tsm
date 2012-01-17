@@ -49,6 +49,9 @@ public class ResLoginOrRegister {
 
 	@XmlElement(namespace = NameSpace.CM, name="ClientInfoList")
 	private ClientInfoList clientInfoList;
+	
+	@XmlElement(namespace = NameSpace.CM, name="MSISDN")
+	private String mobileNo;
 
 	public String getCommandID() {
 		return commandID;
@@ -149,6 +152,15 @@ public class ResLoginOrRegister {
 	public void setClientInfoList(ClientInfoList clientInfoList) {
 		this.clientInfoList = clientInfoList;
 	}
+	
+	public String getMobileNo() {
+		return mobileNo;
+	}
+
+	public void setMobileNo(String mobileNo) {
+		this.mobileNo = mobileNo;
+	}
+	
 	
 	
 
