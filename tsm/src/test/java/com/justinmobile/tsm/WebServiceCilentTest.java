@@ -9,16 +9,21 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 import javax.xml.ws.Service;
 
-import org.apache.commons.lang.ArrayUtils;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.Test;
 
+//import com.justinmobile.cmpp.message.MessageFormat;
+import com.justinmobile.cmpp.message.MessageFormat;
+import com.justinmobile.cmpp.webservice.SmsWebCaller;
 import com.justinmobile.core.utils.ConvertUtils;
-import com.justinmobile.core.utils.TlvObject;
+
 import com.justinmobile.core.utils.webservice.ProxyServiceFactory;
-import com.justinmobile.tsm.cms2ac.engine.ApduEngine;
+
 import com.justinmobile.tsm.endpoint.sms.OuterWebService;
 import com.justinmobile.tsm.endpoint.webservice.MobileWebService;
+import com.justinmobile.tsm.endpoint.webservice.NameSpace;
 import com.justinmobile.tsm.endpoint.webservice.ProviderCallTsmWebService;
 import com.justinmobile.tsm.endpoint.webservice.SmsWebService;
 import com.justinmobile.tsm.endpoint.webservice.dto.Status;
@@ -100,7 +105,7 @@ public class WebServiceCilentTest {
 		client.businessEventNotify(seqNum, sessionId, timeStamp, commType, msisdn, appAid, seId, eventId, status);
 	}
 
-	@Test
+	//@Test
 	public void testSms() throws Exception {
 		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
 		factory.setServiceClass(SmsWebService.class);
@@ -182,12 +187,12 @@ public class WebServiceCilentTest {
 		System.out.println(response.getStatus().getStatusDescription());
 	}
 
-	// @Test //应用详情 pass
+	 //@Test //应用详情 pass
 	public void testGetInfo100007() throws Exception {
 		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
 		factory.setServiceClass(MobileWebService.class);
-		factory.setAddress("http://127.0.0.1:8080/services/MobileWebService?wsdl");
-		// factory.setAddress("http://218.206.179.214:8080/tsm/services/MobileWebService?wsdl");
+		//factory.setAddress("http://127.0.0.1:8080/services/MobileWebService?wsdl");
+		 factory.setAddress("http://218.206.179.214:8080/tsm/services/MobileWebService?wsdl");
 		MobileWebService client = (MobileWebService) factory.create();
 		ReqGetApplicationInfo request = new ReqGetApplicationInfo();
 		request.setAppAID("D056000101800000000100001012");
@@ -233,7 +238,7 @@ public class WebServiceCilentTest {
 		System.out.println(response.getStatus().getStatusDescription());
 	}
 
-	// @Test //获取应用列表,pass
+	 //@Test //获取应用列表,pass
 	public void testApplicationList100005() throws Exception {
 		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
 		factory.setServiceClass(MobileWebService.class);
@@ -244,7 +249,7 @@ public class WebServiceCilentTest {
 		request.setCardNo("12000004000000100006");
 		request.setCommandID("100005");
 		request.setPageNumber(1);
-		request.setIsDownloaded(0);
+		request.setIsDownloaded(1);
 		request.setCommonType("ME-Android2.3-1.0");
 		request.setSessionID("1111002054123000001");
 		ResApplicationList response = client.listApplication(request);
@@ -267,12 +272,12 @@ public class WebServiceCilentTest {
 		System.out.println(response.getStatus().getStatusDescription());
 	}
 
-	@Test
+	//@Test
 	public void testRegAndLogin() throws Exception {
 		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
 		factory.setServiceClass(MobileWebService.class);
-		factory.setAddress("http://218.206.179.214:8080/tsm/services/MobileWebService?wsdl");
-		// factory.setAddress("http://localhost:8080/services/MobileWebService?wsdl");
+		//factory.setAddress("http://218.206.179.214:8080/tsm/services/MobileWebService?wsdl");
+		factory.setAddress("http://localhost:8080/services/MobileWebService?wsdl");
 		MobileWebService client = (MobileWebService) factory.create();
 		LoginOrRegisterRequest request = new LoginOrRegisterRequest();
 		request.setCardNo("12000004000000100006");
@@ -280,10 +285,9 @@ public class WebServiceCilentTest {
 		request.setImei("310260000000000");
 		request.setCommandID("100001");
 		request.setChallengeNo("111111");
-		request.setCommonType("ME-Android-1.0");
+		request.setCommonType("ME-Android2.3-1.0");
 		request.setSessionID("20111127140252000002");
-		ResLoginOrRegister response = client.loginOrRegiseter(request);
-		System.out.println(response.getStatus().getStatusDescription());
+	    client.loginOrRegiseter(request);
 	}
 
 	// @Test
@@ -379,31 +383,54 @@ public class WebServiceCilentTest {
 		System.out.println(response.getStatus().getStatusDescription());
 	}
 
-	// @Test
+	 //@Test
 	public void testSMS() {
 		ProxyServiceFactory factory = new ProxyServiceFactory(
 				"http://218.206.179.214:8080/tsm/services/OuterWebService?wsdl", "OuterWebService",
 				"http://www.chinamobile.com");
 		OuterWebService client = factory.getHttpPort(OuterWebService.class);
-		client.smsNotifyUser("15881053926", "你好哦");
+		client.smsNotifyUser("13880668542", "100112000004000000100009111111111111111111222222");
 	}
+	 //@Test
+		public void testMOSMS() {
+			ProxyServiceFactory factory = new ProxyServiceFactory(
+					"http://218.206.179.214:8080/tsm/services/SmsWebService?wsdl", "SmsWebService",
+					"http://www.chinamobile.com");
+			SmsWebService client = factory.getHttpPort(SmsWebService.class);
+			client.hanldeMessage("100112000004000000100009111111111111111111222222", "13880668542");
+		}
 
 	// @Test
 	public void testOperate() {
-		byte[] a = ConvertUtils.hexString2ByteArray("10480C010A000102030405060708099000");
-		System.out.println(a.length);
-		byte[] b = ArrayUtils.subarray(a, 0, a.length - 2);
-		System.out.println();
-		// response.setData(ArrayUtils.subarray(result.getData(), 0,
-		// result.getData().length - 2));
-		TlvObject data = TlvObject.parse(b, 2, 1);
-		String tokenTag = "01";
-		String dataTag = ConvertUtils.int2HexString(ApduEngine.GET_DATA_CMD_P1P2_TOKEN, 2 * 2);
-		String imsiTag = "02";
-		TlvObject content = TlvObject.parse(data.getByTag(dataTag));
-		String token = new String(content.getByTag(tokenTag));
-		String imsi = new String(content.getByTag(imsiTag));
-		System.out.println(token+" "+imsi);
-
+		byte[] bytes = ConvertUtils
+		.hexString2ByteArray("313030313132303030303034303030303030313030303039313131313131313131313131313131313131323232323232");
+         String string = new String(bytes);
+         System.out.println(string);
+	}
+	@Test
+	public void testPushhSMS() {
+		ProxyServiceFactory factory = new ProxyServiceFactory(
+				"http://218.206.179.214:8080/tsm/services/OuterWebService?wsdl", "OuterWebService",
+				"http://www.chinamobile.com");
+		OuterWebService client = factory.getHttpPort(OuterWebService.class);
+		client.sendPushSms("15267468791", MessageFormat.MSG_FORMAT_TYPE_ASCII.getValue(), "9999", "9999", "22", "12000004000000100006", "12345678");
+		client.sendPushSms("15867175330", MessageFormat.MSG_FORMAT_TYPE_ASCII.getValue(), "9999", "9999", "22", "12000004000000100006", "12345678");
+	}
+	//@Test
+	public void testSysType(){
+		String sysType = StringUtils.substringBefore(StringUtils.substringAfter("ME-Android-1.0", "-"),
+		"-");
+		System.out.println(sysType);
+	}
+	//@Test
+	public void testMoSms(){
+		//ProxyServiceFactory factory = new ProxyServiceFactory(p.getProperty("service.url"), p.getProperty("service.name"), p.getProperty("service.qname"));
+		//SmsWebCaller caller = factory.getHttpPort(SmsWebCaller.class);
+		//caller.hanldeMessage(msgContent, mobileNo);
+		ProxyServiceFactory factory = new ProxyServiceFactory("http://218.206.179.214:8080/tsm/services/SmsWebService?wsdl", "SmsWebService", NameSpace.CM);
+		SmsWebCaller caller = factory.getHttpPort(SmsWebCaller.class);
+		String hexStr= "00000018800000040005F24515BF77C002F3CE7200000000";
+		com.justinmobile.cmpp.webservice.Status status = caller.hanldeMessage(hexStr, "13880668542");
+		System.out.println(status.getStatusDescription());
 	}
 }
