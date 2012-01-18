@@ -42,6 +42,6 @@ public class Status {
 	}
 
 	public boolean isProviderWebServiceSuccess() {
-		return PlatformMessage.WEB_SERVICE_SUCCESS.getCode().equals(statusCode);
+		return PlatformMessage.PROVIDER_WEB_SERVICE_SUCCESS.getCode().equals(statusCode);
 	}
 }
