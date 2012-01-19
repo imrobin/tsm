@@ -11,7 +11,7 @@ import com.justinmobile.tsm.endpoint.webservice.NameSpace;
 @XmlType(name = "Personalization", namespace = NameSpace.CM)
 public class Personalization {
 
-	@XmlElement(name = "AppAid", namespace = NameSpace.CM)
+	@XmlElement(name = "AppAID", namespace = NameSpace.CM)
 	private String aid;
 
 	@XmlElement(name = "FileContent", namespace = NameSpace.CM)
