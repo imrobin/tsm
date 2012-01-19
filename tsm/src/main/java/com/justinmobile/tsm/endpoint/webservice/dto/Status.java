@@ -21,8 +21,8 @@ public class Status {
 
 	public Status() {
 		super();
-		this.statusCode = PlatformMessage.WEB_SERVICE_SUCCESS.getCode();
-		this.statusDescription = PlatformMessage.WEB_SERVICE_SUCCESS.getMessage();
+		this.statusCode = PlatformMessage.PROVIDER_WEB_SERVICE_SUCCESS.getCode();
+		this.statusDescription = PlatformMessage.PROVIDER_WEB_SERVICE_SUCCESS.getMessage();
 	}
 
 	public String getStatusCode() {
