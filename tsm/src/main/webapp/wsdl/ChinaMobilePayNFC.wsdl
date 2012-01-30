@@ -1,0 +1,154 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<wsdl:definitions name="TsmCallProviderWebService" targetNamespace="http://www.chinamobile.com" xmlns:ns1="http://schemas.xmlsoap.org/soap/http"
+   xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://www.chinamobile.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+   <wsdl:types>
+      <xs:schema elementFormDefault="unqualified" targetNamespace="http://www.chinamobile.com" version="1.0" xmlns:tns="http://www.chinamobile.com"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema">
+         <xs:element name="OperationResultNotify" type="tns:OperationResultNotify" />
+         <xs:element name="OperationResultNotifyResponse" type="tns:OperationResultNotifyResponse" />
+         <xs:element name="PreOperationsReq" type="tns:PreOperationsReq" />
+         <xs:element name="PreOperationsReqResponse" type="tns:PreOperationsReqResponse" />
+         <xs:complexType name="OperationResultNotify">
+            <xs:sequence>
+               <xs:element form="qualified" minOccurs="0" name="SeqNum" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="SessionID" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="SessionType" type="xs:int" />
+               <xs:element form="qualified" minOccurs="0" name="TimeStamp" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="OriginalSeqNum" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="Msisdn" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="SEID" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="AppAID" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="ResultCode" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="ResultMsg" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="Imsi" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="CardPOR" type="tns:CardPOR" />
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="CardPOR">
+            <xs:sequence>
+               <xs:element form="qualified" minOccurs="0" name="APDUSum" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="LastApduSW" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="LastData" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="LastApdu" type="xs:string" />
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="OperationResultNotifyResponse">
+            <xs:sequence>
+               <xs:element form="qualified" minOccurs="0" name="SeqNum" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="TimeStamp" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="Status" type="tns:Status" />
+               <xs:element form="qualified" minOccurs="0" name="IfContinueOpt" type="xs:int" />
+               <xs:element form="qualified" minOccurs="0" name="KeyVersion" type="xs:string" />
+               <xs:element form="qualified" maxOccurs="unbounded" minOccurs="0" name="DomainKey" type="tns:DomainKey" />
+               <xs:element form="qualified" maxOccurs="unbounded" minOccurs="0" name="Personalization" type="tns:Personalization" />
+               <xs:element form="qualified" minOccurs="0" name="PersoType" type="xs:int" />
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="Status">
+            <xs:sequence>
+               <xs:element form="qualified" minOccurs="0" name="StatusCode" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="StatusDescription" type="xs:string" />
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="DomainKey">
+            <xs:sequence>
+               <xs:element form="qualified" minOccurs="0" name="KeyID" type="xs:int" />
+               <xs:element form="qualified" minOccurs="0" name="KeyType" type="xs:int" />
+               <xs:element form="qualified" minOccurs="0" name="KeyValue" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="KeyCheck" type="xs:string" />
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="Personalization">
+            <xs:sequence>
+               <xs:element form="qualified" minOccurs="0" name="AppAid" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="FileContent" type="xs:string" />
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="PreOperationsReq">
+            <xs:sequence>
+               <xs:element form="qualified" minOccurs="0" name="SeqNum" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="SessionID" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="SessionType" type="xs:int" />
+               <xs:element form="qualified" minOccurs="0" name="TimeStamp" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="CommType" type="xs:int" />
+               <xs:element form="qualified" minOccurs="0" name="Msisdn" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="SEID" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="IMEI" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="AppAID" type="xs:string" />
+            </xs:sequence>
+         </xs:complexType>
+         <xs:complexType name="PreOperationsReqResponse">
+            <xs:sequence>
+               <xs:element form="qualified" minOccurs="0" name="SeqNum" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="TimeStamp" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="Status" type="tns:Status" />
+               <xs:element form="qualified" minOccurs="0" name="ProviderSessionId" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="DomainAID" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="SSDDapSign" type="xs:string" />
+               <xs:element form="qualified" minOccurs="0" name="KeyVersion" type="xs:string" />
+               <xs:element form="qualified" maxOccurs="unbounded" minOccurs="0" name="DomainKey" type="tns:DomainKey" />
+               <xs:element form="qualified" maxOccurs="unbounded" minOccurs="0" name="Personalization" type="tns:Personalization" />
+               <xs:element form="qualified" minOccurs="0" name="PersoType" type="xs:int" />
+               <xs:element form="qualified" minOccurs="0" name="OrgMsisdn" type="xs:string" />
+            </xs:sequence>
+         </xs:complexType>
+      </xs:schema>
+   </wsdl:types>
+   <wsdl:message name="OperationResultNotifyResponse">
+      <wsdl:part element="tns:OperationResultNotifyResponse" name="parameters">
+      </wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="PreOperationsReq">
+      <wsdl:part element="tns:PreOperationsReq" name="parameters">
+      </wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="PreOperationsReqResponse">
+      <wsdl:part element="tns:PreOperationsReqResponse" name="parameters">
+      </wsdl:part>
+   </wsdl:message>
+   <wsdl:message name="OperationResultNotify">
+      <wsdl:part element="tns:OperationResultNotify" name="parameters">
+      </wsdl:part>
+   </wsdl:message>
+   <wsdl:portType name="TsmCallProviderWebService">
+      <wsdl:operation name="OperationResultNotify">
+         <wsdl:input message="tns:OperationResultNotify" name="OperationResultNotify">
+         </wsdl:input>
+         <wsdl:output message="tns:OperationResultNotifyResponse" name="OperationResultNotifyResponse">
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="PreOperationsReq">
+         <wsdl:input message="tns:PreOperationsReq" name="PreOperationsReq">
+         </wsdl:input>
+         <wsdl:output message="tns:PreOperationsReqResponse" name="PreOperationsReqResponse">
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:portType>
+   <wsdl:binding name="TsmCallProviderWebServiceSoapBinding" type="tns:TsmCallProviderWebService">
+      <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+      <wsdl:operation name="OperationResultNotify">
+         <soap:operation soapAction="" style="document" />
+         <wsdl:input name="OperationResultNotify">
+            <soap:body use="literal" />
+         </wsdl:input>
+         <wsdl:output name="OperationResultNotifyResponse">
+            <soap:body use="literal" />
+         </wsdl:output>
+      </wsdl:operation>
+      <wsdl:operation name="PreOperationsReq">
+         <soap:operation soapAction="" style="document" />
+         <wsdl:input name="PreOperationsReq">
+            <soap:body use="literal" />
+         </wsdl:input>
+         <wsdl:output name="PreOperationsReqResponse">
+            <soap:body use="literal" />
+         </wsdl:output>
+      </wsdl:operation>
+   </wsdl:binding>
+   <wsdl:service name="TsmCallProviderWebService">
+      <wsdl:port binding="tns:TsmCallProviderWebServiceSoapBinding" name="TsmCallProviderWebServiceHttpPort">
+         <soap:address location="http://211.138.236.209:31021/websvr/TSMService" />
+      </wsdl:port>
+   </wsdl:service>
+</wsdl:definitions>
