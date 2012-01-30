@@ -15,15 +15,14 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.junit.Test;
 
 //import com.justinmobile.cmpp.message.MessageFormat;
-import com.justinmobile.cmpp.message.MessageFormat;
-import com.justinmobile.cmpp.webservice.SmsWebCaller;
+//import com.justinmobile.cmpp.message.MessageFormat;
+//import com.justinmobile.cmpp.webservice.SmsWebCaller;
 import com.justinmobile.core.utils.ConvertUtils;
 
 import com.justinmobile.core.utils.webservice.ProxyServiceFactory;
 
 import com.justinmobile.tsm.endpoint.sms.OuterWebService;
 import com.justinmobile.tsm.endpoint.webservice.MobileWebService;
-import com.justinmobile.tsm.endpoint.webservice.NameSpace;
 import com.justinmobile.tsm.endpoint.webservice.ProviderCallTsmWebService;
 import com.justinmobile.tsm.endpoint.webservice.SmsWebService;
 import com.justinmobile.tsm.endpoint.webservice.dto.Status;
@@ -400,22 +399,22 @@ public class WebServiceCilentTest {
 			client.hanldeMessage("100112000004000000100009111111111111111111222222", "13880668542");
 		}
 
-	// @Test
+	 @Test
 	public void testOperate() {
 		byte[] bytes = ConvertUtils
 		.hexString2ByteArray("313030313132303030303034303030303030313030303039313131313131313131313131313131313131323232323232");
          String string = new String(bytes);
          System.out.println(string);
 	}
-	@Test
-	public void testPushhSMS() {
+	//@Test
+	/*public void testPushhSMS() {
 		ProxyServiceFactory factory = new ProxyServiceFactory(
 				"http://218.206.179.214:8080/tsm/services/OuterWebService?wsdl", "OuterWebService",
 				"http://www.chinamobile.com");
 		OuterWebService client = factory.getHttpPort(OuterWebService.class);
 		client.sendPushSms("15267468791", MessageFormat.MSG_FORMAT_TYPE_ASCII.getValue(), "9999", "9999", "22", "12000004000000100006", "12345678");
 		client.sendPushSms("15867175330", MessageFormat.MSG_FORMAT_TYPE_ASCII.getValue(), "9999", "9999", "22", "12000004000000100006", "12345678");
-	}
+	}*/
 	//@Test
 	public void testSysType(){
 		String sysType = StringUtils.substringBefore(StringUtils.substringAfter("ME-Android-1.0", "-"),
@@ -423,7 +422,7 @@ public class WebServiceCilentTest {
 		System.out.println(sysType);
 	}
 	//@Test
-	public void testMoSms(){
+	/*public void testMoSms(){
 		//ProxyServiceFactory factory = new ProxyServiceFactory(p.getProperty("service.url"), p.getProperty("service.name"), p.getProperty("service.qname"));
 		//SmsWebCaller caller = factory.getHttpPort(SmsWebCaller.class);
 		//caller.hanldeMessage(msgContent, mobileNo);
@@ -432,5 +431,5 @@ public class WebServiceCilentTest {
 		String hexStr= "00000018800000040005F24515BF77C002F3CE7200000000";
 		com.justinmobile.cmpp.webservice.Status status = caller.hanldeMessage(hexStr, "13880668542");
 		System.out.println(status.getStatusDescription());
-	}
+	}*/
 }
