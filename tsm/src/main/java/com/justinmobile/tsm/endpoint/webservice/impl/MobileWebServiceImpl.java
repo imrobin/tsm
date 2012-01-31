@@ -386,7 +386,11 @@ public class MobileWebServiceImpl implements MobileWebService {
 		AppInfoList appInfoList = new AppInfoList();
 		// 将得到的结果转换成dto
 		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
-		appInfoList.addAll(page.getResult(), sysType, null);
+		if (req.getQueryCondition().startsWith("EQS_aid=")){
+			appInfoList.addAllFullInfo(page.getResult(), sysType, null);
+		}else{
+			appInfoList.addAll(page.getResult(), sysType, null);
+		}
 		// 设置返回结果
 		List<AppInfo> appInfos = appInfoList.getAppInfo();
 		for (AppInfo appinfo : appInfos) {

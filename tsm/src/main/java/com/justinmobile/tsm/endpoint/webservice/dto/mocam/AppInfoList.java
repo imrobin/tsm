@@ -41,6 +41,14 @@ public class AppInfoList {
 			}
 		}
 	}
-
+	public void addAllFullInfo(List<Application> apps, String sysType, Integer isUpdatable) {
+		if (CollectionUtils.isNotEmpty(apps)) {
+			for (Application app : apps) {
+				AppInfo info = new AppInfo();
+				info.build(app, sysType, isUpdatable);
+				this.add(info);
+			}
+		}
+	}
 
 }

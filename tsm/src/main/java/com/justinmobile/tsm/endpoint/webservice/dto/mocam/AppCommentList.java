@@ -1,5 +1,6 @@
 package com.justinmobile.tsm.endpoint.webservice.dto.mocam;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -10,7 +11,6 @@ import javax.xml.bind.annotation.XmlType;
 import org.apache.commons.collections.CollectionUtils;
 
 import com.google.common.collect.Lists;
-import com.justinmobile.core.utils.CalendarUtils;
 import com.justinmobile.tsm.application.domain.ApplicationComment;
 import com.justinmobile.tsm.endpoint.webservice.NameSpace;
 
@@ -33,7 +33,8 @@ public class AppCommentList {
 		if (CollectionUtils.isNotEmpty(result)) {
 			for (ApplicationComment comment : result) {
 				AppComment appComment = new AppComment();
-				appComment.setCommentTime(CalendarUtils.parsefomatCalendar(comment.getCommentTime(), CalendarUtils.LONG_FORMAT));
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd HH:mm:ss");
+				appComment.setCommentTime(sdf.format(comment.getCommentTime().getTime()));
 				appComment.setCommentContent(comment.getContent());
 				appComment.setStarGrade(comment.getGrade() == null ? 5 : comment.getGrade());
 				appComment.setUserName(comment.getCustomer().getSysUser().getUserName());
