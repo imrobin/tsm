@@ -272,7 +272,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 					status = 1;
 				}
 				info.setAppStatus(status);
-				this.setClientId(info.getAppAid(), info, req.getCardNo());
+				//this.setClientId(info.getAppAid(), info, req.getCardNo());
 				appInfoList.add(info);
 			}
 		}
@@ -306,9 +306,9 @@ public class MobileWebServiceImpl implements MobileWebService {
 		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
 		appInfoList.addAll(page.getResult(), sysType, null);
 		List<AppInfo> appInfos = appInfoList.getAppInfo();
-		for (AppInfo appinfo : appInfos) {
-			this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
-		}
+//		for (AppInfo appinfo : appInfos) {
+//			this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
+//		}
 		int nextPage = page.getNextPage();
 		if (req.getQueryCondition() != null && req.getQueryCondition().equals("topDownload")) {
 			nextPage = 0;
@@ -338,9 +338,9 @@ public class MobileWebServiceImpl implements MobileWebService {
 		}
 		appInfoList.addAll(appList, sysType, null);
 		List<AppInfo> appInfos = appInfoList.getAppInfo();
-		for (AppInfo appinfo : appInfos) {
-			this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
-		}
+		//for (AppInfo appinfo : appInfos) {
+			//this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
+		//}
 		sortList(req, appInfos);
 		// 设置返回结果
 		int nextPage = page.getNextPage();
