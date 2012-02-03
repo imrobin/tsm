@@ -22,7 +22,6 @@ AppManager.Test = new Class(
 			initialize : function(options) {
 				var appM = this;
 				this.getConstants();
-				var cal = new Customer.Cal();
 				appM.grid = new JIM.UI.Grid(
 						'tableDiv',
 						{
@@ -577,7 +576,6 @@ AppManager.Test = new Class(
 				formWin.messageBox.getElement('[id="month"]').set('value', month);
 				formWin.messageBox.getElement('[id="month"]').fireEvent('change');
 				formWin.messageBox.getElement('[id="day"]').set('value', today.getDate());
-
 				formWin.messageBox.getElement('[id="formAppverId"]').set('value', appverId);
 				var form = formWin.messageBox.getElement('form');
 				var validater = new FormCheck(form, {
@@ -826,68 +824,64 @@ AppManager.Test = new Class(
 					formDay.options.add(new Option(i + 1, i + 1));
 				}
 				switch (month) {
-				case "1":
-				case "3":
-				case "5":
-				case "7":
-				case "8":
+				case "01":
+				case "03":
+				case "05":
+				case "07":
+				case "08":
 				case "10":
-				case "12": {
+				case "12": 
 					formDay.options.add(new Option(29, 29));
 					formDay.options.add(new Option(30, 30));
 					formDay.options.add(new Option(31, 31));
-				}
 					break;
-				case "2": {
+				case "02": 
 					var nYear = formYear.get('value');
 					if (nYear % 400 == 0 || nYear % 4 == 0 && nYear % 100 != 0)
 						formDay.options.add(new Option(29, 29));
-				}
 					break;
-				default: {
+				default: 
 					formDay.options.add(new Option(29, 29));
 					formDay.options.add(new Option(30, 30));
 				}
-				}
 				if (day == 31) {
 					switch (month) {
-					case "1":
-					case "3":
-					case "5":
-					case "7":
-					case "8":
+					case "01":
+					case "03":
+					case "05":
+					case "07":
+					case "08":
 					case "10":
-					case "12": {
+					case "12": 
 						formDay.set('value', day);
-					}
 						break;
-					case "2": {
+					case "02": 
 						var nYear = formYear.get('value');
 						if (nYear % 400 == 0 || nYear % 4 == 0 && nYear % 100 != 0) {
 							formDay.set('value', 29);
 						} else {
 							formDay.set('value', 28);
 						}
-					}
+					
 						break;
-					default: {
+					default: 
 						formDay.set('value', 30);
-					}
+				
 					}
 				} else if (day == 29 || day == 30) {
 					switch (month) {
-					case "2": {
+					case "02": 
 						var nYear = formYear.get('value');
 						if (nYear % 400 == 0 || nYear % 4 == 0 && nYear % 100 != 0) {
 							formDay.set('value', 29);
 						} else {
 							formDay.set('value', 28);
 						}
-					}
+					
 						break;
-					default: {
+					default: 
 						formDay.set('value', day);
-					}
+					
 					}
 				} else {
 					formDay.set('value', day);

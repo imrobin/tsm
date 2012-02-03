@@ -127,16 +127,6 @@
 							<option value="12">12</option>
 						</select> 月 
 						<select id="day" name="day" size="1">
-									<script type="text/javascript">
-											var daybegin = 1, dayend = 31;
-											for ( var i = daybegin; i <= dayend; i++) {
-												var day = '';
-												if(i<10){
-													day = "0" + i;
-												}
-												document.write("<option value="+day+">"+ i+ "</option>");
-											}
-										</script>
 						</select> 日
 						</p></td>
 				</tr>
