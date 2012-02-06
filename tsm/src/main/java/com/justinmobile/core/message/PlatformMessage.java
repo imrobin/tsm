@@ -17,6 +17,7 @@ public enum PlatformMessage {
 	SUCCESS("00000000", "操作成功"),
 	WEB_SERVICE_SUCCESS("00000000", "操作成功"),
 	PROVIDER_WEB_SERVICE_SUCCESS("0000", "操作成功"),
+	CLIENT_SUCCESS("000000", "操作成功"),
 	
 	TRANS_EXCESSIVING("FFFFFF", "事务处理中"),
 	TRANS_EXCEPTION_CLOSED("AAAAAA", "异常事务关闭"),
@@ -36,7 +37,7 @@ public enum PlatformMessage {
 	MOBILE_CANCEL("00000003","开始注销"),
 	MOBILE_MISMATCH_CHALLENGE_NO("90000001", "未收到上行短信"),
 	MOBILE_REGISTERED("90000002", "终端已绑定"),
-	MOBILE_IN_BLACK_LIST("90000003", "终端在黑名单"),
+	MOBILE_IN_BLACK_LIST("90000003", "终端在黑名单"), 
 	;
 
 	private String code;

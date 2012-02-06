@@ -25,6 +25,15 @@ public class Status {
 		this.statusDescription = PlatformMessage.PROVIDER_WEB_SERVICE_SUCCESS.getMessage();
 	}
 
+	private Status(PlatformMessage message) {
+		this.statusCode = message.getCode();
+		this.statusDescription = message.getMessage();
+	}
+
+	public static Status getClientStauts() {
+		return new Status(PlatformMessage.CLIENT_SUCCESS);
+	}
+
 	public String getStatusCode() {
 		return statusCode;
 	}
