@@ -275,8 +275,8 @@ public class LocalTransaction extends AbstractEntity {
 		REPLACE_MOBILE_NO(25, "replaceMobileNoProcessor", "100116", SessionType.REPLACE_MOBILE_NO),
 		/** 通知业务平台更换手机号 */
 		NOTIFY_REPLACE_MOBILE_NO(26, "personalizeAppProcessor", "", SessionType.REPLACE_MOBILE_NO),
-		/** IMSI通知  */
-		NOTIFY_IMSI(27,"notifyImsiProcessor","100008",SessionType.OTHER),
+		/** 更新TOKEN  */
+		CHANGE_TOKEN(27,"changeTokenProcessor","100008",SessionType.OTHER),
 		/** 未知操作 */
 		UNKNOWN(-1, "", "", SessionType.OTHER);
 
@@ -292,7 +292,7 @@ public class LocalTransaction extends AbstractEntity {
 		static {
 			CARD_OPERATIONS.add(REGISTER);
 			CARD_OPERATIONS.add(LOGIN);
-			CARD_OPERATIONS.add(NOTIFY_IMSI);
+			CARD_OPERATIONS.add(CHANGE_TOKEN);
 		}
 
 		Operation(int type, String beanName, String commandId, SessionType sessionType) {
