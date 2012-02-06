@@ -169,7 +169,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 	@OpenSession
 	public ResApplicationList listApplication(ReqApplicationList req) {
 		ResApplicationList res = new ResApplicationList();
-		Status status = new Status();
+		Status status = Status.getClientStauts();
 		res.setStatus(status);
 		res.setSessionID(req.getSessionID());
 		res.setCommandID(req.getCommandID());
@@ -386,7 +386,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		AppInfoList appInfoList = new AppInfoList();
 		// 将得到的结果转换成dto
 		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
-		if (req.getQueryCondition().startsWith("EQS_aid=")){
+		if (null != req.getQueryCondition() && req.getQueryCondition().startsWith("EQS_aid=")){
 			appInfoList.addAllFullInfo(page.getResult(), sysType, null);
 		}else{
 			appInfoList.addAll(page.getResult(), sysType, null);
@@ -468,7 +468,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 	@OpenSession
 	public GetInformation getInfo(ReqGetApplicationInfo reqGetApplicationInfo) {
 		GetInformation info = new GetInformation();
-		Status status = new Status();
+		Status status = Status.getClientStauts();
 		info.setStatus(status);
 		info.setCommandID(reqGetApplicationInfo.getCommandID());
 		info.setSessionID(reqGetApplicationInfo.getSessionID());
@@ -557,7 +557,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 
 		ResExecAPDU apdu = new ResExecAPDU();
 		String sessionId = reqExecAPDU.getSessionID();
-		Status status = new Status();
+		Status status = Status.getClientStauts();
 		apdu.setStatus(status);
 		try {
 
@@ -602,10 +602,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 	}
 
 	private void execAPDU(ReqExecAPDU reqExecAPDU, ResExecAPDU apdu, String sessionId) {
-		Status status = new Status();
-		apdu.setStatus(status);
-		status.setStatusCode(PlatformMessage.SUCCESS.getCode());
-		status.setStatusDescription(PlatformMessage.SUCCESS.getMessage());
+		Status status = apdu.getStatus();
 		try {
 			try {
 				apdu = processTrans(reqExecAPDU, apdu, sessionId);
@@ -815,7 +812,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 	@Override
 	public LoadClientResponse loadClient(LoadClientRequest loadClientRequest) {
 		LoadClientResponse response = new LoadClientResponse();
-		Status status = new Status();
+		Status status = Status.getClientStauts();
 		response.setCommandID(loadClientRequest.getCommandID());
 		response.setStatus(status);
 		response.setSessionID(loadClientRequest.getSessionID());
@@ -885,7 +882,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 	public ResLoginOrRegister loginOrRegiseter(LoginOrRegisterRequest request) {
 		ResExecAPDU resAPDU = new ResExecAPDU();
 		ResLoginOrRegister res = new ResLoginOrRegister();
-		Status status = new Status();
+		Status status = Status.getClientStauts();
 		res.setStatus(status);
 		String sessionId = null;
 		try {
@@ -1005,7 +1002,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 	@Override
 	public ResSdList listSd(ReqSdList reqSdList) {
 		ResSdList res = new ResSdList();
-		Status status = new Status();
+		Status status = Status.getClientStauts();
 		res.setStatus(status);
 		res.setCommandID(reqSdList.getCommandID());
 		try {
