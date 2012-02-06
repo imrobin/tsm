@@ -188,8 +188,6 @@ public class MobileWebServiceImpl implements MobileWebService {
 					listCardApps(req, res);
 				}
 			}
-			status.setStatusCode(PlatformMessage.SUCCESS.getCode());
-			status.setStatusDescription(PlatformMessage.SUCCESS.getMessage());
 		} catch (PlatformException e) {
 			e.printStackTrace();
 			status.setStatusCode(e.getErrorCode().getErrorCode());
@@ -749,7 +747,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 	public BasicResponse postAppComment(ReqAppComment reqAppComment) {
 		BasicResponse basicResponse = new BasicResponse();
 		basicResponse.setCommandID(reqAppComment.getCommandID());
-		Status status = new Status();
+		Status status = Status.getClientStauts();
 		basicResponse.setStatus(status);
 		try {
 			ApplicationComment ac = new ApplicationComment();
@@ -774,8 +772,6 @@ public class MobileWebServiceImpl implements MobileWebService {
 			ac.setContent(EncodeUtils.urlDecode(reqAppComment.getComment().getCommentContent()));
 			ac.setGrade(starGrade);
 			commentManager.saveOrUpdate(ac);
-			status.setStatusCode(PlatformMessage.SUCCESS.getCode());
-			status.setStatusDescription(PlatformMessage.SUCCESS.getMessage());
 		} catch (PlatformException e) {
 			e.printStackTrace();
 			status.setStatusCode(e.getErrorCode().getErrorCode());
