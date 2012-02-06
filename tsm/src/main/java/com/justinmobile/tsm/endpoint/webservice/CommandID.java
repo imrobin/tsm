@@ -54,8 +54,8 @@ public enum CommandID {
 	/** 100007，应用详情 */
 	AppInfo("100007"),
 	
-	/**100008，新IMSI通知*/
-	NotifyImsi("100008"),
+	/**100008，更新Token*/
+	ChangeToken("100008"),
 	
 	/** 100101，业务订购 */
 	BusinessOrder("100101"),
