@@ -904,7 +904,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 					processTrans(request, resAPDU, res, cardNo);
 				} else {// 如果该终端已经绑定
 					if (customerCard.getMobileNo().equals(card.getMobileNo())) {// 如果绑定手机号与上行短信手机号一致，发起修改IMSI操作
-						request.setCommandID(CommandID.NotifyImsi.getCode());
+						request.setCommandID(CommandID.ChangeToken.getCode());
 						processTrans(request, resAPDU, res, cardNo);
 					} else {// 如果绑定手机号与上行短信手机号不一致，抛出异常
 						throw new PlatformException(PlatformErrorCode.CARD_IS_EXIST);
@@ -925,7 +925,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 				res.setClientInfoList(upClientInfo(card, sysType));
 				break;
 			}
-			case NotifyImsi: {
+			case ChangeToken: {
 
 				// 客户端在发送CommandID.NotifyImsi之前一定会发送上行短信，因此先验证上行短信
 				PlatformMessage message;
@@ -970,7 +970,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 			}
 		}
 		res.setCommandID(request.getCommandID());
-		if (request.getCommandID().equals(CommandID.NotifyImsi.getCode())) {
+		if (request.getCommandID().equals(CommandID.ChangeToken.getCode())) {
 			res.setUrl(SystemConfigUtils.getServiceUrl() + "aboutus.jsp?v=termsOfServiceLink");
 		} else if (request.getCommandID().equals(CommandID.UserRegist.getCode())) {
 			res.setMocamVersion(applicationClientInfoManager.getMocamMaxVersion());
