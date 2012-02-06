@@ -34,6 +34,13 @@
 	var ctx = '${ctx}';
 	var rImage;
 	window.addEvent('domready', function() {
+		$('menu_customer').setStyles({
+			'background' : 'url("'+ ctx + '/images/user_m1.png") repeat scroll 0 0 transparent',
+			'color' : '#FFFFFF',
+			'font-size' : '14px',
+			'font-weight' : 'bold',
+			'text-decoration' : 'none'
+		});
 		var cal = new Customer.Cal();
 		var validater = new FormCheck('modifyPwdForm', {
 			submit : false,

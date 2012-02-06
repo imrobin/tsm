@@ -19,6 +19,13 @@
 	//EvPNG.fix('div, ul, img, li, a, input, p, strong, span, button'); //EvPNG.fix('包含透明PNG图片的标签'); 多个标签之间用英文逗号隔开。
 	var ctx = '${ctx}';
 	window.addEvent('domready', function() {
+		$('menu_history').setStyles({
+			'background' : 'url("'+ ctx + '/images/user_m1.png") repeat scroll 0 0 transparent',
+			'color' : '#FFFFFF',
+			'font-size' : '14px',
+			'font-weight' : 'bold',
+			'text-decoration' : 'none'
+		});
 		var url = ctx + '/html/subscribehistory/?m=listHistoryForCustomer';
 
 		var grid = new HtmlTable({

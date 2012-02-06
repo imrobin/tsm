@@ -31,6 +31,13 @@ function MM_preloadImages() { //v3.0
 var ctx = '${ctx}';
 var appList;
 window.addEvent('domready', function() {
+	$('menu_termApp').setStyles({
+		'background' : 'url("'+ ctx + '/images/user_m1.png") repeat scroll 0 0 transparent',
+		'color' : '#FFFFFF',
+		'font-size' : '14px',
+		'font-weight' : 'bold',
+		'text-decoration' : 'none'
+	});
 	appList = new AppList();
 	appList.getAllApplist();
 });

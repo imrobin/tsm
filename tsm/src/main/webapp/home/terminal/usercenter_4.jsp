@@ -19,6 +19,13 @@
 	var ctx = '${ctx}';
 	var uc;
 	window.addEvent('domready', function() {
+		$('menu_task').setStyles({
+			'background' : 'url("'+ ctx + '/images/user_m1.png") repeat scroll 0 0 transparent',
+			'color' : '#FFFFFF',
+			'font-size' : '14px',
+			'font-weight' : 'bold',
+			'text-decoration' : 'none'
+		});
 		uc = new App.Index();
 		uc.loadTab1();
 		uc.loadTab2();
