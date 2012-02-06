@@ -602,7 +602,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 	}
 
 	private void execAPDU(ReqExecAPDU reqExecAPDU, ResExecAPDU apdu, String sessionId) {
-		Status status = apdu.getStatus();
+		Status status = Status.getClientStauts();
+		apdu.setStatus(status);
 		try {
 			try {
 				apdu = processTrans(reqExecAPDU, apdu, sessionId);
