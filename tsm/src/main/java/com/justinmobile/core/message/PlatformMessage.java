@@ -31,13 +31,13 @@ public enum PlatformMessage {
 	SMS_CHANGE_PWD("100003", "尊敬的用户：密码修改已成功，您的新的密码为：{0}"),
 	SMS_VALIDATE_CODE("100004","尊敬的用户：密码修改申请成功，您的验证码为：{0}"),
 	
-	MOBILE_LOGIN("00000000", "开始登录"),
-	MOBILE_REGISTER("00000001", "开始注册"),
-	MOBILE_NOTIFY_IMSI("00000002","IMSI通知"),
-	MOBILE_CANCEL("00000003","开始注销"),
-	MOBILE_MISMATCH_CHALLENGE_NO("90000001", "未收到上行短信"),
-	MOBILE_REGISTERED("90000002", "终端已绑定"),
-	MOBILE_IN_BLACK_LIST("90000003", "终端在黑名单"), 
+	MOBILE_LOGIN("000000", "开始登录"),
+	MOBILE_REGISTER("000001", "开始注册"),
+	MOBILE_NOTIFY_IMSI("000002","IMSI通知"),
+	MOBILE_CANCEL("000003","开始注销"),
+	MOBILE_MISMATCH_CHALLENGE_NO("900001", "未收到上行短信"),
+	MOBILE_REGISTERED("900002", "终端已绑定"),
+	MOBILE_IN_BLACK_LIST("900003", "终端在黑名单"), 
 	;
 
 	private String code;
