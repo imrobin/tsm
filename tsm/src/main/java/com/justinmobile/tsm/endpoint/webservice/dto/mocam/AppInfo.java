@@ -1,5 +1,7 @@
 package com.justinmobile.tsm.endpoint.webservice.dto.mocam;
 
+import java.util.Iterator;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -329,9 +331,17 @@ public class AppInfo {
 				this.setClientID(String.valueOf(client.getId()));
 			}
 		}
+		//目前只有一种应用样式
+		Iterator<ApplicationStyle> it = app.getApplicationStyle().iterator(); 
+		if(it.hasNext()){
+			 ApplicationStyle as = it.next(); 
+			 this.setAppCardStyle(as.getStyleUrl());
+		}else{
+			this.setAppCardStyle("");
+		}
 		this.setAppClassify(app.getChildType().getName());
-		//this.setAppLogoURL(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppPcImg&appId="+app.getId());
-		this.setSmallCardURL(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppMobileImgByAid&aId="+app.getAid());
+		this.setAppLogoURL(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppPcImg&appId="+app.getId());
+		//this.setSmallCardURL(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppMobileImgByAid&aId="+app.getAid());
 		this.setAppDesc(app.getDescription());
 	}
 	private void buildInfo(Application app, String sysType, Integer isUpdatable){
