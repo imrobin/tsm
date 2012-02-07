@@ -40,7 +40,10 @@ public class SmsWebServiceImpl implements SmsWebService {
 		CardInfo card = cardManager.buildCardInfoIfNotExist(seId);
 
 		// ismi不用但手机号相同，换卡不换号
-		if (!imsi.equals(card.getImsi()) && mobileNo.equals(card.getMobileNo())) {
+		if(imsi.equals(card.getImsi())){
+			card.setRegisterable(CardInfo.REGISTERABLE_LOGIN);
+		}
+		else if ( mobileNo.equals(card.getMobileNo())) {
 			card.setRegisterable(CardInfo.REGISTERABLE_CHANGE_SIM);
 		} else {
 			card.setRegisterable(CardInfo.REGISTERABLE_NEW);

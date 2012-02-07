@@ -175,14 +175,16 @@ public class MobileWebServiceImpl implements MobileWebService {
 		res.setCommandID(req.getCommandID());
 		Integer isDownloaded = req.getIsDownloaded();
 		try {
-			if (req.getQueryCondition() != null && req.getQueryCondition().equals("commendApp")) {
+			if (req.getQueryCondition() != null
+					&& req.getQueryCondition().equals("commendApp")) {
 				listRecommendApp(req, res);
 				// isDownload=0是未下载，1是已下载，2是所有应用
 			} else if (isDownloaded.intValue() == 2) {
 				listApps(req, res);
 			} else {
 				if (isDownloaded.intValue() == 0
-						|| (req.getQueryCondition() != null && req.getQueryCondition().equals("topDownload"))) {
+						|| (req.getQueryCondition() != null && req
+								.getQueryCondition().equals("topDownload"))) {
 					listNotCardApps(req, res);
 				} else {
 					listCardApps(req, res);
@@ -207,15 +209,20 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 获取分页参数
 		Page<CardApplication> page = buildPage(req);
 		// 是否有用有更新
-		CustomerCardInfo cci = customerCardInfoManager.getByCardNo(req.getCardNo());
+		CustomerCardInfo cci = customerCardInfoManager.getByCardNo(req
+				.getCardNo());
 		CardInfo cardInfo = cci.getCard();
-		List<CardBaseApplication> cardBaseApplications = cardInfo.getCardBaseInfo().getCardBaseApplications();
+		List<CardBaseApplication> cardBaseApplications = cardInfo
+				.getCardBaseInfo().getCardBaseApplications();
 		// 获取过滤条件
 		List<PropertyFilter> filters = buildFilter(req);
 		// 加入卡号
-		filters.add(new PropertyFilter("ALIAS_cardInfoI_EQS_cardNo", req.getCardNo()));
-		filters.add(new PropertyFilter("INI_status", new Integer[] { CardApplication.STATUS_AVAILABLE,
-				CardApplication.STATUS_PERSONALIZED, CardApplication.STATUS_LOCKED }));
+		filters.add(new PropertyFilter("ALIAS_cardInfoI_EQS_cardNo", req
+				.getCardNo()));
+		filters.add(new PropertyFilter("INI_status", new Integer[] {
+				CardApplication.STATUS_AVAILABLE,
+				CardApplication.STATUS_PERSONALIZED,
+				CardApplication.STATUS_LOCKED }));
 
 		page = cardApplicationManager.findPage(page, filters);
 
@@ -228,7 +235,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 			for (CardApplication cardApplication : result) {
 				// String cardVersion =
 				// cardApplication.getApplicationVersion().getVersionNo();
-				Application application = cardApplication.getApplicationVersion().getApplication();
+				Application application = cardApplication
+						.getApplicationVersion().getApplication();
 				// String appVersion = application.getLastestVersion();
 				// 是否有用有更新
 				List<ApplicationVersion> versions = application.getVersions();
@@ -236,15 +244,20 @@ public class MobileWebServiceImpl implements MobileWebService {
 				// 在application.version中存在更高版本，status=3，且card_base_application有该终端对应批次的记录。就显示
 				for (ApplicationVersion av : versions) {
 					if (av.getStatus().intValue() == ApplicationVersion.STATUS_PULISHED
-							&& SpringMVCUtils.compareVersion(av.getVersionNo(), cardApplication.getApplicationVersion()
-									.getVersionNo())) {
+							&& SpringMVCUtils.compareVersion(av.getVersionNo(),
+									cardApplication.getApplicationVersion()
+											.getVersionNo())) {
 						for (int i = 0; i < cardBaseApplications.size(); i++) {
-							CardBaseApplication cba = (CardBaseApplication) cardBaseApplications.get(i);
-							if (av.getId() == cba.getApplicationVersion().getId()) {
-								Set<SpecialMobile> speicalMobiles = av.getSpeicalMobiles();
+							CardBaseApplication cba = (CardBaseApplication) cardBaseApplications
+									.get(i);
+							if (av.getId() == cba.getApplicationVersion()
+									.getId()) {
+								Set<SpecialMobile> speicalMobiles = av
+										.getSpeicalMobiles();
 								if (speicalMobiles.size() != 0) {// 不为空表示当前版本有特定手机限制
 									for (SpecialMobile sm : speicalMobiles) { // 如果在特定手机里，可以更新
-										if (sm.getMobileNo().equals(cci.getMobileNo())) {
+										if (sm.getMobileNo().equals(
+												cci.getMobileNo())) {
 											isUpdate = 0x01;
 											break;
 										}
@@ -260,11 +273,13 @@ public class MobileWebServiceImpl implements MobileWebService {
 				apps.put(cardApplication, isUpdate);
 			}
 		}
-		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
+		String sysType = StringUtils.substringBefore(
+				StringUtils.substringAfter(req.getCommonType(), "-"), "-");
 		if (MapUtils.isNotEmpty(apps)) {
 			for (Map.Entry<CardApplication, Integer> entry : apps.entrySet()) {
 				AppInfo info = new AppInfo();
-				info.buildSimple(entry.getKey().getApplicationVersion(), sysType, entry.getValue());
+				info.buildSimple(entry.getKey().getApplicationVersion(),
+						sysType, entry.getValue());
 				int status = entry.getKey().getStatus();
 				if (status == CardApplication.STATUS_LOCKED) {
 					status = 2;
@@ -272,7 +287,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 					status = 1;
 				}
 				info.setAppStatus(status);
-				//this.setClientId(info.getAppAid(), info, req.getCardNo());
+				// this.setClientId(info.getAppAid(), info, req.getCardNo());
 				appInfoList.add(info);
 			}
 		}
@@ -292,7 +307,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 		Page<Application> page = buildPage(req);
 		Map<String, ?> filters = null;
 
-		if (req.getQueryCondition() != null && req.getQueryCondition().equals("topDownload")) {
+		if (req.getQueryCondition() != null
+				&& req.getQueryCondition().equals("topDownload")) {
 			page.setOrderBy("downloadCount");
 			page.setOrder("desc");
 			filters = new HashMap<String, Object>();
@@ -300,17 +316,20 @@ public class MobileWebServiceImpl implements MobileWebService {
 		} else {
 			filters = buildMapFilter(req);
 		}
-		page = applicationManager.getDownloadableApps(page, req.getCardNo(), filters);
+		page = applicationManager.getDownloadableApps(page, req.getCardNo(),
+				filters);
 		AppInfoList appInfoList = new AppInfoList();
 		// 将得到的结果转换成dto
-		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
+		String sysType = StringUtils.substringBefore(
+				StringUtils.substringAfter(req.getCommonType(), "-"), "-");
 		appInfoList.addAll(page.getResult(), sysType, null);
 		List<AppInfo> appInfos = appInfoList.getAppInfo();
-//		for (AppInfo appinfo : appInfos) {
-//			this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
-//		}
+		// for (AppInfo appinfo : appInfos) {
+		// this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
+		// }
 		int nextPage = page.getNextPage();
-		if (req.getQueryCondition() != null && req.getQueryCondition().equals("topDownload")) {
+		if (req.getQueryCondition() != null
+				&& req.getQueryCondition().equals("topDownload")) {
 			nextPage = 0;
 		} else {
 			sortList(req, appInfos);
@@ -328,19 +347,21 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 获取分页参数
 		Page<RecommendApplication> page = buildPage(req);
 
-		page = recommendApplicationManager.recommendAppListForMobile(page, req.getCardNo());
+		page = recommendApplicationManager.recommendAppListForMobile(page,
+				req.getCardNo());
 		AppInfoList appInfoList = new AppInfoList();
 		// 将得到的结果转换成dto
-		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
+		String sysType = StringUtils.substringBefore(
+				StringUtils.substringAfter(req.getCommonType(), "-"), "-");
 		List<Application> appList = new ArrayList<Application>();
 		for (RecommendApplication ra : page.getResult()) {
 			appList.add(ra.getApplication());
 		}
 		appInfoList.addAll(appList, sysType, null);
 		List<AppInfo> appInfos = appInfoList.getAppInfo();
-		//for (AppInfo appinfo : appInfos) {
-			//this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
-		//}
+		// for (AppInfo appinfo : appInfos) {
+		// this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
+		// }
 		sortList(req, appInfos);
 		// 设置返回结果
 		int nextPage = page.getNextPage();
@@ -359,9 +380,11 @@ public class MobileWebServiceImpl implements MobileWebService {
 			String orderName = StringUtils.substringBefore(order.name(), "_");
 			String sort = StringUtils.substringAfter(order.name(), "_");
 			try {
-				if (order.equals(ListOrder.appName_asc) || order.equals(ListOrder.appName_desc)) {
+				if (order.equals(ListOrder.appName_asc)
+						|| order.equals(ListOrder.appName_desc)) {
 					// 中文排序
-					Collections.sort(appInfos, new BeanComparator(orderName, Collator.getInstance(Locale.CHINA)));
+					Collections.sort(appInfos, new BeanComparator(orderName,
+							Collator.getInstance(Locale.CHINA)));
 				} else {
 					Collections.sort(appInfos, new BeanComparator(orderName));
 				}
@@ -381,14 +404,17 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 获取过滤条件
 		List<PropertyFilter> filters = buildFilter(req);
 		// 应用的状态为已发布状态
-		filters.add(new PropertyFilter("EQI_status", String.valueOf(Application.STATUS_PUBLISHED)));
+		filters.add(new PropertyFilter("EQI_status", String
+				.valueOf(Application.STATUS_PUBLISHED)));
 		page = applicationManager.findPage(page, filters);
 		AppInfoList appInfoList = new AppInfoList();
 		// 将得到的结果转换成dto
-		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
-		if (null != req.getQueryCondition() && req.getQueryCondition().startsWith("EQS_aid=")){
+		String sysType = StringUtils.substringBefore(
+				StringUtils.substringAfter(req.getCommonType(), "-"), "-");
+		if (null != req.getQueryCondition()
+				&& req.getQueryCondition().startsWith("EQS_aid=")) {
 			appInfoList.addAllFullInfo(page.getResult(), sysType, null);
-		}else{
+		} else {
 			appInfoList.addAll(page.getResult(), sysType, null);
 		}
 		// 设置返回结果
@@ -413,7 +439,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 			String[] querys = StringUtils.split(queryCondition, "&");
 			for (String query : querys) {
 				if (StringUtils.indexOf(query, "=") == -1) {
-					throw new PlatformException(PlatformErrorCode.PAGE_FILTER_PARAM_ERROR);
+					throw new PlatformException(
+							PlatformErrorCode.PAGE_FILTER_PARAM_ERROR);
 				}
 				String condition = StringUtils.substringBefore(query, "=");
 				String value = StringUtils.substringAfter(query, "=");
@@ -429,18 +456,24 @@ public class MobileWebServiceImpl implements MobileWebService {
 		if (StringUtils.isNotBlank(queryCondition)) {
 			String[] querys = null;
 			if (queryCondition.startsWith("like=")) {
-				String name = StringUtils.substringAfter(queryCondition, "like=");
-				querys = new String[] { "LIKES_name" + PropertyFilter.OR_SEPARATOR + "LIKES_sp.name"
-						+ PropertyFilter.OR_SEPARATOR + "LIKES_description=" + name };// StringUtils.split(queryCondition,
-																						// "&");
+				String name = StringUtils.substringAfter(queryCondition,
+						"like=");
+				querys = new String[] { "LIKES_name"
+						+ PropertyFilter.OR_SEPARATOR + "LIKES_sp.name"
+						+ PropertyFilter.OR_SEPARATOR + "LIKES_description="
+						+ name };// StringUtils.split(queryCondition,
+									// "&");
 			} else if (queryCondition.startsWith("classify=")) {
-				String classify = StringUtils.substringAfter(queryCondition, "classify=");
-				querys = new String[] { "EQI_childType.classify" + PropertyFilter.OR_SEPARATOR
+				String classify = StringUtils.substringAfter(queryCondition,
+						"classify=");
+				querys = new String[] { "EQI_childType.classify"
+						+ PropertyFilter.OR_SEPARATOR
 						+ "EQI_childType.parentType.classify=" + classify };
 			}
 			for (String query : querys) {
 				if (StringUtils.indexOf(query, "=") == -1) {
-					throw new PlatformException(PlatformErrorCode.PAGE_FILTER_PARAM_ERROR);
+					throw new PlatformException(
+							PlatformErrorCode.PAGE_FILTER_PARAM_ERROR);
 				}
 				String condition = StringUtils.substringBefore(query, "=");
 				String value = StringUtils.substringAfter(query, "=");
@@ -478,7 +511,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 			CommandID commandId = CommandID.AppInfo;// 默认获得应用详情
 			CardInfo card = cardInfoManager.getByCardNo(cardNo);
 			try {
-				commandId = CommandID.codeOf(reqGetApplicationInfo.getCommandID());
+				commandId = CommandID.codeOf(reqGetApplicationInfo
+						.getCommandID());
 			} catch (IllegalArgumentException e) {
 				throw new PlatformException(PlatformErrorCode.PARAM_ERROR);
 			}
@@ -488,23 +522,31 @@ public class MobileWebServiceImpl implements MobileWebService {
 				if (StringUtils.isNotBlank(appAID)) {
 					Application app = null;
 					Integer isUpdate = 0x00;// 默认不更新
-					CardApplication cardApp = cardApplicationManager.getByCardNoAid(reqGetApplicationInfo.getCardNo(),
-							appAID);
-					if (cardApp == null || !CardApplication.STATUS_SHOWABLE.contains(cardApp.getStatus())) {
+					CardApplication cardApp = cardApplicationManager
+							.getByCardNoAid(reqGetApplicationInfo.getCardNo(),
+									appAID);
+					if (cardApp == null
+							|| !CardApplication.STATUS_SHOWABLE
+									.contains(cardApp.getStatus())) {
 						app = applicationManager.getByAid(appAID);
 
 					} else {
 						app = cardApp.getApplicationVersion().getApplication();
-						String cardVersion = cardApp.getApplicationVersion().getVersionNo();
+						String cardVersion = cardApp.getApplicationVersion()
+								.getVersionNo();
 						String appVersion = app.getLastestVersion();
-						if (SpringMVCUtils.compareVersion(appVersion, cardVersion)) {
+						if (SpringMVCUtils.compareVersion(appVersion,
+								cardVersion)) {
 							isUpdate = 0x01;
 						} else {
 							isUpdate = 0x00;
 						}
 					}
-					String sysType = StringUtils.substringBefore(
-							StringUtils.substringAfter(reqGetApplicationInfo.getCommonType(), "-"), "-");
+					String sysType = StringUtils
+							.substringBefore(
+									StringUtils.substringAfter(
+											reqGetApplicationInfo
+													.getCommonType(), "-"), "-");
 					appInfo.build(app, sysType, isUpdate);
 					info.setAppInfo(appInfo);
 				}
@@ -518,19 +560,24 @@ public class MobileWebServiceImpl implements MobileWebService {
 			case CardSpaceInfo:
 
 				if (card == null) {
-					throw new PlatformException(PlatformErrorCode.CARD_NOT_FOUND);
+					throw new PlatformException(
+							PlatformErrorCode.CARD_NOT_FOUND);
 				}
 				MemoryInfo memoryInfo = new MemoryInfo();
-				memoryInfo.setNonVolatileMemory(card.getAvailableNonevolatileSpace());
+				memoryInfo.setNonVolatileMemory(card
+						.getAvailableNonevolatileSpace());
 				memoryInfo.setVolatileMemory(card.getAvailableVolatileSpace());
-				memoryInfo.setTotalMemory(card.getAvailableNonevolatileSpace() + card.getAvailableVolatileSpace());
+				memoryInfo.setTotalMemory(card.getAvailableNonevolatileSpace()
+						+ card.getAvailableVolatileSpace());
 				info.setMemoryInfo(memoryInfo);
 				break;
 			case AppClientInfo:
 				if (card == null) {
-					throw new PlatformException(PlatformErrorCode.CARD_NOT_FOUND);
+					throw new PlatformException(
+							PlatformErrorCode.CARD_NOT_FOUND);
 				}
-				List<ApplicationClientInfo> clients = applicationClientInfoManager.getClientByCard(card);
+				List<ApplicationClientInfo> clients = applicationClientInfoManager
+						.getClientByCard(card);
 				ClientInfoList clist = new ClientInfoList();
 				clist.addAll(clients, appAID);
 				info.setClientInfoList(clist);
@@ -565,10 +612,12 @@ public class MobileWebServiceImpl implements MobileWebService {
 			String commonType = reqExecAPDU.getCommonType();
 			// 取第一个操作
 			if (StringUtils.isBlank(sessionId)) {
-				List<AppOperate> appAids = reqExecAPDU.getAppList().getAppOperate();
+				List<AppOperate> appAids = reqExecAPDU.getAppList()
+						.getAppOperate();
 				// 第一次请求时，检查卡片和用户是否存在，是否登录等
 				if (!SystemConfigUtils.isTestRuntimeEnvironment()) {
-					if (!StringUtils.startsWith(commonType, "ME") && !StringUtils.startsWith(commonType, "APC")) {// 手机不需要登录，所以不验证
+					if (!StringUtils.startsWith(commonType, "ME")
+							&& !StringUtils.startsWith(commonType, "APC")) {// 手机不需要登录，所以不验证
 						checkCustomer(reqExecAPDU);
 					}
 				}
@@ -577,16 +626,18 @@ public class MobileWebServiceImpl implements MobileWebService {
 					CardInfo card = cardInfoManager.getByCardNo(cardNo);
 					card.setMobileNo(mobileNo);
 				}
-				sessionId = transactionHelper.createSession(appAids, cardNo, commonType,
-						SpringSecurityUtils.getCurrentUserName());
-				LocalTransaction localTransaction = localTransactionManager.getBySessionId(sessionId);
+				sessionId = transactionHelper.createSession(appAids, cardNo,
+						commonType, SpringSecurityUtils.getCurrentUserName());
+				LocalTransaction localTransaction = localTransactionManager
+						.getBySessionId(sessionId);
 				localTransaction.setBeginTime(Calendar.getInstance());
 			}
 
 			// 开始处理流程，结果保存在参数apdu中
 			execAPDU(reqExecAPDU, apdu, sessionId);
 
-			Task task = localTransactionManager.getBySessionId(sessionId).getTask();
+			Task task = localTransactionManager.getBySessionId(sessionId)
+					.getTask();
 			taskManager.saveOrUpdate(task);
 		} catch (PlatformException e) {
 			e.printStackTrace();
@@ -601,7 +652,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 		return apdu;
 	}
 
-	private void execAPDU(ReqExecAPDU reqExecAPDU, ResExecAPDU apdu, String sessionId) {
+	private void execAPDU(ReqExecAPDU reqExecAPDU, ResExecAPDU apdu,
+			String sessionId) {
 		Status status = Status.getClientStauts();
 		apdu.setStatus(status);
 		try {
@@ -619,22 +671,26 @@ public class MobileWebServiceImpl implements MobileWebService {
 			status.setStatusCode(errorCode);
 			status.setStatusDescription(e.getMessage());
 			if (StringUtils.isNotBlank(sessionId)) {// 如果有localTransaction，修改结果
-				LocalTransaction localTransaction = endFaildTrans(sessionId, e, errorCode);
+				LocalTransaction localTransaction = endFaildTrans(sessionId, e,
+						errorCode);
 				transactionHelper.completDesiredOperation(localTransaction);
 
 				Task task = localTransaction.getTask();
 				task.increaseFailTransCount();// 任务的失败流程数+1
 				processNextTransactionOrEndTask(reqExecAPDU, apdu, task,
-						MocamResult.getLastResult(localTransaction.getAid()), transactionHelper.getNextSeqNum());// 执行任务的下一流程（如果还有流程需要执行）或解说流程（如果没有流程需要执行）
+						MocamResult.getLastResult(localTransaction.getAid()),
+						transactionHelper.getNextSeqNum());// 执行任务的下一流程（如果还有流程需要执行）或解说流程（如果没有流程需要执行）
 			}
 		}
 	}
 
-	private LocalTransaction endFaildTrans(String sessionId, PlatformException e, String errorCode) {
-		LocalTransaction localTransaction = localTransactionManager.getBySessionId(sessionId);
+	private LocalTransaction endFaildTrans(String sessionId,
+			PlatformException e, String errorCode) {
+		LocalTransaction localTransaction = localTransactionManager
+				.getBySessionId(sessionId);
 		localTransaction.setResult(errorCode);// 设置状态码
-		localTransaction.setFailMessage(StringUtils.isBlank(e.getMessage()) ? e.getErrorCode().getDefaultMessage() : e
-				.getMessage());
+		localTransaction.setFailMessage(StringUtils.isBlank(e.getMessage()) ? e
+				.getErrorCode().getDefaultMessage() : e.getMessage());
 		localTransaction.setExecutionStatusAsCompeleted();// 将当前流程及其子流程的执行状态设为“已执行”
 		localTransaction.setEndTime(Calendar.getInstance());
 		localTransactionManager.saveOrUpdate(localTransaction);
@@ -658,7 +714,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 			}
 			List<CustomerCardInfo> customerCardInfos = c.getCustomerCardInfos();
 			if (CollectionUtils.isEmpty(customerCardInfos)) {
-				throw new PlatformException(PlatformErrorCode.CUSTOMER_CARD_NOT_EXIST);
+				throw new PlatformException(
+						PlatformErrorCode.CUSTOMER_CARD_NOT_EXIST);
 			}
 			boolean hasCard = false;
 			for (CustomerCardInfo customerCardInfo : customerCardInfos) {
@@ -668,17 +725,21 @@ public class MobileWebServiceImpl implements MobileWebService {
 				}
 			}
 			if (!hasCard) {
-				throw new PlatformException(PlatformErrorCode.CUSTOMER_CARD_NOT_EXIST);
+				throw new PlatformException(
+						PlatformErrorCode.CUSTOMER_CARD_NOT_EXIST);
 			}
 		}
 	}
 
-	private ResExecAPDU processTrans(ReqExecAPDU reqExecAPDU, ResExecAPDU apdu, String sessionId) {
+	private ResExecAPDU processTrans(ReqExecAPDU reqExecAPDU, ResExecAPDU apdu,
+			String sessionId) {
 		MocamProcessor processor = null;
 		MocamResult result = new MocamResult();
 
-		LocalTransaction localTransaction = localTransactionManager.getBySessionId(sessionId);
-		processor = transactionHelper.routeProcessor(localTransaction.getProcedureName());
+		LocalTransaction localTransaction = localTransactionManager
+				.getBySessionId(sessionId);
+		processor = transactionHelper.routeProcessor(localTransaction
+				.getProcedureName());
 		result = processor.process(localTransaction, reqExecAPDU);
 		if (localTransaction.isComplete()) {// 当前流程已经完成
 			localTransaction.setEndTime(Calendar.getInstance());
@@ -686,23 +747,28 @@ public class MobileWebServiceImpl implements MobileWebService {
 			transactionHelper.completDesiredOperation(localTransaction);
 
 			Task task = localTransaction.getTask();
-			if (PlatformMessage.SUCCESS.getCode().equals(localTransaction.getResult())) {
+			if (PlatformMessage.SUCCESS.getCode().equals(
+					localTransaction.getResult())) {
 				task.increaseSuccTransCount();
 			} else {
 				task.increaseFailTransCount();
 			}
-			apdu = processNextTransactionOrEndTask(reqExecAPDU, apdu, task, result, transactionHelper.getNextSeqNum());// 执行任务的下一流程（如果还有流程需要执行）或解说流程（如果没有流程需要执行）
+			apdu = processNextTransactionOrEndTask(reqExecAPDU, apdu, task,
+					result, transactionHelper.getNextSeqNum());// 执行任务的下一流程（如果还有流程需要执行）或解说流程（如果没有流程需要执行）
 		} else {// 当前流程未完成，设置当前流程的执行结果
-			buildResApdu(reqExecAPDU, apdu, localTransaction, transactionHelper.getNextSeqNum(), result);
+			buildResApdu(reqExecAPDU, apdu, localTransaction,
+					transactionHelper.getNextSeqNum(), result);
 		}
 		return apdu;
 	}
 
-	private void buildResApdu(ReqExecAPDU reqExecAPDU, ResExecAPDU apdu, LocalTransaction localTransaction,
-			String nextSeqNum, MocamResult result) {
+	private void buildResApdu(ReqExecAPDU reqExecAPDU, ResExecAPDU apdu,
+			LocalTransaction localTransaction, String nextSeqNum,
+			MocamResult result) {
 		apdu.addApdus(result.getApdus());
 
-		Operation operation = Operation.valueOf(localTransaction.getProcedureName());
+		Operation operation = Operation.valueOf(localTransaction
+				.getProcedureName());
 		if (StringUtils.isNotBlank(operation.getCommandId())) {
 			apdu.setCommandID(operation.getCommandId());
 		} else {
@@ -720,14 +786,16 @@ public class MobileWebServiceImpl implements MobileWebService {
 			apdu.setApduName(ApduName.Complete.name());
 		}
 
-		if (SessionStatus.TERMINATE == localTransaction.getSessionStatus().intValue()) {
+		if (SessionStatus.TERMINATE == localTransaction.getSessionStatus()
+				.intValue()) {
 			Status status = apdu.getStatus();
 			status.setStatusCode(localTransaction.getResult());
 			status.setStatusDescription(localTransaction.getFailMessage());
 		}
 	}
 
-	private ResExecAPDU processNextTransactionOrEndTask(ReqExecAPDU reqExecAPDU, ResExecAPDU apdu, Task task,
+	private ResExecAPDU processNextTransactionOrEndTask(
+			ReqExecAPDU reqExecAPDU, ResExecAPDU apdu, Task task,
 			MocamResult result, String nextSeqNum) {
 		LocalTransaction localTransaction = task.getCurrentTransaction();
 		task.increaseCurrentTransIndex();// 任务的当前流程索引+1
@@ -739,7 +807,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 		} else {// 否则结束任务
 			task.setFinished(Boolean.TRUE);
 			task.setEndTime(Calendar.getInstance());
-			buildResApdu(reqExecAPDU, apdu, localTransaction, nextSeqNum, result);
+			buildResApdu(reqExecAPDU, apdu, localTransaction, nextSeqNum,
+					result);
 		}
 
 		return apdu;
@@ -756,23 +825,28 @@ public class MobileWebServiceImpl implements MobileWebService {
 			ApplicationComment ac = new ApplicationComment();
 			String appAID = reqAppComment.getComment().getAppAID();
 			String cardNo = reqAppComment.getCardNo();
-			CustomerCardInfo customerCardInfo = customerCardInfoManager.getByCardNo(cardNo);
+			CustomerCardInfo customerCardInfo = customerCardInfoManager
+					.getByCardNo(cardNo);
 			Integer starGrade = reqAppComment.getComment().getStarGrade();
 			if (StringUtils.isBlank(appAID)) {
-				throw new PlatformException(PlatformErrorCode.APPLICAION_AID_NOT_EXIST);
+				throw new PlatformException(
+						PlatformErrorCode.APPLICAION_AID_NOT_EXIST);
 			}
 			if (starGrade == null) {
 				starGrade = 0;
 			}
 			Application app = applicationManager.getByAid(appAID);
 			Customer customer = customerCardInfo.getCustomer();
-			if (commentManager.getByAppIdAndCustomerId(app.getId(), customer.getId()) != null) {
-				throw new PlatformException(PlatformErrorCode.APPLICATION_COMMENT_REPEAT);
+			if (commentManager.getByAppIdAndCustomerId(app.getId(),
+					customer.getId()) != null) {
+				throw new PlatformException(
+						PlatformErrorCode.APPLICATION_COMMENT_REPEAT);
 			}
 			ac.setApplication(app);
 			ac.setCustomer(customer);
 			ac.setCommentTime(Calendar.getInstance());
-			ac.setContent(EncodeUtils.urlDecode(reqAppComment.getComment().getCommentContent()));
+			ac.setContent(EncodeUtils.urlDecode(reqAppComment.getComment()
+					.getCommentContent()));
 			ac.setGrade(starGrade);
 			commentManager.saveOrUpdate(ac);
 			status.setStatusCode(PlatformMessage.SUCCESS.getCode());
@@ -789,13 +863,15 @@ public class MobileWebServiceImpl implements MobileWebService {
 		return basicResponse;
 	}
 
-	private ResListComment listComment(ReqGetApplicationInfo reqGetApplicationInfo) {
+	private ResListComment listComment(
+			ReqGetApplicationInfo reqGetApplicationInfo) {
 		ResListComment comments = new ResListComment();
 		Page<ApplicationComment> page = buildPage(reqGetApplicationInfo);
 		// 加根据时间倒叙
 		page.addOrder("commentTime", "desc");
 		List<PropertyFilter> filters = buildFilter(reqGetApplicationInfo);
-		filters.add(new PropertyFilter("ALIAS_applicationI_EQS_aid", reqGetApplicationInfo.getAppAID()));
+		filters.add(new PropertyFilter("ALIAS_applicationI_EQS_aid",
+				reqGetApplicationInfo.getAppAID()));
 		page = commentManager.findPage(page, filters);
 		AppCommentList appCommentList = new AppCommentList();
 		appCommentList.addAll(page.getResult());
@@ -833,33 +909,42 @@ public class MobileWebServiceImpl implements MobileWebService {
 			}
 			String fileType = null;
 			ApplicationClientInfo applicationClientInfo = null;
-			if (ApplicationClientInfo.SYS_TYPE_Android.equalsIgnoreCase(sysType)) {
+			if (ApplicationClientInfo.SYS_TYPE_Android
+					.equalsIgnoreCase(sysType)) {
 				fileType = ApplicationClientInfo.FILE_TYPE_APK;
 				// 忽略掉小版本号
 				// sysRequirment =
 				// sysRequirment.substring(0,sysRequirment.indexOf(".")+1);
-			} else if (ApplicationClientInfo.SYS_TYPE_J2ME.equalsIgnoreCase(sysType)) {
+			} else if (ApplicationClientInfo.SYS_TYPE_J2ME
+					.equalsIgnoreCase(sysType)) {
 				fileType = ApplicationClientInfo.FILE_TYPE_JAD;
 			} else {
 				fileType = ApplicationClientInfo.FILE_TYPE_JAR;
 			}
-			if (loadClientRequest.getCommandID().equalsIgnoreCase(CommandID.AppClientUpgrade.getCode())) {
-				CardApplication cardApplication = cardApplicationManager.getByCardNoAid(cardNo, aid);
-				ApplicationVersion appVer = cardApplication.getApplicationVersion();
+			if (loadClientRequest.getCommandID().equalsIgnoreCase(
+					CommandID.AppClientUpgrade.getCode())) {
+				CardApplication cardApplication = cardApplicationManager
+						.getByCardNoAid(cardNo, aid);
+				ApplicationVersion appVer = cardApplication
+						.getApplicationVersion();
 				applicationClientInfo = applicationClientInfoManager
-						.getByApplicationVersionSysTypeSysRequirementFileType(appVer, "os", sysType + sysRequirment,
-								fileType);
+						.getByApplicationVersionSysTypeSysRequirementFileType(
+								appVer, "os", sysType + sysRequirment, fileType);
 				if (applicationClientInfo == null) {
-					throw new PlatformException(PlatformErrorCode.APPLICAION_CLIENT_NOT_EXSIT);
+					throw new PlatformException(
+							PlatformErrorCode.APPLICAION_CLIENT_NOT_EXSIT);
 				}
 				ClientInfo ci = new ClientInfo();
 				ci.build(aid, applicationClientInfo, isUpdatable);
 				response.setClientInfo(ci);
-			} else if (loadClientRequest.getCommandID().equals(CommandID.UeUprage.getCode())) {
-				applicationClientInfo = applicationClientInfoManager.getAppManagerByTypeAndReqAndVersion("os", sysType
-						+ sysRequirment, version);
+			} else if (loadClientRequest.getCommandID().equals(
+					CommandID.UeUprage.getCode())) {
+				applicationClientInfo = applicationClientInfoManager
+						.getAppManagerByTypeAndReqAndVersion("os", sysType
+								+ sysRequirment, version);
 				if (applicationClientInfo == null) {
-					throw new PlatformException(PlatformErrorCode.APPLICAION_CLIENT_NOT_EXSIT);
+					throw new PlatformException(
+							PlatformErrorCode.APPLICAION_CLIENT_NOT_EXSIT);
 				}
 				ClientInfo ci = new ClientInfo();
 				ci.build(aid, applicationClientInfo, isUpdatable);
@@ -890,7 +975,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 			CommandID commandId = CommandID.UserLogin;// 默认为注册
 			String cardNo = request.getCardNo();
 			CardInfo card = cardInfoManager.getByCardNo(cardNo);
-			CustomerCardInfo customerCard = customerCardInfoManager.getByCardNo(cardNo);
+			CustomerCardInfo customerCard = customerCardInfoManager
+					.getByCardNo(cardNo);
 			try {
 				commandId = CommandID.codeOf(request.getCommandID());
 			} catch (IllegalArgumentException e) {
@@ -900,7 +986,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 			case UserRegist: {
 				// 注册时必须验证随机码
 				if (!card.getChallengeNo().equals(request.getChallengeNo())) {// 如果随机数不匹配，抛出异常
-					throw new PlatformException(PlatformErrorCode.MISMATCH_CHALLENGE_NO);
+					throw new PlatformException(
+							PlatformErrorCode.MISMATCH_CHALLENGE_NO);
 				}
 				card.setRegisterable(CardInfo.REGISTERABLE_READY);
 
@@ -912,16 +999,18 @@ public class MobileWebServiceImpl implements MobileWebService {
 						request.setCommandID(CommandID.ChangeToken.getCode());
 						processTrans(request, resAPDU, res, cardNo);
 					} else {// 如果绑定手机号与上行短信手机号不一致，抛出异常
-						throw new PlatformException(PlatformErrorCode.CARD_IS_EXIST);
+						throw new PlatformException(
+								PlatformErrorCode.CARD_IS_EXIST);
 					}
 				}
 				break;
 			}
 			case UserLogin: {
-				String sysType = StringUtils.substringBefore(StringUtils.substringAfter(request.getCommonType(), "-"),
-						"-");
+				String sysType = StringUtils.substringBefore(StringUtils
+						.substringAfter(request.getCommonType(), "-"), "-");
 				if (null == customerCard) {// 如果当前终端未绑定，则抛出异常
-					throw new PlatformException(PlatformErrorCode.CARD_NO_UNEXIST);
+					throw new PlatformException(
+							PlatformErrorCode.CARD_NO_UNEXIST);
 				} else {
 					processTrans(request, resAPDU, res, cardNo);
 				}
@@ -932,33 +1021,46 @@ public class MobileWebServiceImpl implements MobileWebService {
 			}
 			case ChangeToken: {
 
-				// 客户端在发送CommandID.NotifyImsi之前一定会发送上行短信，因此先验证上行短信
+				// 客户端在发送CommandID.ChangeToken之前一定会发送上行短信，因此先验证上行短信
 				PlatformMessage message;
-				if (null == card || !card.getChallengeNo().equals(request.getChallengeNo())) {
+				if (null == card
+						|| !card.getChallengeNo().equals(
+								request.getChallengeNo())) {
 					message = PlatformMessage.MOBILE_MISMATCH_CHALLENGE_NO;
 				} else {// 收到上行短信，根据绑定关系通知客户端下一步行为
+				
 					if (null == customerCard) {// 如果绑定关系为空，说明终端未绑定，执行注册
 						message = PlatformMessage.MOBILE_REGISTER;
-					} else {// 如果绑定关心存在，首先判定是否在黑名单
-						if (customerCard.isInBlackList()) {// 如果在黑名单
+					} else {// 如果绑定关系存在，首先判定是否在黑名单
+						
+					    if (customerCard.isInBlackList()) {// 如果在黑名单
 							message = PlatformMessage.MOBILE_IN_BLACK_LIST;
 						} else {// 如果不再黑名单
-							if (customerCard.getMobileNo().equals(card.getMobileNo())) {// 如果绑定手机号与上行短信手机号一致，执行修改IMSI操作
+							if (customerCard.getMobileNo().equals(
+									card.getMobileNo())) {// 如果绑定手机号与上行短信手机号一致，执行修改IMSI操作
 								message = PlatformMessage.MOBILE_NOTIFY_IMSI;
 							} else {// 如果绑定手机号与上行短信手机号不一致
+								if (card.getRegisterable().intValue() == CardInfo.REGISTERABLE_LOGIN
+										.intValue()) {
+									message = PlatformMessage.MOBILE_LOGIN;
+								}else{
 								message = PlatformMessage.MOBILE_REGISTERED;
+								
 							}
 						}
 					}
+				}
 				}
 				status.setStatusCode(message.getCode());
 				status.setStatusDescription(message.getDefaultMessage());
 				break;
 			}
 			case UserCancel: {
-				boolean result = customerCardInfoManager.checkCancelTermCardApp(customerCard.getId());
+				boolean result = customerCardInfoManager
+						.checkCancelTermCardApp(customerCard.getId());
 				if (result) {
-					throw new PlatformException(PlatformErrorCode.CARD_NOT_CANCEL_FOR_APP);
+					throw new PlatformException(
+							PlatformErrorCode.CARD_NOT_CANCEL_FOR_APP);
 				} else {
 					customerCardInfoManager.finashCancel(customerCard.getId());
 				}
@@ -976,22 +1078,29 @@ public class MobileWebServiceImpl implements MobileWebService {
 		}
 		res.setCommandID(request.getCommandID());
 		if (request.getCommandID().equals(CommandID.ChangeToken.getCode())) {
-			res.setUrl(SystemConfigUtils.getServiceUrl() + "aboutus.jsp?v=termsOfServiceLink");
-		} else if (request.getCommandID().equals(CommandID.UserRegist.getCode())) {
-			res.setMocamVersion(applicationClientInfoManager.getMocamMaxVersion());
+			res.setUrl(SystemConfigUtils.getServiceUrl()
+					+ "aboutus.jsp?v=termsOfServiceLink");
+		} else if (request.getCommandID()
+				.equals(CommandID.UserRegist.getCode())) {
+			res.setMocamVersion(applicationClientInfoManager
+					.getMocamMaxVersion());
 		}
 		return res;
 	}
 
-	private void processTrans(LoginOrRegisterRequest request, ResExecAPDU resAPDU, ResLoginOrRegister res, String cardNo) {
+	private void processTrans(LoginOrRegisterRequest request,
+			ResExecAPDU resAPDU, ResLoginOrRegister res, String cardNo) {
 		String sessionId;
 		List<AppOperate> appAids = new ArrayList<AppOperate>();
 		AppOperate operate = new AppOperate();
-		operate.setOperation(new Integer(CommandID.codeOf(request.getCommandID()).getCode()));
+		operate.setOperation(new Integer(CommandID.codeOf(
+				request.getCommandID()).getCode()));
 		appAids.add(operate);
-		sessionId = transactionHelper.createSession(appAids, cardNo, request.getCommonType(),
+		sessionId = transactionHelper.createSession(appAids, cardNo,
+				request.getCommonType(),
 				SpringSecurityUtils.getCurrentUserName());
-		LocalTransaction localTransaction = localTransactionManager.getBySessionId(sessionId);
+		LocalTransaction localTransaction = localTransactionManager
+				.getBySessionId(sessionId);
 		localTransaction.setBeginTime(Calendar.getInstance());
 		// 开始处理流程，结果保存在参数apdu中
 		execAPDU(null, resAPDU, sessionId);
@@ -1036,14 +1145,19 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 获取过滤条件
 		List<PropertyFilter> filters = buildFilter(req);
 		// 应用的状态为已发布状态
-		filters.add(new PropertyFilter("EQI_status", String.valueOf(CardSecurityDomain.STATUS_PERSO)));
-		filters.add(new PropertyFilter("ALIAS_cardL_EQS_cardNo", req.getCardNo()));
+		filters.add(new PropertyFilter("EQI_status", String
+				.valueOf(CardSecurityDomain.STATUS_PERSO)));
+		filters.add(new PropertyFilter("ALIAS_cardL_EQS_cardNo", req
+				.getCardNo()));
 		page = cardSecurityDomainManager.findPage(page, filters);
 		SDInfoList sdInfoList = new SDInfoList();
 		List<PropertyFilter> appFilters = new ArrayList<PropertyFilter>();
-		appFilters.add(new PropertyFilter("EQI_status", String.valueOf(CardApplication.STATUS_AVAILABLE)));
-		appFilters.add(new PropertyFilter("ALIAS_cardInfoL_EQS_cardNo", req.getCardNo()));
-		List<CardApplication> cardApplications = cardApplicationManager.find(appFilters);
+		appFilters.add(new PropertyFilter("EQI_status", String
+				.valueOf(CardApplication.STATUS_AVAILABLE)));
+		appFilters.add(new PropertyFilter("ALIAS_cardInfoL_EQS_cardNo", req
+				.getCardNo()));
+		List<CardApplication> cardApplications = cardApplicationManager
+				.find(appFilters);
 		// 将得到的结果转换成dto
 		sdInfoList.addAll(page.getResult(), cardApplications);
 		// 设置返回结果
@@ -1061,19 +1175,23 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 获取分页参数
 		Page<CardSecurityDomain> page = buildPage(req);
 		// 获取CardBaseInfo
-		CardBaseInfo cbi = cardBaseInfoManager.getCardBaseInfoByCardNo(req.getCardNo());
+		CardBaseInfo cbi = cardBaseInfoManager.getCardBaseInfoByCardNo(req
+				.getCardNo());
 		// 通过CardNo获取该CardBaseSecurityDomain
-		List<CardBaseSecurityDomain> listCbsd = cardBaseSecurityDomainManager.getByCardBase(cbi);
+		List<CardBaseSecurityDomain> listCbsd = cardBaseSecurityDomainManager
+				.getByCardBase(cbi);
 		List<SecurityDomain> allSd = new ArrayList<SecurityDomain>();
 		for (CardBaseSecurityDomain cbsd : listCbsd) {
 			allSd.add(cbsd.getSecurityDomain());
 		}
 		// 获取CardSecurityDomain下的安全域
-		List<SecurityDomain> createdSd = cardSecurityDomainManager.getSdByCardNo(req.getCardNo());
+		List<SecurityDomain> createdSd = cardSecurityDomainManager
+				.getSdByCardNo(req.getCardNo());
 		SDInfoList sdInfoList = new SDInfoList();
 		if (createdSd != null) {
 			@SuppressWarnings("unchecked")
-			List<SecurityDomain> unCreatedSd = (List<SecurityDomain>) CollectionUtils.subtract(allSd, createdSd);
+			List<SecurityDomain> unCreatedSd = (List<SecurityDomain>) CollectionUtils
+					.subtract(allSd, createdSd);
 			// 将得到的结果转换成dto
 			sdInfoList.addAll(unCreatedSd);
 		} else {
@@ -1092,25 +1210,33 @@ public class MobileWebServiceImpl implements MobileWebService {
 	private void setClientId(String aid, AppInfo info, String cardNo) {
 		if (cardNo != null) {
 			CustomerCardInfo cci = customerCardInfoManager.getByCardNo(cardNo);
-			CardApplication ca = cardApplicationManager.getAvailbleOrLockedByCardNoAid(cci.getCard().getCardNo(), aid);
+			CardApplication ca = cardApplicationManager
+					.getAvailbleOrLockedByCardNoAid(cci.getCard().getCardNo(),
+							aid);
 			if (ca == null) {
 
 			} else {
-				boolean hasSysRequirment = customerCardInfoManager.hasSysRequirment(cci, ca);
+				boolean hasSysRequirment = customerCardInfoManager
+						.hasSysRequirment(cci, ca);
 				if (!hasSysRequirment) {
 					// mappedApplication.put("clientStatusStr",
 					// PlatformErrorCode.NOT_DOWN_CLINET.getDefaultMessage());
 				} else {
 					MobileType mt = cci.getMobileType();
-					Set<ApplicationClientInfo> acs = ca.getApplicationVersion().getClients();
+					Set<ApplicationClientInfo> acs = ca.getApplicationVersion()
+							.getClients();
 					ApplicationClientInfo androidTemp = null;
-					for (Iterator<ApplicationClientInfo> it = acs.iterator(); it.hasNext();) {
-						ApplicationClientInfo ac = (ApplicationClientInfo) it.next();
+					for (Iterator<ApplicationClientInfo> it = acs.iterator(); it
+							.hasNext();) {
+						ApplicationClientInfo ac = (ApplicationClientInfo) it
+								.next();
 						if (mt.getOriginalOsKey().equals(ac.getSysRequirment())) {
 							// 应用详情-下载客户端：当同一手机型号对应了多个版本的Android客户端时
 							// ，应该下载当前手机型号对应的最高版本的客户端，以版本号来判断，而不是上传时间。
 							if (androidTemp == null
-									|| SpringMVCUtils.compareVersion(ac.getVersion(), androidTemp.getVersion())) {
+									|| SpringMVCUtils.compareVersion(
+											ac.getVersion(),
+											androidTemp.getVersion())) {
 								info.setClientID(String.valueOf(ac.getId()));
 								androidTemp = ac;
 							}
@@ -1122,18 +1248,21 @@ public class MobileWebServiceImpl implements MobileWebService {
 	}
 
 	private AppInfoList upAppInfo(CardInfo card, String sysType) {
-		List<CardApplication> cardAppList = cardApplicationManager.getByCardAndStatus(card,
-				CardApplication.STATUS_AVAILABLE);
+		List<CardApplication> cardAppList = cardApplicationManager
+				.getByCardAndStatus(card, CardApplication.STATUS_AVAILABLE);
 		List<Application> updateAppList = new ArrayList<Application>();
 		AppInfoList appList = new AppInfoList();
 		Integer isUpdatable = 0x01;
-		
+
 		for (CardApplication cardApp : cardAppList) {
-			ApplicationVersion installedVersion = cardApp.getApplicationVersion();
-			ApplicationVersion lastedVersion = appVerManager.getLastestAppVersionSupportCard(card, cardApp
-					.getApplicationVersion().getApplication());
-			//如果最新版本大于已安装版本则该应用需要更新
-			if (SpringMVCUtils.compareVersion(lastedVersion.getVersionNo(), installedVersion.getVersionNo())) {
+			ApplicationVersion installedVersion = cardApp
+					.getApplicationVersion();
+			ApplicationVersion lastedVersion = appVerManager
+					.getLastestAppVersionSupportCard(card, cardApp
+							.getApplicationVersion().getApplication());
+			// 如果最新版本大于已安装版本则该应用需要更新
+			if (SpringMVCUtils.compareVersion(lastedVersion.getVersionNo(),
+					installedVersion.getVersionNo())) {
 				updateAppList.add(lastedVersion.getApplication());
 			}
 		}
@@ -1142,29 +1271,32 @@ public class MobileWebServiceImpl implements MobileWebService {
 	}
 
 	private ClientInfoList upClientInfo(CardInfo card, String sysType) {
-		Integer isUpdatable = 0x01;;
+		Integer isUpdatable = 0x01;
+		;
 		ClientInfoList ciList = new ClientInfoList();
 		// 获取卡上安装的所有应用
-		List<CardApplication> cardAppList = cardApplicationManager.getByCardAndStatus(card,
-				CardApplication.STATUS_AVAILABLE);
+		List<CardApplication> cardAppList = cardApplicationManager
+				.getByCardAndStatus(card, CardApplication.STATUS_AVAILABLE);
 		for (CardApplication ca : cardAppList) {
 			Application app = ca.getApplicationVersion().getApplication();
 			// 根据应用和卡片获取CardClient
-			CardClient cc = cardClientManager.getByCardAndApplicationAndSysType(card, app, sysType);
-			if(null!=cc){
-			ApplicationClientInfo aci = cc.getClient();
-			// 获取该卡上可以安装应用的最大版本
-			List<ApplicationClientInfo> maxAciList = applicationClientInfoManager.getByAidAndCardNo(app.getAid(),
-					card.getCardNo());
-			inner: for (ApplicationClientInfo ac : maxAciList) {
-				if (SpringMVCUtils.compareVersion(ac.getVersion(), aci.getVersion())) {
-					ClientInfo ci = new ClientInfo();
-					ci.build(app.getAid(), ac, isUpdatable);
-					ciList.addClientInfo(ci);
-					break inner;
+			CardClient cc = cardClientManager
+					.getByCardAndApplicationAndSysType(card, app, sysType);
+			if (null != cc) {
+				ApplicationClientInfo aci = cc.getClient();
+				// 获取该卡上可以安装应用的最大版本
+				List<ApplicationClientInfo> maxAciList = applicationClientInfoManager
+						.getByAidAndCardNo(app.getAid(), card.getCardNo());
+				inner: for (ApplicationClientInfo ac : maxAciList) {
+					if (SpringMVCUtils.compareVersion(ac.getVersion(),
+							aci.getVersion())) {
+						ClientInfo ci = new ClientInfo();
+						ci.build(app.getAid(), ac, isUpdatable);
+						ciList.addClientInfo(ci);
+						break inner;
+					}
 				}
 			}
-		}
 		}
 		return ciList;
 	}
