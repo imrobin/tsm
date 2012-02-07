@@ -39,6 +39,9 @@ public class CardInfo extends AbstractEntity {
 	/** 卡状态：3-准备注册 */
 	public static final Integer REGISTERABLE_READY = 3;
 	
+	/** 卡状态 ：4-准备登陆 */
+	public static final Integer REGISTERABLE_LOGIN = 4;
+	
 	public static final Set<Integer> REGISTERABLE_REGISTER =new HashSet<Integer>();
 	static{
 		REGISTERABLE_REGISTER.add(REGISTERABLE_NEW);
