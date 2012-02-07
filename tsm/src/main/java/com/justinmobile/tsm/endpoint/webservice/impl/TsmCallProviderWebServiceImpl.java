@@ -78,8 +78,8 @@ public class TsmCallProviderWebServiceImpl implements TsmCallProviderWebService 
 
 	private ArrayList<Personalization> preOperation(String sessionId, SessionType sessionType, String appAid, Holder<Integer> personalType) {
 		switch (sessionType) {
-		case SERVICE_UNSUBSCRIBE:
-		case SERVICE_UPDATE:
+		// case SERVICE_UNSUBSCRIBE:
+		// case SERVICE_UPDATE:
 		case PERSO_DATA_MANAGE:
 			return getPersonalizationWhenPreOperation(sessionId, appAid, personalType);
 		default:
