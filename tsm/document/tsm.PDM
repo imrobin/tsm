@@ -4081,7 +4081,7 @@ CARD 0 新宋体,8,N</a:FontList>
 <o:ReferenceSymbol Id="o113">
 <a:CreationDate>1302080546</a:CreationDate>
 <a:ModificationDate>1314756832</a:ModificationDate>
-<a:Rect>((-3105,19198), (-1151,59194))</a:Rect>
+<a:Rect>((-6768,19198), (2606,59194))</a:Rect>
 <a:ListOfPoints>((-1151,59194),(-3105,19198))</a:ListOfPoints>
 <a:ArrowStyle>1</a:ArrowStyle>
 <a:LineColor>12615680</a:LineColor>
@@ -4802,7 +4802,7 @@ CARD 0 新宋体,8,N</a:FontList>
 <o:ReferenceSymbol Id="o206">
 <a:CreationDate>1302516355</a:CreationDate>
 <a:ModificationDate>1302835164</a:ModificationDate>
-<a:Rect>((26576,19580), (29515,30108))</a:Rect>
+<a:Rect>((23930,19580), (32180,30108))</a:Rect>
 <a:ListOfPoints>((26576,19580),(29515,30108))</a:ListOfPoints>
 <a:ArrowStyle>1</a:ArrowStyle>
 <a:LineColor>12615680</a:LineColor>
@@ -9821,11 +9821,11 @@ TableComment 0 新宋体,8,N</a:FontList>
 <a:Code>IMSI</a:Code>
 <a:CreationDate>1319095054</a:CreationDate>
 <a:Creator>peak</a:Creator>
-<a:ModificationDate>1319095054</a:ModificationDate>
+<a:ModificationDate>1328598348</a:ModificationDate>
 <a:Modifier>peak</a:Modifier>
 <a:Comment>IMSI</a:Comment>
-<a:DataType>VARCHAR2(32)</a:DataType>
-<a:Length>32</a:Length>
+<a:DataType>VARCHAR2(40)</a:DataType>
+<a:Length>40</a:Length>
 </o:Column>
 <o:Column Id="o549">
 <a:ObjectID>C9825874-0174-4FDD-BB2B-4D6D4CC7EE78</a:ObjectID>
