@@ -14,6 +14,7 @@ import com.justinmobile.tsm.cms2ac.exception.ApduException;
 import com.justinmobile.tsm.process.mocam.MocamResult;
 import com.justinmobile.tsm.process.mocam.MocamResult.ApduName;
 import com.justinmobile.tsm.transaction.domain.LocalTransaction;
+import com.justinmobile.tsm.utils.SystemConfigUtils;
 
 @Service("mocamUpdateKeyProcessor")
 public class MocamUpdateSSDProcessorImpl extends PublicOperationProcessor {
@@ -150,7 +151,7 @@ public class MocamUpdateSSDProcessorImpl extends PublicOperationProcessor {
 		cardSd.setCurrentKeyVersion(cardSd.getSd().getCurrentKeyVersion());
 		cardSecurityDomainManager.saveOrUpdate(cardSd);
 
-		if (CardSecurityDomain.STATUS_PERSO == cardSd.getStatus().intValue()) {// 如果卡上安全域已经是“已个人化”状态，流程结束
+		if (CardSecurityDomain.STATUS_PERSO == cardSd.getStatus().intValue() || !SystemConfigUtils.isCms2acRuntimeEnvironment()) {// 如果卡上安全域已经是“已个人化”状态，或者运行环境不是CMS2AC，流程结束
 			localTransaction.setSessionStatus(SessionStatus.COMPLETED);
 			return processTrans(localTransaction);
 		} else {// 如果卡上安全域已经不是“已个人化”状态，下发set status指令

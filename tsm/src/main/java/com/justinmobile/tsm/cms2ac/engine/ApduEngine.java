@@ -873,8 +873,15 @@ public class ApduEngine {
 		if (Operation.CREATE_SD.name().equals(trans.getProcedureName())) {
 			installAid = trans.getAid();
 			securityDomain = securityDomainManager.getByAid(installAid);
-			loadModule = securityDomain.getLoadModule();
-			loadFile = loadModule.getLoadFileVersion().getLoadFile();
+			if (SystemConfigUtils.isCms2acRuntimeEnvironment()) {
+				loadModule = securityDomain.getLoadModule();
+				loadFile = loadModule.getLoadFileVersion().getLoadFile();
+			} else {
+				loadModule = new LoadModule();
+				loadModule.setAid(SystemConfigUtils.getMockIsdModuleAid());
+				loadFile = new LoadFile();
+				loadFile.setAid(SystemConfigUtils.getMockIsdFileAid());
+			}
 			privilege = toHexString(intToHexBytes(securityDomain.getPrivilege(), 1));
 			installParams = getInstallParams(securityDomain);
 		} else {
@@ -1474,6 +1481,12 @@ public class ApduEngine {
 		if (StringUtils.isEmpty(selectAid)) {
 			throw new PlatformException(PlatformErrorCode.SELECT_APP_ERROR);
 		}
+
+		SecurityDomain sd = securityDomainManager.getByAid(selectAid);
+		if (!SystemConfigUtils.isCms2acRuntimeEnvironment() && (null != sd && sd.isIsd())) {// 如果运行环境不是CMS2AC并且选择的是主安全域，使用配置文件指定的AID
+			selectAid = SystemConfigUtils.getMockIsdAppAid();
+		}
+
 		ApduCommand cmd = new ApduCommand();
 		cmd.setCla((byte) 0x00);
 		cmd.setIns((byte) 0xA4);
