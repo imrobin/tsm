@@ -963,7 +963,12 @@ public class ApduEngine {
 		LoadFile loadFile = loadFileVersion.getLoadFile();
 
 		String loadFileAid = loadFile.getAid();
-		String sdAid = loadFile.getSd().getAid();
+		String sdAid;
+		if (!SystemConfigUtils.isCms2acRuntimeEnvironment() && loadFile.getSd().isIsd()) {// 如果当前运行环境不是CMS2AC并行安全域是主安全域，使用配置文件
+			sdAid = SystemConfigUtils.getMockIsdAppAid();
+		} else {// 否则，使用数据库配置
+			sdAid = loadFile.getSd().getAid();
+		}
 		String loadFileHash = loadFileVersion.getHash();
 		String loadParams = loadFileVersion.getLoadParams();
 
