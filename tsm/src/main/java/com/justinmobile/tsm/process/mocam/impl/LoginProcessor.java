@@ -14,6 +14,7 @@ import com.justinmobile.tsm.cms2ac.response.GetDataReadTokenResponse;
 import com.justinmobile.tsm.process.mocam.MocamResult;
 import com.justinmobile.tsm.process.mocam.MocamResult.ApduName;
 import com.justinmobile.tsm.transaction.domain.LocalTransaction;
+import com.justinmobile.tsm.utils.SystemConfigUtils;
 
 @Service("loginProcessor")
 public class LoginProcessor extends PublicOperationProcessor {
@@ -25,18 +26,22 @@ public class LoginProcessor extends PublicOperationProcessor {
 			result = startup(localTransaction);
 			break;
 		case SessionStatus.OPEN_RW_WAIT_OPEN_REQ:
-			result = launchSelectSd(localTransaction, securityDomainManager.getIsd(), SessionStatus.LOGIN_SELECT_ISD);
+			result = launchSelectSd(localTransaction,
+					securityDomainManager.getIsd(),
+					SessionStatus.LOGIN_SELECT_ISD);
 			result.setProgress("选择安全域");
 			result.setProgressPercent("25");
 			break;
 		case SessionStatus.LOGIN_SELECT_ISD:
 			parseSelectAppRsp(localTransaction);
-			result = launchInitUpdate(localTransaction, SessionStatus.LOGIN_INIT_UPDATE);
+			result = launchInitUpdate(localTransaction,
+					SessionStatus.LOGIN_INIT_UPDATE);
 			result.setProgress("建立安全通道");
 			result.setProgressPercent("45");
 			break;
 		case SessionStatus.LOGIN_INIT_UPDATE:
-			result = parseInitUpdateSdRsp(localTransaction, SessionStatus.LOGIN_EXT_AUTH);
+			result = parseInitUpdateSdRsp(localTransaction,
+					SessionStatus.LOGIN_EXT_AUTH);
 			result.setProgress("建立安全通道");
 			result.setProgressPercent("65");
 			break;
@@ -64,19 +69,23 @@ public class LoginProcessor extends PublicOperationProcessor {
 	}
 
 	private void parseReadToken(LocalTransaction localTransaction) {
-		Cms2acParam cms2acParam = localTransaction.getLastCms2acParam();
-		parseCms2acMoMocamMessage(localTransaction, cms2acParam);
+		if (SystemConfigUtils.isCms2acRuntimeEnvironment()) {
+			Cms2acParam cms2acParam = localTransaction.getLastCms2acParam();
+			parseCms2acMoMocamMessage(localTransaction, cms2acParam);
 
-		GetDataReadTokenResponse response;
-		try {
-			response = apduEngine.parseReadTokenRsp(cms2acParam);
-		} catch (ApduException ae) {
-			throw new PlatformException(PlatformErrorCode.APDU_WRITE_TOKEN_ERROR, ae);
-		}
-
-		CardInfo card = cardInfoManager.getByCardNo(localTransaction.getCardNo());
-		if (!card.getToken().equals(ConvertUtils.byteArray2HexString(response.getToken()))) {
-			throw new PlatformException(PlatformErrorCode.TOKEN_MISMATCH);
+			GetDataReadTokenResponse response;
+			try {
+				response = apduEngine.parseReadTokenRsp(cms2acParam);
+			} catch (ApduException ae) {
+				throw new PlatformException(
+						PlatformErrorCode.APDU_WRITE_TOKEN_ERROR, ae);
+			}
+			CardInfo card = cardInfoManager.getByCardNo(localTransaction
+					.getCardNo());
+			if (!card.getToken().equals(
+					ConvertUtils.byteArray2HexString(response.getToken()))) {
+				throw new PlatformException(PlatformErrorCode.TOKEN_MISMATCH);
+			}
 		}
 	}
 
@@ -86,7 +95,8 @@ public class LoginProcessor extends PublicOperationProcessor {
 		ApduCommand apdu = apduEngine.buildReadTokenCmd(cms2acParam);
 
 		contactApduCommand(cms2acParam, apdu);
-		MocamResult result = buildMocamMessage(localTransaction, cms2acParam, SessionStatus.LOGIN_READ_TOEKN);
+		MocamResult result = buildMocamMessage(localTransaction, cms2acParam,
+				SessionStatus.LOGIN_READ_TOEKN);
 		result.setApduName(ApduName.Load);
 		return result;
 	}

@@ -15,8 +15,9 @@ import com.justinmobile.tsm.customer.domain.CustomerCardInfo;
 import com.justinmobile.tsm.process.mocam.MocamResult;
 import com.justinmobile.tsm.process.mocam.MocamResult.ApduName;
 import com.justinmobile.tsm.transaction.domain.LocalTransaction;
+import com.justinmobile.tsm.utils.SystemConfigUtils;
 
-@Service("notifyImsiProcessor")
+@Service("changeTokenProcessor")
 public class ChangeTokenProcessor extends PublicOperationProcessor {
 
 	public MocamResult processTrans(LocalTransaction localTransaction) {
@@ -26,18 +27,22 @@ public class ChangeTokenProcessor extends PublicOperationProcessor {
 			result = startup(localTransaction);
 			break;
 		case SessionStatus.OPEN_RW_WAIT_OPEN_REQ:
-			result = launchSelectSd(localTransaction, securityDomainManager.getIsd(), SessionStatus.REG_SELECT_ISD);
+			result = launchSelectSd(localTransaction,
+					securityDomainManager.getIsd(),
+					SessionStatus.REG_SELECT_ISD);
 			result.setProgress("选择安全域");
 			result.setProgressPercent("25");
 			break;
 		case SessionStatus.REG_SELECT_ISD:
 			parseSelectAppRsp(localTransaction);
-			result = launchInitUpdate(localTransaction, SessionStatus.REG_INIT_UPDATE);
+			result = launchInitUpdate(localTransaction,
+					SessionStatus.REG_INIT_UPDATE);
 			result.setProgress("建立安全通道");
 			result.setProgressPercent("45");
 			break;
 		case SessionStatus.REG_INIT_UPDATE:
-			result = parseInitUpdateSdRsp(localTransaction, SessionStatus.REG_EXT_AUTH);
+			result = parseInitUpdateSdRsp(localTransaction,
+					SessionStatus.REG_EXT_AUTH);
 			result.setProgress("建立安全通道");
 			result.setProgressPercent("65");
 			break;
@@ -65,14 +70,17 @@ public class ChangeTokenProcessor extends PublicOperationProcessor {
 	}
 
 	private void parseWriteToken(LocalTransaction localTransaction) {
-		Cms2acParam cms2acParam = localTransaction.getLastCms2acParam();
-		parseCms2acMoMocamMessage(localTransaction, cms2acParam);
-		try {
-			apduEngine.parseRspWithSecurity(cms2acParam);
-		} catch (ApduException ae) {
-			throw new PlatformException(PlatformErrorCode.APDU_WRITE_TOKEN_ERROR, ae);
+		if (SystemConfigUtils.isCms2acRuntimeEnvironment()) {
+			Cms2acParam cms2acParam = localTransaction.getLastCms2acParam();
+			parseCms2acMoMocamMessage(localTransaction, cms2acParam);
+			try {
+				apduEngine.parseRspWithSecurity(cms2acParam);
+			} catch (ApduException ae) {
+				throw new PlatformException(
+						PlatformErrorCode.APDU_WRITE_TOKEN_ERROR, ae);
+			}
 		}
-	
+
 	}
 
 	private MocamResult launchWriteToken(LocalTransaction localTransaction) {
@@ -80,21 +88,30 @@ public class ChangeTokenProcessor extends PublicOperationProcessor {
 
 		List<ApduCommand> apdus = apduEngine.buildWriteTokenCmd(cms2acParam);
 
-		serializeApduCmdBatch(cms2acParam, apdus, Constants.MOCAM_DATA_MAX_LENGTH);
-		MocamResult result = buildMocamMessage(localTransaction, cms2acParam, apdus, SessionStatus.REG_WRITE_TOEKN);
+		serializeApduCmdBatch(cms2acParam, apdus,
+				Constants.MOCAM_DATA_MAX_LENGTH);
+		MocamResult result = buildMocamMessage(localTransaction, cms2acParam,
+				apdus, SessionStatus.REG_WRITE_TOEKN);
 		result.setApduName(ApduName.Load);
 		return result;
 	}
 
 	@Override
 	protected void check(LocalTransaction localTransaction) {
-		CardInfo card = cardInfoManager.getByCardNo(localTransaction.getCardNo());
-		if (null == card.getRegisterable() && CardInfo.REGISTERABLE_CHANGE_SIM.intValue() != card.getRegisterable().intValue()) {// 如果没有收到注册短信，抛出异常
+		CardInfo card = cardInfoManager.getByCardNo(localTransaction
+				.getCardNo());
+		if (null == card.getRegisterable()
+				&& CardInfo.REGISTERABLE_CHANGE_SIM.intValue() != card
+						.getRegisterable().intValue()) {// 如果没有收到注册短信，抛出异常
 			throw new PlatformException(PlatformErrorCode.TRANS_REG_REFUSE);
 		}
-		CustomerCardInfo cci = customerCardInfoManager.getByCardNo(localTransaction.getCardNo());
-		if(null!=cci && !cci.getCustomer().getSysUser().getMobile().equals(localTransaction.getMobileNo())){
-			throw new PlatformException(PlatformErrorCode.CARD_MOBILE_NO_NOT_MATCH);
+		CustomerCardInfo cci = customerCardInfoManager
+				.getByCardNo(localTransaction.getCardNo());
+		if (null != cci
+				&& !cci.getCustomer().getSysUser().getMobile()
+						.equals(localTransaction.getMobileNo())) {
+			throw new PlatformException(
+					PlatformErrorCode.CARD_MOBILE_NO_NOT_MATCH);
 		}
 	}
 }
