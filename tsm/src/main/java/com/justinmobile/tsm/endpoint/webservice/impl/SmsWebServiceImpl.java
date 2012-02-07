@@ -34,8 +34,8 @@ public class SmsWebServiceImpl implements SmsWebService {
 	private Status register(Status status,String content,String mobileNo){
 		try{
 		String seId = content.substring(4, 24);
-		String imsi = content.substring(24, 42);
-		String challengeNo = content.substring(42, 48);
+		String imsi = content.substring(24, 64);
+		String challengeNo = content.substring(64, 70);
 		// 如果卡未注册，注册卡
 		CardInfo card = cardManager.buildCardInfoIfNotExist(seId);
 
