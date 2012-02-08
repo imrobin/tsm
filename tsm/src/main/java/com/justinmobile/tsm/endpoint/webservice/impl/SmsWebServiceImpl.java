@@ -38,15 +38,15 @@ public class SmsWebServiceImpl implements SmsWebService {
 		String challengeNo = content.substring(64, 70);
 		// 如果卡未注册，注册卡
 		CardInfo card = cardManager.buildCardInfoIfNotExist(seId);
-
-		// ismi不用但手机号相同，换卡不换号
+		// imsi相同，SE相同
 		if(imsi.equals(card.getImsi())){
 			card.setRegisterable(CardInfo.REGISTERABLE_LOGIN);
 		}
+		// ismi不同但手机号相同，换卡不换号
 		else if ( mobileNo.equals(card.getMobileNo())) {
 			card.setRegisterable(CardInfo.REGISTERABLE_CHANGE_SIM);
 		} else {
-			card.setRegisterable(CardInfo.REGISTERABLE_NEW);
+			card.setRegisterable(CardInfo.REGISTERABLE_READY);
 		}
 		card.setImsi(imsi);
 		card.setMobileNo(mobileNo);
