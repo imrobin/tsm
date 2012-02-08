@@ -737,7 +737,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	public Long bindCardWithMobileType(Map<String, String> paramMap, boolean isChange) {
 		try {
 			// 获取手机型号
-			MobileType type = checkMobileType(paramMap);
+			MobileType type = getMobileType(paramMap);
 
 			CustomerCardInfo customerCard = bindCard(paramMap, isChange);
 
@@ -778,7 +778,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 			oldCCi.setStatus(CustomerCardInfo.STATUS_REPLACING);
 			customerCardInfoDao.saveOrUpdate(oldCCi);
 		}
-		MobileType type = checkMobileType(paramMap);
+		MobileType type = getMobileType(paramMap);
 		customerCard.setMobileType(type);// 设置手机型号
 		customerCard.setActive(CustomerCardInfo.NOT_ACTIVED);// 设置未激活
 		customerCard.setCard(cardInfo);// 设置SE
@@ -796,15 +796,11 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	 * @param paramMap
 	 * @return
 	 */
-	private MobileType checkMobileType(Map<String, String> paramMap) {
+	private MobileType getMobileType(Map<String, String> paramMap) {
 		String mobileTypeId = paramMap.get("mobileTypeId");
-		Long id = 1L;
-		if (null != mobileTypeId) {// 如果手机SE注册没有终端型号.取默认第一条
-			id = Long.valueOf(mobileTypeId);
-		}
-		MobileType type = mobileTypeDao.load(id);
-		if (null == type) {
-			throw new PlatformException(PlatformErrorCode.TYPE_IS_NOT_EXIST);
+		MobileType type = null;
+		if (null != mobileTypeId) {
+			type = mobileTypeDao.load(Long.valueOf(mobileTypeId));
 		}
 		return type;
 	}
