@@ -1,8 +1,5 @@
 package com.justinmobile.tsm.card.domain;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -30,23 +27,14 @@ public class CardInfo extends AbstractEntity {
 	/** 卡状态：1-可用 */
 	public static final String STATUS_ENABLE = "1";
 
-	/** 卡状态：1-新添加 */
-	public static final Integer REGISTERABLE_NEW = 1;
+	/** 卡状态：1-更换SIM卡 */
+	public static final Integer REGISTERABLE_CHANGE_SIM = 1;
 
-	/** 卡状态：2-更换SIM卡 */
-	public static final Integer REGISTERABLE_CHANGE_SIM = 2;
-
-	/** 卡状态：3-准备注册 */
-	public static final Integer REGISTERABLE_READY = 3;
+	/** 卡状态：2-准备注册 */
+	public static final Integer REGISTERABLE_READY = 2;
 	
-	/** 卡状态 ：4-准备登陆 */
-	public static final Integer REGISTERABLE_LOGIN = 4;
-	
-	public static final Set<Integer> REGISTERABLE_REGISTER =new HashSet<Integer>();
-	static{
-		REGISTERABLE_REGISTER.add(REGISTERABLE_NEW);
-		REGISTERABLE_REGISTER.add(REGISTERABLE_READY);
-	}
+	/** 卡状态 ：3-准备登陆 */
+	public static final Integer REGISTERABLE_LOGIN = 3;
 
 	/** 卡类型：0-正常卡 */
 	public static final Integer CARD_TYPE_NORMAL = 0;
