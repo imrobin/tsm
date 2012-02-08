@@ -229,7 +229,8 @@ public class LoadModule extends AbstractEntity {
 
 		String rid = this.aid.substring(0, 10);
 		if (!rid.equals(this.loadFileVersion.getLoadFile().getSp().getRid())) {
-			throw new PlatformException(PlatformErrorCode.SP_RID_DISCARD);
+			// RID管理方式现有问题，暂时不验证
+			// throw new PlatformException(PlatformErrorCode.SP_RID_DISCARD);
 		}
 	}
 
