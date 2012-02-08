@@ -309,8 +309,16 @@ TermOpt = new Class({
 								liString += '<td align="center"><span title="' + phoneName + '">' + obj.maxText(phoneName, 14) + '</span></td>';
 								liString += '<td align="center">' + item.mobileNo + '</td>';
 								liString += '<td align="center"> ' +  item.status + (item.inBlackOriginal == 0 ?'':'(在黑名单)') + '</td>';
-								liString += '<td align="center">' + item.mobileType_brandChs + '</td>';
+								if($chk(item.mobileType_brandChs)){
+									liString += '<td align="center">' + item.mobileType_brandChs + '</td>';
+								}else{
+									liString += '<td align="center">未指定</td>';
+								}
+								if($chk(item.mobileType_type)){
 								liString += '<td align="center"><span title="' + item.mobileType_type + ' ">'+ obj.maxText(item.mobileType_type, 14) + '</span></td>';
+								}else{
+									liString += '<td align="center">未指定</td>';
+								}
 								liString += '</tr>';
 								liString += '</table>'; 
 								liString += '</div>';
