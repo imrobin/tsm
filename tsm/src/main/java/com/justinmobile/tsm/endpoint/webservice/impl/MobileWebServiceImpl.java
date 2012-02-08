@@ -1008,6 +1008,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 			case UserLogin: {
 				String sysType = StringUtils.substringBefore(StringUtils
 						.substringAfter(request.getCommonType(), "-"), "-");
+				ClientInfoList clist = request.getClientInfoList();
 				if (null == customerCard) {// 如果当前终端未绑定，则抛出异常
 					throw new PlatformException(
 							PlatformErrorCode.CARD_NO_UNEXIST);
@@ -1028,29 +1029,23 @@ public class MobileWebServiceImpl implements MobileWebService {
 								request.getChallengeNo())) {
 					message = PlatformMessage.MOBILE_MISMATCH_CHALLENGE_NO;
 				} else {// 收到上行短信，根据绑定关系通知客户端下一步行为
-				
-					if (null == customerCard) {// 如果绑定关系为空，说明终端未绑定，执行注册
-						message = PlatformMessage.MOBILE_REGISTER;
-					} else {// 如果绑定关系存在，首先判定是否在黑名单
-						
-					    if (customerCard.isInBlackList()) {// 如果在黑名单
+					 if(null != customerCard){
+				    	if (customerCard.isInBlackList()) {// 如果在黑名单
 							message = PlatformMessage.MOBILE_IN_BLACK_LIST;
-						} else {// 如果不再黑名单
-							if (customerCard.getMobileNo().equals(
-									card.getMobileNo())) {// 如果绑定手机号与上行短信手机号一致，执行修改IMSI操作
-								message = PlatformMessage.MOBILE_NOTIFY_IMSI;
-							} else {// 如果绑定手机号与上行短信手机号不一致
-								if (card.getRegisterable().intValue() == CardInfo.REGISTERABLE_LOGIN
-										.intValue()) {
-									message = PlatformMessage.MOBILE_LOGIN;
-								}else{
-								message = PlatformMessage.MOBILE_REGISTERED;
-								
-							}
+						}else if(card.getRegisterable().intValue() == CardInfo.REGISTERABLE_CHANGE_SIM.intValue())// 如果不再黑名单
+						{// 如果绑定手机号与上行短信手机号一致，执行修改IMSI操作
+						message = PlatformMessage.MOBILE_NOTIFY_IMSI;
+					    } else if(card.getRegisterable().intValue() == CardInfo.REGISTERABLE_LOGIN.intValue()) //发起登陆
+					    {
+							message = PlatformMessage.MOBILE_LOGIN;
+						}else{
+							//提示已经绑定
+							message = PlatformMessage.MOBILE_REGISTERED;
 						}
-					}
-				}
-				}
+					}else {// 如果绑定手机号与上行短信手机号不一致
+						message = PlatformMessage.MOBILE_REGISTER;
+				    }
+				    }
 				status.setStatusCode(message.getCode());
 				status.setStatusDescription(message.getDefaultMessage());
 				break;
