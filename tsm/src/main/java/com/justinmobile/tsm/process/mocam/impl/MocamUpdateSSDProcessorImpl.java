@@ -151,7 +151,11 @@ public class MocamUpdateSSDProcessorImpl extends PublicOperationProcessor {
 		cardSd.setCurrentKeyVersion(cardSd.getSd().getCurrentKeyVersion());
 		cardSecurityDomainManager.saveOrUpdate(cardSd);
 
-		if (CardSecurityDomain.STATUS_PERSO == cardSd.getStatus().intValue() || !SystemConfigUtils.isCms2acRuntimeEnvironment()) {// 如果卡上安全域已经是“已个人化”状态，或者运行环境不是CMS2AC，流程结束
+		if (!SystemConfigUtils.isCms2acRuntimeEnvironment()) {// 如果运行环境不是CMS2AC，put-key执行成功后SE上安全域的状态会自动改为“已个人化”，因此需要修改数据库记录
+			cardSd.setStatus(CardSecurityDomain.STATUS_PERSO);
+		}
+
+		if (CardSecurityDomain.STATUS_PERSO == cardSd.getStatus().intValue()) {// 如果卡上安全域已经是“已个人化”状态，流程结束
 			localTransaction.setSessionStatus(SessionStatus.COMPLETED);
 			return processTrans(localTransaction);
 		} else {// 如果卡上安全域已经不是“已个人化”状态，下发set status指令
