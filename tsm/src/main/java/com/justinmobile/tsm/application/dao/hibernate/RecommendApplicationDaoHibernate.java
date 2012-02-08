@@ -64,7 +64,7 @@ public class RecommendApplicationDaoHibernate extends EntityDaoHibernate<Recomme
 	}
 	
 	@Override
-	public Page<RecommendApplication> recommendAppListForMobile(Page<RecommendApplication> page, String cardNo) {
+	public Page<RecommendApplication> recommendAppListForMobile(Page<RecommendApplication> page, String cardNo, SysUser currentUser) {
 		StringBuffer hql = new StringBuffer("select g from " + RecommendApplication.class.getName() + " as g ");
 		hql.append(" where g.application.id not in (");
 		hql.append(" select distinct ca.applicationVersion.application.id from ").append(CardApplication.class.getName());
@@ -76,7 +76,9 @@ public class RecommendApplicationDaoHibernate extends EntityDaoHibernate<Recomme
 		hql.append(") and ca.cardInfo.cardNo='").append(cardNo).append("'");
 		hql.append(")").append(" and g.application.status=").append(Application.STATUS_PUBLISHED);
 		hql.append(" and g.application.sp.status=").append(SpBaseInfo.NORMAL).append(" and g.application.sp.inBlack <>").append(SpBaseInfo.INBLACK);
-		hql.append(" order by g.orderNo desc ");
+		hql.append(" and (g.application.location like '%" + Application.LOCATION_TOTAL_NETWORK + "%' " +
+				"or g.application.location = '%" + currentUser.getProvince() + "%')");
+		hql.append(" order by g.orderNo");
 		return findPage(page, hql.toString());
 	}
 	

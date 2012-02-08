@@ -18,6 +18,8 @@ import com.justinmobile.tsm.application.dao.RecommendApplicationDao;
 import com.justinmobile.tsm.application.domain.Application;
 import com.justinmobile.tsm.application.domain.RecommendApplication;
 import com.justinmobile.tsm.application.manager.RecommendApplicationManager;
+import com.justinmobile.tsm.card.domain.CardInfo;
+import com.justinmobile.tsm.card.manager.CardInfoManager;
 import com.justinmobile.tsm.customer.domain.Customer;
 import com.justinmobile.tsm.customer.manager.CustomerManager;
 
@@ -31,6 +33,8 @@ public class RecommendApplicationManagerImpl extends EntityManagerImpl<Recommend
 	private CustomerManager customerManager;
 	@Autowired
 	private SysUserManager userManager;
+	@Autowired
+	private CardInfoManager cardInfoManager;
 
 	@Override
 	public Page<RecommendApplication> findRecommendApplication(Page<RecommendApplication> page, List<PropertyFilter> filters, boolean local) {
@@ -73,7 +77,9 @@ public class RecommendApplicationManagerImpl extends EntityManagerImpl<Recommend
 	@Override
 	public Page<RecommendApplication> recommendAppListForMobile(Page<RecommendApplication> page, String cardNo) {
 		try {
-			return recommendApplicationDao.recommendAppListForMobile(page, cardNo);
+			CardInfo cardInfo = cardInfoManager.getByCardNo(cardNo);
+			SysUser sysUser = userManager.getUserByMobile(cardInfo.getMobileNo());
+			return recommendApplicationDao.recommendAppListForMobile(page, cardNo, sysUser);
 		} catch (PlatformException e) {
 			throw e;
 		} catch (HibernateException e) {
