@@ -40,9 +40,9 @@ public class ApplicationComment extends AbstractEntity {
 
 	private String content;
 	
-	private int up;
+	private Integer up;
 	
-	private int down;
+	private Integer down;
 
 	private Customer customer;
 
@@ -115,19 +115,19 @@ public class ApplicationComment extends AbstractEntity {
 		this.content = content;
 	}
 
-	public int getUp() {
+	public Integer getUp() {
 		return up;
 	}
 
-	public void setUp(int up) {
+	public void setUp(Integer up) {
 		this.up = up;
 	}
 
-	public int getDown() {
+	public Integer getDown() {
 		return down;
 	}
 
-	public void setDown(int down) {
+	public void setDown(Integer down) {
 		this.down = down;
 	}
 	
