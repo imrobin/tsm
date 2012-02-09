@@ -145,7 +145,7 @@ public class ApplicationCommentManagerImpl extends
 	public void upComment(long commentId) throws PlatformException {
 		try {
 			ApplicationComment appCom = applicationCommentDao.findUniqueByProperty("id", commentId);
-			appCom.setUp(appCom.getUp()+1);
+			appCom.setUp(appCom.getUp().intValue()+1);
 			applicationCommentDao.saveOrUpdate(appCom);
 
 		} catch (PlatformException e) {
@@ -162,7 +162,7 @@ public class ApplicationCommentManagerImpl extends
 	public void downComment(long commentId) throws PlatformException {
 		try {
 			ApplicationComment appCom = applicationCommentDao.findUniqueByProperty("id", commentId);
-			appCom.setDown(appCom.getDown()+1);
+			appCom.setDown(appCom.getDown().intValue()+1);
 			applicationCommentDao.saveOrUpdate(appCom);
 		} catch (PlatformException e) {
 			throw e;
