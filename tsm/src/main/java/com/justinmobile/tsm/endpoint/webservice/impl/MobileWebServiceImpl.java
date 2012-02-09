@@ -190,8 +190,6 @@ public class MobileWebServiceImpl implements MobileWebService {
 					listCardApps(req, res);
 				}
 			}
-			status.setStatusCode(PlatformMessage.SUCCESS.getCode());
-			status.setStatusDescription(PlatformMessage.SUCCESS.getMessage());
 		} catch (PlatformException e) {
 			e.printStackTrace();
 			status.setStatusCode(e.getErrorCode().getErrorCode());
@@ -822,6 +820,14 @@ public class MobileWebServiceImpl implements MobileWebService {
 		Status status = Status.getClientStauts();
 		basicResponse.setStatus(status);
 		try {
+			CommandID commandId = CommandID.CommentPost;// 默认为提交评论
+			try {
+				commandId = CommandID.codeOf(reqAppComment.getCommandID());
+			} catch (IllegalArgumentException e) {
+				throw new PlatformException(PlatformErrorCode.PARAM_ERROR);
+			}
+			switch(commandId){
+			case CommentPost:{
 			ApplicationComment ac = new ApplicationComment();
 			String appAID = reqAppComment.getComment().getAppAID();
 			String cardNo = reqAppComment.getCardNo();
@@ -849,8 +855,19 @@ public class MobileWebServiceImpl implements MobileWebService {
 					.getCommentContent()));
 			ac.setGrade(starGrade);
 			commentManager.saveOrUpdate(ac);
-			status.setStatusCode(PlatformMessage.SUCCESS.getCode());
-			status.setStatusDescription(PlatformMessage.SUCCESS.getMessage());
+			break;
+			}
+			case CommentUpDown:{
+				long id = reqAppComment.getComment().getCommentId();
+				if(reqAppComment.getComment().getDown()!=null){
+					commentManager.downComment(id);
+				}
+				if(reqAppComment.getComment().getUp()!=null){
+					commentManager.upComment(id);
+				}
+				break;
+			}
+		}
 		} catch (PlatformException e) {
 			e.printStackTrace();
 			status.setStatusCode(e.getErrorCode().getErrorCode());
