@@ -39,6 +39,10 @@ public class ApplicationComment extends AbstractEntity {
 	private Integer oldGrade; // 记录修改评论前的星
 
 	private String content;
+	
+	private int up;
+	
+	private int down;
 
 	private Customer customer;
 
@@ -110,5 +114,22 @@ public class ApplicationComment extends AbstractEntity {
 	public void setContent(String content) {
 		this.content = content;
 	}
+
+	public int getUp() {
+		return up;
+	}
+
+	public void setUp(int up) {
+		this.up = up;
+	}
+
+	public int getDown() {
+		return down;
+	}
+
+	public void setDown(int down) {
+		this.down = down;
+	}
+	
 
 }

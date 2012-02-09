@@ -22,17 +22,19 @@ import com.justinmobile.tsm.customer.domain.Customer;
 import com.justinmobile.tsm.customer.manager.CustomerManager;
 
 @Service("applicationCommentManager")
-public class ApplicationCommentManagerImpl extends EntityManagerImpl<ApplicationComment, ApplicationCommentDao> implements ApplicationCommentManager {
+public class ApplicationCommentManagerImpl extends
+		EntityManagerImpl<ApplicationComment, ApplicationCommentDao> implements
+		ApplicationCommentManager {
 
 	@Autowired
 	private ApplicationCommentDao applicationCommentDao;
-	
+
 	@Autowired
 	private ApplicationManager applicationManager;
-	
+
 	@Autowired
 	private CustomerManager customerManager;
-	
+
 	@Autowired
 	private GradeStatisticsManager gradeStatisticsManager;
 
@@ -52,11 +54,12 @@ public class ApplicationCommentManagerImpl extends EntityManagerImpl<Application
 			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
 		}
 	}
-	
+
 	@Override
 	public void saveOrUpdate(ApplicationComment ac) {
 		GradeStatistics gs = null;
-		Application application = applicationManager.load(ac.getApplication().getId());
+		Application application = applicationManager.load(ac.getApplication()
+				.getId());
 		if (ac.getId() == null) {
 			ac.setOldGrade(-1); // 如果没有 commentId表明是新comment没有oldstar
 		}
@@ -68,13 +71,14 @@ public class ApplicationCommentManagerImpl extends EntityManagerImpl<Application
 				throw new PlatformException(PlatformErrorCode.USER_NOT_EXIST);
 			}
 		} else {
-			Customer customer = customerManager.getCustomerByUserName(currentUserName);
+			Customer customer = customerManager
+					.getCustomerByUserName(currentUserName);
 			ac.setCustomer(customer);
 		}
 		if (ac.getGrade() == null) { // =null表明有权限但是打的0分
 			ac.setGrade(0);
 		}
-		if (ac.getGrade() == -1){ // =-1表明没有打星的权限
+		if (ac.getGrade() == -1) { // =-1表明没有打星的权限
 			ac.setGrade(null);
 		}
 
@@ -86,10 +90,10 @@ public class ApplicationCommentManagerImpl extends EntityManagerImpl<Application
 		} else {
 			gs = application.getStatistics();
 		}
-		if (ac.getGrade() != null){
+		if (ac.getGrade() != null) {
 			gs.countGrade(ac.getGrade(), true);
 		}
-		if ( ac.getOldGrade() != null){
+		if (ac.getOldGrade() != null) {
 			gs.countGrade(ac.getOldGrade(), false);
 		}
 		gradeStatisticsManager.saveOrUpdate(gs);
@@ -101,12 +105,15 @@ public class ApplicationCommentManagerImpl extends EntityManagerImpl<Application
 	@Override
 	public boolean isCommented(long appId) {
 		try {
-			Customer customer = customerManager.getCustomerByUserName(SpringSecurityUtils.getCurrentUserName());
-			if (customer == null){
+			Customer customer = customerManager
+					.getCustomerByUserName(SpringSecurityUtils
+							.getCurrentUserName());
+			if (customer == null) {
 				return true;
 			}
-			Integer countComments = applicationCommentDao.isCommented(appId, customer.getId());
-			if (countComments == null){
+			Integer countComments = applicationCommentDao.isCommented(appId,
+					customer.getId());
+			if (countComments == null) {
 				countComments = 0;
 			}
 			return countComments != 0;
@@ -120,9 +127,11 @@ public class ApplicationCommentManagerImpl extends EntityManagerImpl<Application
 	}
 
 	@Override
-	public ApplicationComment getByAppIdAndCustomerId(long appId, long customerId) throws PlatformException {
+	public ApplicationComment getByAppIdAndCustomerId(long appId,
+			long customerId) throws PlatformException {
 		try {
-			return applicationCommentDao.getByAppIdAndCustomerId(appId, customerId);
+			return applicationCommentDao.getByAppIdAndCustomerId(appId,
+					customerId);
 		} catch (PlatformException e) {
 			throw e;
 		} catch (HibernateException e) {
@@ -130,5 +139,38 @@ public class ApplicationCommentManagerImpl extends EntityManagerImpl<Application
 		} catch (Exception e) {
 			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
 		}
+	}
+
+	@Override
+	public void upComment(long commentId) throws PlatformException {
+		try {
+			ApplicationComment appCom = applicationCommentDao.findUniqueByProperty("id", commentId);
+			appCom.setUp(appCom.getUp()+1);
+			applicationCommentDao.saveOrUpdate(appCom);
+
+		} catch (PlatformException e) {
+			throw e;
+		} catch (HibernateException e) {
+			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
+		}
+
+	}
+
+	@Override
+	public void downComment(long commentId) throws PlatformException {
+		try {
+			ApplicationComment appCom = applicationCommentDao.findUniqueByProperty("id", commentId);
+			appCom.setDown(appCom.getDown()+1);
+			applicationCommentDao.saveOrUpdate(appCom);
+		} catch (PlatformException e) {
+			throw e;
+		} catch (HibernateException e) {
+			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
+		}
+
 	}
 }

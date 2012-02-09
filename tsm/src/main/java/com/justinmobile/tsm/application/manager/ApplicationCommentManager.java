@@ -11,5 +11,9 @@ public interface ApplicationCommentManager extends EntityManager<ApplicationComm
 	boolean isCommented(long appId) throws PlatformException;
 	
 	ApplicationComment getByAppIdAndCustomerId(long appId, long customerId) throws PlatformException;
+	
+	void upComment(long commentId) throws PlatformException;
+	
+	void downComment(long commentId) throws PlatformException;
 
 }
