@@ -119,6 +119,9 @@ public enum CommandID {
 	
 	/** 100302，浏览评论 */
 	CommentView("100302"),
+	
+	/** 100401， 评论顶踩*/
+	CommentUpDown("100401"),
 	;
 	
 	private String  code;

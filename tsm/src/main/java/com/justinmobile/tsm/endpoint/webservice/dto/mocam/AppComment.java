@@ -10,6 +10,9 @@ import com.justinmobile.tsm.endpoint.webservice.NameSpace;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Comment", namespace = NameSpace.CM)
 public class AppComment {
+	
+	@XmlElement(namespace = NameSpace.CM)
+	private Long commentId;
 
 	@XmlElement(namespace = NameSpace.CM)
 	private String userName;
@@ -25,6 +28,12 @@ public class AppComment {
 	
 	@XmlElement(namespace = NameSpace.CM,name = "AppAID")
 	private String AppAID;
+	
+	@XmlElement(namespace = NameSpace.CM,name = "AGREE")
+	private Integer up;
+	
+	@XmlElement(namespace = NameSpace.CM,name = "OPPOSE")
+	private Integer down;
 
 	public String getUserName() {
 		return userName;
@@ -65,6 +74,31 @@ public class AppComment {
 	public void setAppAID(String appAID) {
 		AppAID = appAID;
 	}
+
+	public Long getCommentId() {
+		return commentId;
+	}
+
+	public void setCommentId(Long commentId) {
+		this.commentId = commentId;
+	}
+
+	public Integer getUp() {
+		return up;
+	}
+
+	public void setUp(Integer up) {
+		this.up = up;
+	}
+
+	public Integer getDown() {
+		return down;
+	}
+
+	public void setDown(Integer down) {
+		this.down = down;
+	}
+	
     
 	
 }

@@ -39,6 +39,9 @@ public class AppCommentList {
 				appComment.setStarGrade(comment.getGrade() == null ? 5 : comment.getGrade());
 				appComment.setUserName(comment.getCustomer().getSysUser().getUserName());
 				appComment.setAppAID(comment.getApplication().getAid());
+				appComment.setCommentId(comment.getId());
+				appComment.setUp(comment.getUp());
+				appComment.setDown(comment.getDown());
 				this.Comment.add(appComment);
 			}
 		}

@@ -316,6 +316,9 @@ public class AppInfo {
 	private void buildSimpleInfo(Application app,String sysType,Integer isUpdatable){
 		this.setAppAid(app.getAid());
 		this.setAppName(app.getName());
+		Space appSpace = app.getLastestSpace();
+		this.setAppNvm(appSpace.getNvm());
+		this.setAppRam(appSpace.getRam());
 		this.setAppCharge("0");
 		GradeStatistics statistics = app.getStatistics();
 		if (statistics == null) {
@@ -355,9 +358,6 @@ public class AppInfo {
 		if (app.getPublishDate() != null) {
 			this.setAppIssuingDate(CalendarUtils.parsefomatCalendar(app.getPublishDate(), CalendarUtils.SHORT_FORMAT_LINE));
 		}
-		Space appSpace = app.getLastestSpace();
-		this.setAppNvm(appSpace.getNvm());
-		this.setAppRam(appSpace.getRam());
 		this.setCommentTotalCount(app.getComments().size());
 		this.setSmallCardURL(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppMobileImgByAid&aId="+app.getAid());
 		pictureUrlList = new PictureURLList();
