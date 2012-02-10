@@ -558,13 +558,8 @@ public class ApduEngine {
 
 	private List<ApduCommand> extractLoadCmdBatch(Cms2acParam cms2acParam, String cms2acCapFileHex) {
 		byte[] cms2acCapFileBytes = generateCapFileBytes(cms2acCapFileHex);
-		LocalTransaction localTransaction = cms2acParam.getLocalTransaction();
 		List<byte[]> exeCodeByteList = null;
-		if (null != localTransaction.getCommType() && localTransaction.getCommType() == Constants.COMM_TYPE_MOCAM) {
-			exeCodeByteList = segmentalize(cms2acCapFileBytes, LOAD_CMD_MAX_DATA_LENGTH_BY_MOBILE_MOCAM);
-		} else {
-			exeCodeByteList = segmentalize(cms2acCapFileBytes, LOAD_CMD_MAX_DATA_LENGTH);
-		}
+		exeCodeByteList = segmentalize(cms2acCapFileBytes, LOAD_CMD_MAX_DATA_LENGTH_BY_MOBILE_MOCAM);
 		List<ApduCommand> apduCmdBatch = new ArrayList<ApduCommand>();
 		ApduCommand apduCommand = null;
 		int cursor = 0;
