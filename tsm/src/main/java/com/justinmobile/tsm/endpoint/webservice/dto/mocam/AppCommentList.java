@@ -36,7 +36,7 @@ public class AppCommentList {
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd HH:mm:ss");
 				appComment.setCommentTime(sdf.format(comment.getCommentTime().getTime()));
 				appComment.setCommentContent(comment.getContent());
-				appComment.setStarGrade(comment.getGrade() == null ? 5 : comment.getGrade());
+				appComment.setStarGrade(comment.getGrade());
 				appComment.setUserName(comment.getCustomer().getSysUser().getUserName());
 				appComment.setAppAID(comment.getApplication().getAid());
 				appComment.setCommentId(comment.getId());

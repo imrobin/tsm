@@ -306,6 +306,12 @@ public class AppInfo {
 		if(av.getVersionNo()!=null){
 		this.setAppVersion(av.getVersionNo());
 		}
+		if(av.getNonVolatileSpace() != null){
+			this.setAppNvm(av.getNonVolatileSpace());
+		}
+		if(av.getVolatileSpace() != null){
+			this.setAppRam(av.getVolatileSpace());
+		}
 	}
 	public void buildSimple(ApplicationVersion av,String sysType,Integer isUpdatable){
 		this.buildSimpleInfo(av.getApplication(), sysType, isUpdatable);

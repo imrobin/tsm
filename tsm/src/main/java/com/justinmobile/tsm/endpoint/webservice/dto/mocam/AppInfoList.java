@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 import org.apache.commons.collections.CollectionUtils;
 
 import com.justinmobile.tsm.application.domain.Application;
+import com.justinmobile.tsm.application.domain.ApplicationVersion;
 import com.justinmobile.tsm.endpoint.webservice.NameSpace;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -50,5 +51,11 @@ public class AppInfoList {
 			}
 		}
 	}
-
+	public void addMyAppInfo(ApplicationVersion applicationVersion, String sysType) {
+		if (applicationVersion != null) {
+			AppInfo info = new AppInfo();
+			info.build(applicationVersion, sysType, null);
+			this.add(info);
+		}
+	}
 }

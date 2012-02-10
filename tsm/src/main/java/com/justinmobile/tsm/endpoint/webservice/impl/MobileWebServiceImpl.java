@@ -178,8 +178,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		res.setCommandID(req.getCommandID());
 		Integer isDownloaded = req.getIsDownloaded();
 		try {
-			if (req.getQueryCondition() != null
-					&& req.getQueryCondition().equals("commendApp")) {
+			if (req.getQueryCondition() != null && req.getQueryCondition().equals("commendApp")) {
 				listRecommendApp(req, res);
 				// isDownload=0是未下载，1是已下载，2是所有应用
 			} else if (isDownloaded.intValue() == 2) {
@@ -405,17 +404,28 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 获取过滤条件
 		List<PropertyFilter> filters = buildFilter(req);
 		// 应用的状态为已发布状态
-		filters.add(new PropertyFilter("EQI_status", String
-				.valueOf(Application.STATUS_PUBLISHED)));
-		page = applicationManager.findPage(page, filters);
+		filters.add(new PropertyFilter("EQI_status", String.valueOf(Application.STATUS_PUBLISHED)));
+	//	page = applicationManager.findPage(page, filters);
 		AppInfoList appInfoList = new AppInfoList();
 		// 将得到的结果转换成dto
-		String sysType = StringUtils.substringBefore(
-				StringUtils.substringAfter(req.getCommonType(), "-"), "-");
-		if (null != req.getQueryCondition()
-				&& req.getQueryCondition().startsWith("EQS_aid=")) {
+		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
+		if (null != req.getQueryCondition()&& req.getQueryCondition().startsWith("EQS_aid=")) {
+			page = applicationManager.findPage(page, filters);
 			appInfoList.addAllFullInfo(page.getResult(), sysType, null);
+		}else if (null != req.getQueryCondition()&& req.getQueryCondition().startsWith("EQS_appVersion=")) { // 我的应用，查看下载的版本
+			String aid = "";
+			String appVersion = "";
+			for (PropertyFilter pf : filters){
+				if (pf.getPropertyName().equals("appVersion")){
+					appVersion = pf.getMatchValue()+"";
+				}else if (pf.getPropertyName().equals("aid")){
+					aid = pf.getMatchValue()+"";
+				}
+			}
+			ApplicationVersion applicationVersion = applicationVersionManager.getByAidAndVersionNo(aid, appVersion);
+			appInfoList.addMyAppInfo(applicationVersion, sysType);
 		} else {
+			page = applicationManager.findPage(page, filters);
 			appInfoList.addAll(page.getResult(), sysType, null);
 		}
 		// 设置返回结果
@@ -440,8 +450,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 			String[] querys = StringUtils.split(queryCondition, "&");
 			for (String query : querys) {
 				if (StringUtils.indexOf(query, "=") == -1) {
-					throw new PlatformException(
-							PlatformErrorCode.PAGE_FILTER_PARAM_ERROR);
+					throw new PlatformException(PlatformErrorCode.PAGE_FILTER_PARAM_ERROR);
 				}
 				String condition = StringUtils.substringBefore(query, "=");
 				String value = StringUtils.substringAfter(query, "=");
@@ -840,9 +849,6 @@ public class MobileWebServiceImpl implements MobileWebService {
 			if (StringUtils.isBlank(appAID)) {
 				throw new PlatformException(
 						PlatformErrorCode.APPLICAION_AID_NOT_EXIST);
-			}
-			if (starGrade == null) {
-				starGrade = 0;
 			}
 			Application app = applicationManager.getByAid(appAID);
 			Customer customer = customerCardInfo.getCustomer();
