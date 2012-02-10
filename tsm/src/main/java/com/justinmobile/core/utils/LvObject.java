@@ -35,6 +35,10 @@ public class LvObject {
 		return parse(src, 1);
 	}
 
+	public static LvObject parse(String plaintextHexString, int lLength) {
+		return parse(ConvertUtils.hexString2ByteArray(plaintextHexString));
+	}
+
 	public static LvObject parse(byte[] src, final int lLength) {
 		LvObject lv = new LvObject();
 
@@ -108,4 +112,5 @@ public class LvObject {
 	public void add(TlvObject value) {
 		add(value.build());
 	}
+
 }
