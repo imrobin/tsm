@@ -43,11 +43,9 @@ public class LvObject {
 		LvObject lv = new LvObject();
 
 		if (null == src) {
-			// TODO 异常不明确
 			throw new RuntimeException();
 		}
 		if (0 == lLength) {
-			// TODO 异常不明确
 			throw new RuntimeException();
 		}
 
@@ -66,7 +64,6 @@ public class LvObject {
 
 			int nextLvIndex = vIndex + vLength;// 保证源数据中有完整的v字段
 			if (nextLvIndex > src.length) {
-				// TODO 异常不明确
 				throw new RuntimeException();
 			}
 
@@ -81,6 +78,10 @@ public class LvObject {
 		}
 
 		return lv;
+	}
+
+	public List<byte[]> getValues() {
+		return values;
 	}
 
 	public byte[] getByIndex(int index) {
@@ -112,5 +113,4 @@ public class LvObject {
 	public void add(TlvObject value) {
 		add(value.build());
 	}
-
 }
