@@ -40,7 +40,6 @@ import com.justinmobile.tsm.application.domain.Space;
 import com.justinmobile.tsm.application.domain.SpecialMobile;
 import com.justinmobile.tsm.application.manager.ApplicationLoadFileManager;
 import com.justinmobile.tsm.application.manager.ApplicationManager;
-import com.justinmobile.tsm.application.manager.ApplicationVersionManager;
 import com.justinmobile.tsm.card.dao.CardApplicationDao;
 import com.justinmobile.tsm.card.dao.CardBaseApplicationDao;
 import com.justinmobile.tsm.card.dao.CardBaseInfoDao;
@@ -150,10 +149,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 
 	@Autowired
 	private ApplicationManager applicationManager;
-	
-	@Autowired
-	private ApplicationVersionManager applicationVersionManager;
-	
+
 	@Autowired
 	ApplicationLoadFileManager applicationLoadFileManager;
 
@@ -253,13 +249,13 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 		try {
 			CustomerCardInfo cci = customerCardInfoDao.load(ccId);
 			if (null != cci) {
-				if(cci.getStatus().intValue() == CustomerCardInfo.STATUS_NORMAL) {
+				if (cci.getStatus().intValue() == CustomerCardInfo.STATUS_NORMAL) {
 					List<CardApplication> caList = cardApplicationManager.getForLostListByCardInfo(cci.getCard());
-					if(CollectionUtils.isNotEmpty(caList)){
-						if(cci.isInBlack()){
+					if (CollectionUtils.isNotEmpty(caList)) {
+						if (cci.isInBlack()) {
 							cci.setStatus(CustomerCardInfo.STATUS_LOST);
 							this.saveOrUpdate(cci);
-						}else{
+						} else {
 							saveCCiInBlackForLost(cci);
 							cearteBlackListWithLost(ccId);
 						}
@@ -269,10 +265,10 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 							ca.setStatus(CardApplication.STATUS_LOSTED);
 							cardApplicationManager.saveOrUpdate(ca);
 						}
-					}else{
+					} else {
 						finashCancel(ccId);
 					}
-				} else{
+				} else {
 					throw new PlatformException(PlatformErrorCode.TERM_STATUS_IS_ANOMALOUS);
 				}
 			} else {
@@ -907,7 +903,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 						cci.setBindingDate(Calendar.getInstance());
 						cci.setStatus(CustomerCardInfo.STATUS_NORMAL);
 						customerCardInfoDao.saveOrUpdate(cci);
-						saveCustomerCardContact(cci);// 保存预制卡片批次信息
+						saveCardContact(cci.getCard());// 保存预制卡片批次信息
 						checkCardSpace(cci);
 						return true;
 					}
@@ -933,17 +929,18 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 		}
 	}
 
+	
 	/**
 	 * @param cci
 	 */
-	private void saveCustomerCardContact(CustomerCardInfo cci) {
-		CardBaseInfo cbi = cci.getCard().getCardBaseInfo();
-		createCardSd(cci, cbi);
+	public void saveCardContact(CardInfo card) {
+		CardBaseInfo cbi = card.getCardBaseInfo();
+		createCardSd(card);
 		List<CardBaseApplication> applist = cbi.getCardBaseApplications();
 		for (CardBaseApplication cba : applist) {
 			if (cba.getPreset()) {
 				// 预制cardApplication表
-				List<CardApplication> oldCaList = cardApplicationDao.findByProperty("cardInfo", cci.getCard());
+				List<CardApplication> oldCaList = cardApplicationDao.findByProperty("cardInfo", card);
 				boolean isExist = false;
 				for (CardApplication oldca : oldCaList) {
 					if (oldca.getApplicationVersion().getId() == cba.getApplicationVersion().getId()) {
@@ -953,23 +950,20 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 				if (isExist) {
 					continue;
 				}
-				List<CardApplication> caList = cardApplicationManager.getByCardAndApplication(cci.getCard(), cba.getApplicationVersion().getApplication());
+				List<CardApplication> caList = cardApplicationManager.getByCardAndApplication(card, cba.getApplicationVersion()
+						.getApplication());
 				if (caList.size() > 0) {
 					continue;
 				} else {
-					createCardApp(cci, cba);
+					createCardApp(card, cba);
 				}
 			}
 		}
-		createCardLoadFile(cci, cbi);
+		createCardLoadFile(card);
 	}
 
-	/**
-	 * @param cci
-	 * @param cbi
-	 */
-	private void createCardSd(CustomerCardInfo cci, CardBaseInfo cbi) {
-		CardInfo card = cci.getCard();
+	private void createCardSd(CardInfo card) {
+		CardBaseInfo cbi = card.getCardBaseInfo();
 		List<CardBaseSecurityDomain> sdlist = cbi.getCardBaseSecurityDomain();
 		for (CardBaseSecurityDomain cbsd : sdlist) {
 			if (cbsd.getPreset() == CardBaseSecurityDomain.PRESET && null != cbsd.getPresetMode()) {
@@ -981,6 +975,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 			}
 		}
 	}
+
 
 	private void createCustomerCardAndSave(CardInfo card, CardBaseSecurityDomain cbsd) {
 		CardSecurityDomain csd = new CardSecurityDomain();
@@ -1008,15 +1003,15 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	 * @param cci
 	 * @param cba
 	 */
-	private void createCardApplet(CustomerCardInfo cci, CardBaseApplication cba) {
+	private void createCardApplet(CardInfo card, CardBaseApplication cba) {
 		Set<Applet> applets = cba.getApplicationVersion().getApplets();
 		for (Applet applet : applets) {
-			CardApplet calet = cardAppletManager.getByCardAndApplet(cci.getCard(), applet);
+			CardApplet calet = cardAppletManager.getByCardAndApplet(card, applet);
 			if (null != calet) {
 				continue;
 			} else {
 				calet = new CardApplet();
-				calet.setCard(cci.getCard());
+				calet.setCard(card);
 				calet.setApplet(applet);
 				cardAppletManager.saveOrUpdate(calet);
 			}
@@ -1027,34 +1022,33 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	 * @param cci
 	 * @param cbi
 	 */
-	private void createCardLoadFile(CustomerCardInfo cci, CardBaseInfo cbi) {
-		List<CardBaseLoadFile> BaseLoadFileList = cardBaseLoadFileManager.getBaseLoadFileByCardBase(cbi);
+	private void createCardLoadFile(CardInfo card) {
+		List<CardBaseLoadFile> BaseLoadFileList = cardBaseLoadFileManager.getBaseLoadFileByCardBase(card.getCardBaseInfo());
 		for (CardBaseLoadFile cbf : BaseLoadFileList) {
-			boolean dupFlag = false;//是否有同一应用下的重复LOADFILE	
-			
-			List<CardLoadFile> clfList = cardLoadFileManager.getByCard(cci.getCard());
+			boolean dupFlag = false;// 是否有同一应用下的重复LOADFILE
+
+			List<CardLoadFile> clfList = cardLoadFileManager.getByCard(card);
 			Set<ApplicationLoadFile> loadFiles = cbf.getLoadFileVersion().getApplicationLoadFiles();
-			
+
 			for (CardLoadFile clf : clfList) {
 				Set<ApplicationLoadFile> AppverLoadFileSet = clf.getLoadFileVersion().getApplicationLoadFiles();
 				for (ApplicationLoadFile alf : AppverLoadFileSet) {
 					Application application = alf.getApplicationVersion().getApplication();
-					for(ApplicationLoadFile presetAlf : loadFiles) {
+					for (ApplicationLoadFile presetAlf : loadFiles) {
 						Application preapp = presetAlf.getApplicationVersion().getApplication();
-						if(application.getId().longValue() == preapp.getId().longValue()) {
+						if (application.getId().longValue() == preapp.getId().longValue()) {
 							dupFlag = true;
 						}
 					}
 				}
 			}
-			
+
 			if (dupFlag) {
 				continue;
 			} else {
 				CardLoadFile clf = new CardLoadFile();
-				clf.setCard(cci.getCard());
+				clf.setCard(card);
 				clf.setLoadFileVersion(cbf.getLoadFileVersion());
-				CardInfo card = cci.getCard();
 				SecurityDomain sd = cbf.getLoadFileVersion().getLoadFile().getSd();
 				CardSecurityDomain csd = cardSecurityDomainManager.getbySdAndCard(card, sd);
 				if (null == csd) {
@@ -1073,18 +1067,18 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	 * @param cba
 	 * @return
 	 */
-	private void createCardApp(CustomerCardInfo cci, CardBaseApplication cba) {
+	private void createCardApp(CardInfo card, CardBaseApplication cba) {
 		CardApplication ca = new CardApplication();
 		ca.setApplicationVersion(cba.getApplicationVersion());
 		if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_CREATE) {
 			ca.setStatus(CardApplication.STATUS_DOWNLOADED);
-			createCardLoadFileForApp(cci, ca);
+			createCardLoadFileForApp(card, ca);
 			ca.setUsedVolatileSpace(cba.getApplicationVersion().getLoadFileSpaceInfo().getRam());
 			ca.setUsedNonVolatileSpace(cba.getApplicationVersion().getLoadFileSpaceInfo().getNvm());
 		} else if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_PERSONAL) {
 			ca.setStatus(CardApplication.STATUS_INSTALLED);
-			createCardLoadFileForApp(cci, ca);
-			createCardApplet(cci, cba);
+			createCardLoadFileForApp(card, ca);
+			createCardApplet(card, cba);
 			Integer ram = cba.getApplicationVersion().getLoadFileSpaceInfo().getRam()
 					+ cba.getApplicationVersion().getAppletSpaceInfo().getRam();
 			Long rom = cba.getApplicationVersion().getLoadFileSpaceInfo().getNvm()
@@ -1092,8 +1086,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 			ca.setUsedNonVolatileSpace(rom);
 			ca.setUsedVolatileSpace(ram);
 		}
-		ca.setCardInfo(cci.getCard());
-		CardInfo card = cci.getCard();
+		ca.setCardInfo(card);
 		SecurityDomain sd = ca.getApplicationVersion().getApplication().getSd();
 		CardSecurityDomain csd = cardSecurityDomainManager.getbySdAndCard(card, sd);
 		if (null == csd) {
@@ -1105,8 +1098,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 		cardApplicationDao.saveOrUpdate(ca);
 	}
 
-	private void createCardLoadFileForApp(CustomerCardInfo cci, CardApplication ca) {
-		CardInfo card = cci.getCard();
+	private void createCardLoadFileForApp(CardInfo card, CardApplication ca) {
 		Set<ApplicationLoadFile> appLoadFileList = ca.getApplicationVersion().getApplicationLoadFiles();
 		for (ApplicationLoadFile alf : appLoadFileList) {
 			LoadFileVersion lfv = alf.getLoadFileVersion();
@@ -1115,7 +1107,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 				continue;
 			} else {
 				clf = new CardLoadFile();
-				clf.setCard(cci.getCard());
+				clf.setCard(card);
 				clf.setLoadFileVersion(lfv);
 				cardLoadFileManager.saveOrUpdate(clf);
 			}
@@ -1505,7 +1497,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 			if (cci.getStatus().intValue() == CustomerCardInfo.STATUS_LOST) {
 				// 1.改变CCI的状态
 				cci.setStatus(CustomerCardInfo.STATUS_NORMAL);
-				if(cci.isInBlack()) {
+				if (cci.isInBlack()) {
 					cci.setInBlack(CustomerCardInfo.NOT_INBLACK);
 					// 2.从黑名单中移除
 					CardBlackList cardBlackList = new CardBlackList();
@@ -1521,8 +1513,9 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 				for (CardApplication ca : caList) {
 					ca.setStatus(CardApplication.STATUS_INSTALLED);
 					cardApplicationManager.saveOrUpdate(ca);
-					
-					SubscribeHistory subscribeHistory = subscribeHistoryManager.getLastSubscribeHistoryByCustomerCardAndApplicationVersion(cci, ca.getApplicationVersion());
+
+					SubscribeHistory subscribeHistory = subscribeHistoryManager.getLastSubscribeHistoryByCustomerCardAndApplicationVersion(
+							cci, ca.getApplicationVersion());
 					if (null != subscribeHistory) {
 						subscribeHistory.setUnsubscribeDate(Calendar.getInstance());
 						subscribeHistoryManager.saveOrUpdate(subscribeHistory);
@@ -2138,7 +2131,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 					cci.setBindingDate(Calendar.getInstance());
 					cci.setStatus(CustomerCardInfo.STATUS_NORMAL);
 					customerCardInfoDao.saveOrUpdate(cci);
-					saveCustomerCardContact(cci);// 保存预制卡片批次信息
+					saveCardContact(cci.getCard());// 保存预制卡片批次信息
 					checkCardSpace(cci);
 				}
 			}
@@ -2574,7 +2567,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	@Override
 	public void sysnLostToCancel(CustomerCardInfo cci) {
 		try {
-			if(cci.isInBlack()) {
+			if (cci.isInBlack()) {
 				cci.setInBlack(CustomerCardInfo.NOT_INBLACK);
 				CardBlackList cardBlackList = new CardBlackList();
 				cardBlackList.setCustomerCardInfo(cci);

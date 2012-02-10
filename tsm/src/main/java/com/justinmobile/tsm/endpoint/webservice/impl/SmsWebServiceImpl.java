@@ -4,12 +4,15 @@ import javax.jws.WebService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
 import com.justinmobile.core.utils.ConvertUtils;
+import com.justinmobile.core.utils.hibernate.OpenSessionInMethod;
 import com.justinmobile.tsm.card.domain.CardInfo;
 import com.justinmobile.tsm.card.manager.CardInfoManager;
+import com.justinmobile.tsm.customer.manager.CustomerCardInfoManager;
 import com.justinmobile.tsm.endpoint.webservice.NameSpace;
 import com.justinmobile.tsm.endpoint.webservice.SmsWebService;
 import com.justinmobile.tsm.endpoint.webservice.dto.Status;
@@ -20,6 +23,10 @@ public class SmsWebServiceImpl implements SmsWebService {
 
 	@Autowired
 	private CardInfoManager cardManager;
+	@Autowired
+	private CustomerCardInfoManager cciManager;
+	@Autowired
+	private OpenSessionInMethod openSession;
 
 	@Override
 	public Status hanldeMessage(String content, String mobileNo) {
@@ -37,7 +44,9 @@ public class SmsWebServiceImpl implements SmsWebService {
 		String imsi = content.substring(24, 64);
 		String challengeNo = content.substring(64, 70);
 		// 如果卡未注册，注册卡
+		openSession.openSession();
 		CardInfo card = cardManager.buildCardInfoIfNotExist(seId);
+		cciManager.saveCardContact(card);
 		// imsi相同，SE相同
 		if(imsi.equals(card.getImsi())){
 			card.setRegisterable(CardInfo.REGISTERABLE_LOGIN);
@@ -52,6 +61,7 @@ public class SmsWebServiceImpl implements SmsWebService {
 		card.setMobileNo(mobileNo);
 		card.setChallengeNo(challengeNo);
 		cardManager.generateToken(card);
+		openSession.releaseSession();
 		}catch (PlatformException e) {
 			e.printStackTrace();
 			status.setStatusCode(e.getErrorCode().getErrorCode());

@@ -496,6 +496,12 @@ public interface CustomerCardInfoManager extends EntityManager<CustomerCardInfo>
 	 * @return
 	 */
 	public CustomerCardInfo getByCardNoThatNormalOrLosted(String cardNo);
-
+	
+	/**
+	 * 保存根据卡批次预置的卡片信息
+	 * @param card
+	 */
+	public void saveCardContact(CardInfo card);
+	
 	boolean hasSysRequirmentForMobile(CustomerCardInfo cci, ApplicationVersion applicationVersion);
 }
