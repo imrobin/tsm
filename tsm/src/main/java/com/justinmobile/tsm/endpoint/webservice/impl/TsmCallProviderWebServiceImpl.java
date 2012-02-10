@@ -51,7 +51,6 @@ public class TsmCallProviderWebServiceImpl implements TsmCallProviderWebService 
 			Holder<String> domainAid, Holder<String> ssdDapSign, Holder<String> keyVersion, Holder<List<DomainKey>> domainKeys,
 			Holder<List<Personalization>> personalizations, Holder<Integer> personalType, Holder<String> orgMsisdn) {
 		log.debug("\n" + "收到预处理请求" + "\n");
-
 		try {
 			SessionType sessionType = SessionType.valueOf(sessionTypeValue);
 			// 生成业务平台SessionId

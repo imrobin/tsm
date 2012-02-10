@@ -40,6 +40,7 @@ import com.justinmobile.tsm.application.domain.Space;
 import com.justinmobile.tsm.application.domain.SpecialMobile;
 import com.justinmobile.tsm.application.manager.ApplicationLoadFileManager;
 import com.justinmobile.tsm.application.manager.ApplicationManager;
+import com.justinmobile.tsm.application.manager.ApplicationVersionManager;
 import com.justinmobile.tsm.card.dao.CardApplicationDao;
 import com.justinmobile.tsm.card.dao.CardBaseApplicationDao;
 import com.justinmobile.tsm.card.dao.CardBaseInfoDao;
@@ -151,6 +152,9 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	private ApplicationManager applicationManager;
 	
 	@Autowired
+	private ApplicationVersionManager applicationVersionManager;
+	
+	@Autowired
 	ApplicationLoadFileManager applicationLoadFileManager;
 
 	@Autowired
@@ -187,8 +191,7 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 	public boolean hasSysRequirment(CustomerCardInfo cci, CardApplication ca) {
 		try {
 
-			List<CustomerCardInfo> _cci = customerCardInfoDao.getHasRequiremnt(cci.getId(), ca.getApplicationVersion().getId(), ca
-					.getApplicationVersion().getId());
+			List<CustomerCardInfo> _cci = customerCardInfoDao.getHasRequirement(cci.getId(), ca.getApplicationVersion().getId());
 			return _cci.size() != 0;
 		} catch (PlatformException pe) {
 			throw pe;
@@ -199,6 +202,20 @@ public class CustomerCardInfoManagerImpl extends EntityManagerImpl<CustomerCardI
 		}
 	}
 
+	@Override
+	public boolean hasSysRequirmentForMobile(CustomerCardInfo cci, ApplicationVersion applicationVersion) {
+		try {
+			List<CustomerCardInfo> _cci = customerCardInfoDao.hasSysRequirmentForMobile(cci.getId(), applicationVersion);
+			return _cci.size() != 0;
+		} catch (PlatformException pe) {
+			throw pe;
+		} catch (HibernateException e) {
+			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
+		}
+	}
+	
 	@Override
 	public CustomerCardInfo getCustomerCardInfoById(Long ccIdL) {
 		try {

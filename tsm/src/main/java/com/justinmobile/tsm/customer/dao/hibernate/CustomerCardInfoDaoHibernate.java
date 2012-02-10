@@ -67,16 +67,26 @@ public class CustomerCardInfoDaoHibernate extends EntityDaoHibernate<CustomerCar
 	}
 
 	@Override
-	public List<CustomerCardInfo> getHasRequiremnt(Long id, Long caId, Long appVerId) {
+	public List<CustomerCardInfo> getHasRequirement(Long id, Long appVerId) {
 		String hql = "from " + CustomerCardInfo.class.getName()
 				+ " as cci where cci.id=? and (cci.mobileType.originalOsKey in (select aci.sysRequirment from "
 				+ ApplicationClientInfo.class.getName() + " as aci inner join aci.applicationVersions av where  av.id=? )"
 				+ " or cci.mobileType.j2meKey in (select aci.sysRequirment from " + ApplicationClientInfo.class.getName()
 				+ " as aci inner join aci.applicationVersions av where  av.id=?))";
 		hql += " order by cci.status";
-		return this.find(hql, id, caId, appVerId);
+		return this.find(hql, id, appVerId, appVerId);
 	}
 
+	@Override
+	public List<CustomerCardInfo> hasSysRequirmentForMobile(Long id, ApplicationVersion applicationVersion) {
+		String hql = "from " + CustomerCardInfo.class.getName()
+				+ " as cci where cci.id=? and (cci.mobileType.originalOsKey in (select aci.sysRequirment from "
+				+ ApplicationClientInfo.class.getName() + " as aci inner join aci.applicationVersions av where  av.id=? )"
+				+ " or cci.mobileType.j2meKey in (select aci.sysRequirment from " + ApplicationClientInfo.class.getName()
+				+ " as aci inner join aci.applicationVersions av where  av.id=?))";
+		hql += " order by cci.status";
+		return this.find(hql, id, applicationVersion.getId(), applicationVersion.getId());
+	}
 	@Override
 	public List<CustomerCardInfo> getCustomerCardInfoByIdAsNormomAndLost(Customer customer) {
 		String hql = "from " + CustomerCardInfo.class.getName() + " as cci where cci.customer = ? and (cci.status = ? or cci.status = ?)";

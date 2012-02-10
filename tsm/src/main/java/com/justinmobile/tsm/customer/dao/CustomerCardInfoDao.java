@@ -52,11 +52,10 @@ public interface CustomerCardInfoDao extends EntityDao<CustomerCardInfo, Long> {
 
 	/**
 	 * @param id
-	 * @param id2
-	 * @param id3
+	 * @param appVerId
 	 * @return
 	 */
-	List<CustomerCardInfo> getHasRequiremnt(Long id, Long id2, Long id3);
+	List<CustomerCardInfo> getHasRequirement(Long id, Long appVerId);
 
 	/**
 	 * 根据用户来查找正常和挂失状态的终端
@@ -226,4 +225,6 @@ public interface CustomerCardInfoDao extends EntityDao<CustomerCardInfo, Long> {
 	 * @return
 	 */
 	CustomerCardInfo findByCardNoThatNormalOrLosted(CardInfo cardInfo);
+
+	List<CustomerCardInfo> hasSysRequirmentForMobile(Long id, ApplicationVersion applicationVersion);
 }

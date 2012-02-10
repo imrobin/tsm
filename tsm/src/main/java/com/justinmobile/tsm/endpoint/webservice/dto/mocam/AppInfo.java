@@ -344,7 +344,7 @@ public class AppInfo {
 		}
 		this.setAppClassify(app.getChildType().getName());
 		this.setAppLogoURL(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppPcImg&appId="+app.getId());
-		//this.setSmallCardURL(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppMobileImgByAid&aId="+app.getAid());
+		this.setSmallCardURL(SystemConfigUtils.getServiceUrl()+"html/application/?m=getAppMobileImgByAid&aId="+app.getAid());
 		this.setAppDesc(app.getDescription());
 	}
 	private void buildInfo(Application app, String sysType, Integer isUpdatable){

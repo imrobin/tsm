@@ -155,6 +155,9 @@ public class MobileWebServiceImpl implements MobileWebService {
 
 	@Autowired
 	private CardInfoManager cardInfoManager;
+	
+	@Autowired
+	private ApplicationVersionManager applicationVersionManager;
 
 	@Autowired
 	private CardBaseInfoManager cardBaseInfoManager;
@@ -418,7 +421,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 设置返回结果
 		List<AppInfo> appInfos = appInfoList.getAppInfo();
 		for (AppInfo appinfo : appInfos) {
-			this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
+			this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo(), appinfo.getAppVersion());
 		}
 		sortList(req, appInfos);
 		int nextPage = page.getNextPage();
@@ -944,9 +947,10 @@ public class MobileWebServiceImpl implements MobileWebService {
 						.getByCardNoAid(cardNo, aid);
 				ApplicationVersion appVer = cardApplication
 						.getApplicationVersion();
+			//	System.out.println(appVer.getId());
 				applicationClientInfo = applicationClientInfoManager
 						.getByApplicationVersionSysTypeSysRequirementFileType(
-								appVer, "os", sysType + sysRequirment, fileType);
+								appVer, sysType, sysType + sysRequirment, fileType);
 				if (applicationClientInfo == null) {
 					throw new PlatformException(
 							PlatformErrorCode.APPLICAION_CLIENT_NOT_EXSIT);
@@ -1219,39 +1223,27 @@ public class MobileWebServiceImpl implements MobileWebService {
 		res.setSdInfoList(sdInfoList);
 	}
 
-	private void setClientId(String aid, AppInfo info, String cardNo) {
+	private void setClientId(String aid, AppInfo info, String cardNo, String appVersion) {
 		if (cardNo != null) {
 			CustomerCardInfo cci = customerCardInfoManager.getByCardNo(cardNo);
-			CardApplication ca = cardApplicationManager
-					.getAvailbleOrLockedByCardNoAid(cci.getCard().getCardNo(),
-							aid);
-			if (ca == null) {
-
+			ApplicationVersion applicationVersion = applicationVersionManager.getByAidAndVersionNo(aid, appVersion);
+			boolean hasSysRequirment = customerCardInfoManager.hasSysRequirmentForMobile(cci, applicationVersion);
+			if (!hasSysRequirment) {
+				// mappedApplication.put("clientStatusStr",
+				// PlatformErrorCode.NOT_DOWN_CLINET.getDefaultMessage());
 			} else {
-				boolean hasSysRequirment = customerCardInfoManager
-						.hasSysRequirment(cci, ca);
-				if (!hasSysRequirment) {
-					// mappedApplication.put("clientStatusStr",
-					// PlatformErrorCode.NOT_DOWN_CLINET.getDefaultMessage());
-				} else {
-					MobileType mt = cci.getMobileType();
-					Set<ApplicationClientInfo> acs = ca.getApplicationVersion()
-							.getClients();
-					ApplicationClientInfo androidTemp = null;
-					for (Iterator<ApplicationClientInfo> it = acs.iterator(); it
-							.hasNext();) {
-						ApplicationClientInfo ac = (ApplicationClientInfo) it
-								.next();
-						if (mt.getOriginalOsKey().equals(ac.getSysRequirment())) {
-							// 应用详情-下载客户端：当同一手机型号对应了多个版本的Android客户端时
-							// ，应该下载当前手机型号对应的最高版本的客户端，以版本号来判断，而不是上传时间。
-							if (androidTemp == null
-									|| SpringMVCUtils.compareVersion(
-											ac.getVersion(),
-											androidTemp.getVersion())) {
-								info.setClientID(String.valueOf(ac.getId()));
-								androidTemp = ac;
-							}
+				MobileType mt = cci.getMobileType();
+				Set<ApplicationClientInfo> acs = applicationVersion.getClients();
+				ApplicationClientInfo androidTemp = null;
+				for (Iterator<ApplicationClientInfo> it = acs.iterator(); it.hasNext();) {
+					ApplicationClientInfo ac = (ApplicationClientInfo) it.next();
+					if (mt.getOriginalOsKey().equals(ac.getSysRequirment())) {
+						// 应用详情-下载客户端：当同一手机型号对应了多个版本的Android客户端时
+						// ，应该下载当前手机型号对应的最高版本的客户端，以版本号来判断，而不是上传时间。
+						if (androidTemp == null
+								|| SpringMVCUtils.compareVersion(ac.getVersion(), androidTemp.getVersion())) {
+							info.setClientID(String.valueOf(ac.getId()));
+							androidTemp = ac;
 						}
 					}
 				}

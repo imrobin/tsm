@@ -496,4 +496,6 @@ public interface CustomerCardInfoManager extends EntityManager<CustomerCardInfo>
 	 * @return
 	 */
 	public CustomerCardInfo getByCardNoThatNormalOrLosted(String cardNo);
+
+	boolean hasSysRequirmentForMobile(CustomerCardInfo cci, ApplicationVersion applicationVersion);
 }
