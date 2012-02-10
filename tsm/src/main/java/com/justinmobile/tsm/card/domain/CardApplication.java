@@ -60,7 +60,7 @@ public class CardApplication extends AbstractEntity {
 
 	/** 8-可用(业务平台订购关系建立成功，应用可用) */
 	public static final Integer STATUS_AVAILABLE = 8;
-	
+
 	/**
 	 * 9-已挂失.作为挂失后通知业务平台后的状态.
 	 */
@@ -137,6 +137,7 @@ public class CardApplication extends AbstractEntity {
 	/** 可删除状态集合 */
 	public static final Set<Integer> STATUS_DELETEABLE = new HashSet<Integer>();
 	static {
+		STATUS_DELETEABLE.add(STATUS_UNDOWNLOAD);
 		STATUS_DELETEABLE.add(STATUS_DOWNING);
 		STATUS_DELETEABLE.add(STATUS_PERSONALIZED);
 		STATUS_DELETEABLE.add(STATUS_AVAILABLE);
@@ -192,7 +193,7 @@ public class CardApplication extends AbstractEntity {
 		STATUS_PERSO_DATA_READABLE.add(STATUS_PERSONALIZED);
 		STATUS_PERSO_DATA_READABLE.add(STATUS_AVAILABLE);
 	}
-	
+
 	/** 可读取个人化数据的状态集合 */
 	public static final Set<Integer> STATUS_PERSO_DATA_DELETABLE = new HashSet<Integer>();
 	static {
@@ -240,7 +241,7 @@ public class CardApplication extends AbstractEntity {
 
 	/** 卡上应用的订购时间 */
 	private Date lastFeeTime;
-	
+
 	private Integer originalStatus;
 
 	/**
@@ -388,7 +389,5 @@ public class CardApplication extends AbstractEntity {
 	public void setOriginalStatus(Integer originalStatus) {
 		this.originalStatus = originalStatus;
 	}
-	
-	
 
 }
