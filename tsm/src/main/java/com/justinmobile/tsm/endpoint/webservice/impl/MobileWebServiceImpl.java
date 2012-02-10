@@ -1029,7 +1029,6 @@ public class MobileWebServiceImpl implements MobileWebService {
 			case UserLogin: {
 				String sysType = StringUtils.substringBefore(StringUtils
 						.substringAfter(request.getCommonType(), "-"), "-");
-				ClientInfoList clist = request.getClientInfoList();
 				if (null == customerCard) {// 如果当前终端未绑定，则抛出异常
 					throw new PlatformException(
 							PlatformErrorCode.CARD_NO_UNEXIST);
