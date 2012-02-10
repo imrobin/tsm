@@ -9,4 +9,5 @@
 <body>
 	<p><a href="testSubscribe.jsp">订购/退订测试页面</a></p>
 	<p><a href="pcmd.jsp">模拟个人化指令管理</a></p>
+	<p><a href="clearData.jsp">清除数据</a></p>
 </html>
