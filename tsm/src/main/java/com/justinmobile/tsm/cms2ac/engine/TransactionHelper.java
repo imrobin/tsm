@@ -56,6 +56,8 @@ import com.justinmobile.tsm.cms2ac.dto.SpaceInfo;
 import com.justinmobile.tsm.cms2ac.manager.TaskManager;
 import com.justinmobile.tsm.customer.domain.CustomerCardInfo;
 import com.justinmobile.tsm.customer.manager.CustomerCardInfoManager;
+import com.justinmobile.tsm.endpoint.domain.PushSms;
+import com.justinmobile.tsm.endpoint.manager.PushSmsManager;
 import com.justinmobile.tsm.endpoint.webservice.ProviderService;
 import com.justinmobile.tsm.endpoint.webservice.dto.CardPOR;
 import com.justinmobile.tsm.endpoint.webservice.dto.mocam.AppOperate;
@@ -138,6 +140,9 @@ public class TransactionHelper implements ApplicationContextAware {
 	protected OracleSequenceDao oracleSequenceDao;
 
 	@Autowired
+	private PushSmsManager pushSmsManager;
+
+	@Autowired
 	@Qualifier("providerCaller")
 	protected ProviderService providerCaller;
 
@@ -188,7 +193,7 @@ public class TransactionHelper implements ApplicationContextAware {
 		return message;
 	}
 
-	public String createSession(List<AppOperate> appOperates, String cardNo, String commonType, String username) {
+	public String createSession(List<AppOperate> appOperates, String cardNo, String commonType, String pushSerial) {
 		try {
 			CardInfo card = cardManager.getByCardNo(cardNo);
 			if (null == card) {
@@ -210,7 +215,7 @@ public class TransactionHelper implements ApplicationContextAware {
 					LocalTransaction trans = buildTransaction(cardNo, commonType, appOperate.getAppAid(), appOperate.getAppVersion(),
 							appOperate.getOperation(), customerCard, appOperate.getOriginalCardNo());
 					trans.setTask(task);
-					task.getLocalTransactions().add(trans);
+					task.addTransaction(trans);
 
 					if (null != customerCard && !Operation.CARD_OPERATIONS.contains(Operation.valueOf(trans.getProcedureName()))) {
 						DesiredOperation desiredOperation = desiredOperationManager.getByAidAndProcedureNameAndCustomerCardThatNotExcuted(
@@ -222,6 +227,13 @@ public class TransactionHelper implements ApplicationContextAware {
 						}
 					}
 				}
+			}
+
+			if (StringUtils.isNotBlank(pushSerial)) {// 如果有push短信的序列号，组建相应的操作
+				PushSms pushSms = pushSmsManager.getByPushSerial(pushSerial);
+				LocalTransaction trans = buildTransaction(cardNo, commonType, pushSms.getAid(), pushSms.getVersion(),
+						pushSms.getOperation(), customerCard);
+				task.addTransaction(trans);
 			}
 
 			task.setTransCount(task.getLocalTransactions().size());
@@ -349,6 +361,16 @@ public class TransactionHelper implements ApplicationContextAware {
 		return task;
 	}
 
+	/**
+	 * 
+	 * @param cardNo
+	 * @param commonType
+	 * @param aid
+	 * @param versionNo
+	 * @param operation
+	 * @param customerCard
+	 * @return
+	 */
 	private LocalTransaction buildTransaction(String cardNo, String commonType, String aid, String versionNo, Operation operation,
 			CustomerCardInfo customerCard) {
 		return buildTransaction(cardNo, commonType, aid, versionNo, operation.getType(), customerCard);
@@ -367,6 +389,17 @@ public class TransactionHelper implements ApplicationContextAware {
 		return buildTransaction(cardNo, commonType, aid, versionNo, operation, customerCard, null);
 	}
 
+	/**
+	 * 
+	 * @param cardNo
+	 * @param commonType
+	 * @param aid
+	 * @param versionNo
+	 * @param operationValue
+	 * @param customerCard
+	 * @param originalCardNo
+	 * @return
+	 */
 	private LocalTransaction buildTransaction(String cardNo, String commonType, String aid, String versionNo, int operationValue,
 			CustomerCardInfo customerCard, String originalCardNo) {
 		LocalTransaction trans = new LocalTransaction();
