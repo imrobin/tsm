@@ -570,6 +570,31 @@ public class ApplicationManagerImpl extends EntityManagerImpl<Application, Appli
 		}
 		return "";
 	}
+	@Override
+	public String getLocationMobileStatusForMobile(String cardNo, String appLocation) {
+		CustomerCardInfo cci = customerCardInfoManager.getByCardNo(cardNo);
+		if (cci == null) { // cci为空表示状态不正常，跳过归属地，直接交给核心流程
+			return "";
+		}
+		String mobileNo = cci.getMobileNo();
+		String paragraph = mobileNo.substring(0, 7);
+		List<PropertyFilter> filters = new ArrayList<PropertyFilter>();
+		filters.add(new PropertyFilter("paragraph", MatchType.EQ, PropertyType.S, paragraph));
+		List<MobileSection> mobileSections = mobileSectionManager.find(filters);
+		if (mobileSections.size() == 0) {
+			return "notInMobileSection";
+		}
+		if (appLocation.equals(Application.LOCATION_TOTAL_NETWORK)) {
+			return "";
+		} else {
+			for (MobileSection mobileSection : mobileSections) {
+				if (!mobileSection.getProvince().equals(appLocation)) {
+					return mobileSection.getProvince() + "," + appLocation;
+				}
+			}
+		}
+		return "";
+	}
 
 	@Override
 	public List<Map<String, Object>> getShowTypeApp() {

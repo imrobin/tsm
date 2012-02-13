@@ -184,9 +184,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 			} else if (isDownloaded.intValue() == 2) {
 				listApps(req, res);
 			} else {
-				if (isDownloaded.intValue() == 0
-						|| (req.getQueryCondition() != null && req
-								.getQueryCondition().equals("topDownload"))) {
+				if (isDownloaded.intValue() == 0 || (req.getQueryCondition() != null && req.getQueryCondition().equals("topDownload"))) {
 					listNotCardApps(req, res);
 				} else {
 					listCardApps(req, res);
@@ -222,7 +220,9 @@ public class MobileWebServiceImpl implements MobileWebService {
 		filters.add(new PropertyFilter("INI_status", new Integer[] {
 				CardApplication.STATUS_AVAILABLE,
 				CardApplication.STATUS_PERSONALIZED,
-				CardApplication.STATUS_LOCKED }));
+				CardApplication.STATUS_LOCKED,
+				CardApplication.STATUS_DELETEING
+				}));
 
 		page = cardApplicationManager.findPage(page, filters);
 
@@ -320,16 +320,14 @@ public class MobileWebServiceImpl implements MobileWebService {
 				filters);
 		AppInfoList appInfoList = new AppInfoList();
 		// 将得到的结果转换成dto
-		String sysType = StringUtils.substringBefore(
-				StringUtils.substringAfter(req.getCommonType(), "-"), "-");
+		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
 		appInfoList.addAll(page.getResult(), sysType, null);
 		List<AppInfo> appInfos = appInfoList.getAppInfo();
 		// for (AppInfo appinfo : appInfos) {
 		// this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
 		// }
 		int nextPage = page.getNextPage();
-		if (req.getQueryCondition() != null
-				&& req.getQueryCondition().equals("topDownload")) {
+		if (req.getQueryCondition() != null && req.getQueryCondition().equals("topDownload")) {
 			nextPage = 0;
 		} else {
 			sortList(req, appInfos);
@@ -411,7 +409,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
 		if (null != req.getQueryCondition()&& req.getQueryCondition().startsWith("EQS_aid=")) {
 			page = applicationManager.findPage(page, filters);
-			appInfoList.addAllFullInfo(page.getResult(), sysType, null);
+			appInfoList.addAllFullInfo(page.getResult(), sysType, null,req.getCardNo(), applicationManager);
 		}else if (null != req.getQueryCondition()&& req.getQueryCondition().startsWith("EQS_appVersion=")) { // 我的应用，查看下载的版本
 			String aid = "";
 			String appVersion = "";

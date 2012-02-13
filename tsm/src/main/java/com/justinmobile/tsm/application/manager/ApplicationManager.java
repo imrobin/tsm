@@ -161,4 +161,6 @@ public interface ApplicationManager extends EntityManager<Application> {
 	public void validateBuissinessUrl(String businessPlatformUrl, String serviceName);
 
 	public List<Map<String, Object>> getShowTypeApp();
+
+	String getLocationMobileStatusForMobile(String cardNo, String appLocation);
 }
