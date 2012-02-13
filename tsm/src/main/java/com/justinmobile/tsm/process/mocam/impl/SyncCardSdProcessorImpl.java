@@ -33,6 +33,7 @@ import com.justinmobile.tsm.process.mocam.MocamProcessor;
 import com.justinmobile.tsm.process.mocam.MocamResult;
 import com.justinmobile.tsm.process.mocam.MocamResult.ApduName;
 import com.justinmobile.tsm.transaction.domain.LocalTransaction;
+import com.justinmobile.tsm.utils.SystemConfigUtils;
 
 @Service("syncCardSdProcessor")
 public class SyncCardSdProcessorImpl extends PublicOperationProcessor implements MocamProcessor {
@@ -221,7 +222,15 @@ public class SyncCardSdProcessorImpl extends PublicOperationProcessor implements
 			Collection<String> platHas = ListUtils.removeAll(dataCardAppletAndSdAids, cardAppletAids);// 平台上比卡上多的实例记录
 			Collection<String> cardHas = ListUtils.removeAll(cardAppletAids, dataCardAppletAndSdAids);// 卡上比平台上多的实例记录
 
-			platHas.remove(securityDomainManager.getIsd().getAid());
+			String isdAid = null;
+			if (SystemConfigUtils.isCms2acRuntimeEnvironment()) {
+				isdAid = securityDomainManager.getIsd().getAid();
+			} else {
+				isdAid = SystemConfigUtils.getMockIsdAppAid();
+			}
+			platHas.remove(isdAid);
+			cardHas.remove(isdAid);
+			
 			if (CollectionUtils.isNotEmpty(platHas)) {// 如果平台有记录，但是卡上没有实例，则删除平台上的记录
 				for (String aid : platHas) {
 					CardApplet cardApplet = cardAppletManager.getByCardNoAndAppletAid(cardNo, aid);

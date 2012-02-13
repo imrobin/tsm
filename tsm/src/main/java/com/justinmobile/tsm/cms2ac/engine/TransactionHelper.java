@@ -71,6 +71,7 @@ import com.justinmobile.tsm.transaction.domain.LocalTransaction.ExecutionStatus;
 import com.justinmobile.tsm.transaction.domain.LocalTransaction.Operation;
 import com.justinmobile.tsm.transaction.manager.DesiredOperationManager;
 import com.justinmobile.tsm.transaction.manager.LocalTransactionManager;
+import com.justinmobile.tsm.utils.SystemConfigUtils;
 
 @Service("transactionHelper")
 public class TransactionHelper implements ApplicationContextAware {
@@ -260,33 +261,41 @@ public class TransactionHelper implements ApplicationContextAware {
 	 * @param customerCard
 	 */
 	private void checkRunningOperations(String cardNo, String commonType, Task task, CustomerCardInfo customerCard) {
-		List<LocalTransaction> localTransactions = localTransactionManager.getRunningTransByCardNo(cardNo);
-		if (CollectionUtils.isNotEmpty(localTransactions)) {
-			for (LocalTransaction localTransaction : localTransactions) {
-				Cms2acParam cms2acParam = localTransaction.getLastCms2acParam();
-				if (cms2acParam != null) {
-					SecurityDomain sd = cms2acParam.getCurrentSecurityDomain();
-					LocalTransaction trans = buildTransaction(cardNo, commonType, sd.getAid(), null, Operation.SYNC_CARD_SD, customerCard);
-					task.getLocalTransactions().add(trans);
-					trans.setTask(task);
+		if (SystemConfigUtils.isCms2acRuntimeEnvironment()) {// 如果当前运行环境是Cms2ac环境，判断是否需要执行同步操作
+			List<LocalTransaction> localTransactions = localTransactionManager.getRunningTransByCardNo(cardNo);
+			if (CollectionUtils.isNotEmpty(localTransactions)) {
+				for (LocalTransaction localTransaction : localTransactions) {
+					Cms2acParam cms2acParam = localTransaction.getLastCms2acParam();
+					if (cms2acParam != null) {
+						SecurityDomain sd = cms2acParam.getCurrentSecurityDomain();
+						LocalTransaction trans = buildTransaction(cardNo, commonType, sd.getAid(), null, Operation.SYNC_CARD_SD,
+								customerCard);
+						task.getLocalTransactions().add(trans);
+						trans.setTask(task);
+					}
+					// 处理事务
+					localTransaction.setExecutionStatus(ExecutionStatus.COMPLETED.getStatus());
+					localTransaction.setResult(PlatformMessage.TRANS_EXCEPTION_CLOSED);
+					localTransaction.setFailMessage(PlatformMessage.TRANS_EXCEPTION_CLOSED.getMessage());
+					localTransaction.setEndTime(Calendar.getInstance());
+					localTransactionManager.saveOrUpdate(localTransaction);
+
+					// 处理事务所属应用
+					Task exceptionTask = getTask(localTransaction);
+					exceptionTask.setEndTime(Calendar.getInstance());
+					exceptionTask.increaseFailTransCount();
+					exceptionTask.setFinished(true);
+					taskManager.saveOrUpdate(exceptionTask);
+
+					// 处理事务对应预置操作
+					completDesiredOperation(localTransaction);
 				}
-				// 处理事务
-				localTransaction.setExecutionStatus(ExecutionStatus.COMPLETED.getStatus());
-				localTransaction.setResult(PlatformMessage.TRANS_EXCEPTION_CLOSED);
-				localTransaction.setFailMessage(PlatformMessage.TRANS_EXCEPTION_CLOSED.getMessage());
-				localTransaction.setEndTime(Calendar.getInstance());
-				localTransactionManager.saveOrUpdate(localTransaction);
-
-				// 处理事务所属应用
-				Task exceptionTask = getTask(localTransaction);
-				exceptionTask.setEndTime(Calendar.getInstance());
-				exceptionTask.increaseFailTransCount();
-				exceptionTask.setFinished(true);
-				taskManager.saveOrUpdate(exceptionTask);
-
-				// 处理事务对应预置操作
-				completDesiredOperation(localTransaction);
 			}
+		} else {// 如果当前运行环境不是Cms2ac环境，在操作执行前强制执行同步操作
+			SecurityDomain sd = securityDomainManager.getIsd();
+			LocalTransaction trans = buildTransaction(cardNo, commonType, sd.getAid(), null, Operation.SYNC_CARD_SD, customerCard);
+			task.getLocalTransactions().add(trans);
+			trans.setTask(task);
 		}
 	}
 
