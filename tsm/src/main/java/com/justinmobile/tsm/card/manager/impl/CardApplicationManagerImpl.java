@@ -1,5 +1,7 @@
 package com.justinmobile.tsm.card.manager.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,15 +10,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.justinmobile.core.dao.support.Page;
+import com.justinmobile.core.dao.support.PropertyFilter;
+import com.justinmobile.core.dao.support.PropertyFilter.JoinType;
+import com.justinmobile.core.dao.support.PropertyFilter.MatchType;
+import com.justinmobile.core.dao.support.PropertyFilter.PropertyType;
 import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
 import com.justinmobile.core.manager.EntityManagerImpl;
+import com.justinmobile.core.utils.ResourceBundleUtils;
 import com.justinmobile.tsm.application.domain.Application;
 import com.justinmobile.tsm.application.domain.ApplicationVersion;
 import com.justinmobile.tsm.application.domain.SecurityDomain;
 import com.justinmobile.tsm.card.dao.CardApplicationDao;
+import com.justinmobile.tsm.card.dao.CardBaseApplicationDao;
 import com.justinmobile.tsm.card.domain.CardApplication;
 import com.justinmobile.tsm.card.domain.CardBaseApplication;
+import com.justinmobile.tsm.card.domain.CardBaseInfo;
 import com.justinmobile.tsm.card.domain.CardInfo;
 import com.justinmobile.tsm.card.manager.CardApplicationManager;
 import com.justinmobile.tsm.card.manager.CardBaseApplicationManager;
@@ -41,6 +50,9 @@ public class CardApplicationManagerImpl extends EntityManagerImpl<CardApplicatio
 	@Autowired
 	private CardBaseApplicationManager cardBaseApplicationManager;
 
+	@Autowired
+	private CardBaseApplicationDao cardBaseApplicationDao;
+	
 	@Override
 	public CardApplication getByCardNoAid(String cardNo, String aid) {
 		try {
@@ -348,5 +360,124 @@ public class CardApplicationManagerImpl extends EntityManagerImpl<CardApplicatio
 		} catch (Exception e) {
 			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
 		}
+	}
+
+	@Override
+	public List<Map<String, Object>> getCardApplicationsByCustomerCardId(Long ccid, Page<CardApplication> page) {
+		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		try {
+			CustomerCardInfo cci = customerCardManager.load(ccid);
+					List<PropertyFilter> filters = new ArrayList<PropertyFilter>();
+					filters.add(new PropertyFilter("cardInfo", JoinType.I, "id", MatchType.EQ, PropertyType.L, String.valueOf(cci.getCard().getId())));
+					Page<CardApplication> cardAppList = cardApplicationDao.findPage(page, filters);
+					for (CardApplication ca : cardAppList.getResult()) {
+						CardInfo card = ca.getCardInfo();
+						// 对是否采取默认规则进行判断
+						boolean showRule = false;
+						boolean show = true;
+						if (ca.getStatus().intValue() == CardApplication.STATUS_DOWNLOADED) {
+							CardBaseApplication checkCBA = cardBaseApplicationManager.getByCardBaseAndApplicationThatPreset(
+									card.getCardBaseInfo(), ca.getApplicationVersion().getApplication());
+							if (null == checkCBA) {
+								showRule = false;
+							} else {
+								showRule = true;
+								show = false;
+							}
+						} else if (ca.getStatus().intValue() == CardApplication.STATUS_INSTALLED) {
+							CardBaseApplication checkCBA = cardBaseApplicationManager.getByCardBaseAndApplicationThatPreset(
+									card.getCardBaseInfo(), ca.getApplicationVersion().getApplication());
+							if (null == checkCBA) {
+								showRule = false;
+							} else {
+								showRule = true;
+								if (checkCBA.getPresetMode().intValue() == CardBaseApplication.MODE_CREATE) {
+									showRule = true;
+									show = true;
+								} else {
+									show = false;
+								}
+							}
+						}
+
+						if (!showRule) {
+							if (ca.getStatus().intValue() != CardApplication.STATUS_UNDOWNLOAD) {
+								if (ca.getStatus().intValue() == CardApplication.STATUS_DOWNLOADED) {
+									CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
+									CardBaseApplication cba = cardBaseApplicationDao.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
+									Application app = ca.getApplicationVersion().getApplication();
+									if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
+											&& app.getDeleteRule().intValue() == Application.DELETE_RULE_DELETE_ALL) {
+										Map<String, Object> map = buildAppMap(ca);
+										map.put("cciName", cci.getName());
+										map.put("userName", cci.getCustomer().getSysUser().getUserName());
+										map.put("cciId", cci.getId());
+										list.add(map);
+									}
+								} else if (ca.getStatus().intValue() == CardApplication.STATUS_INSTALLED) {
+									CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
+									CardBaseApplication cba = cardBaseApplicationDao
+											.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
+									if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
+											&& ca.getApplicationVersion().getApplication().getDeleteRule().intValue() == Application.DELETE_RULE_CAN_NOT) {
+										continue;
+									}
+									if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
+											|| cba.getPresetMode().intValue() == CardBaseApplication.MODE_CREATE) {
+										Map<String, Object> map = buildAppMap(ca);
+										map.put("cciName", cci.getName());
+										map.put("userName", cci.getCustomer().getSysUser().getUserName());
+										map.put("cciId", cci.getId());
+										list.add(map);
+									}
+								} else {
+									Map<String, Object> map = buildAppMap(ca);
+									map.put("cciName", cci.getName());
+									map.put("userName", cci.getCustomer().getSysUser().getUserName());
+									map.put("cciId", cci.getId());
+									list.add(map);
+								}
+							}
+						} else if (showRule && show) {
+							Map<String, Object> map = buildAppMap(ca);
+							map.put("cciName", cci.getName());
+							map.put("userName", cci.getCustomer().getSysUser().getUserName());
+							map.put("cciId", cci.getId());
+							list.add(map);
+						}
+					}
+		} catch (PlatformException pe) {
+			throw pe;
+		} catch (HibernateException e) {
+			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
+		}
+		return list;
+	}
+
+	private Map<String, Object> buildAppMap(CardApplication ca) {
+		Application app = ca.getApplicationVersion().getApplication();
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("appName", app.getName());
+		map.put("appDesc", app.getDescription());
+		map.put("appType", app.getChildType().getName());
+		map.put("location", app.getLocation());
+		map.put("sp", app.getSp().getName());
+		map.put("spId", app.getSp().getId());
+		map.put("aid", ca.getApplicationVersion().getApplication().getAid());
+		map.put("appStatus", ResourceBundleUtils.getMapMessage("customerapplication.status").get(String.valueOf(ca.getStatus())));
+		map.put("statusOrg", ca.getStatus());
+		map.put("id", ca.getId());
+		map.put("appId", app.getId());
+		map.put("appver", ca.getApplicationVersion().getVersionNo());
+		if (null != ca.getUsedNonVolatileSpace() && null != ca.getUsedVolatileSpace()) {
+			map.put("useRam", ca.getSpaceInfo().getRam());
+			map.put("useRom", ca.getSpaceInfo().getNvm());
+		} else {
+			map.put("useRam", -1);
+			map.put("useRom", -1);
+		}
+		return map;
 	}
 }

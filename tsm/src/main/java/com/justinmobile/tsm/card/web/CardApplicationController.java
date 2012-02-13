@@ -148,5 +148,31 @@ public class CardApplicationController {
 		}
 		return result;
 	}
+	
+	/**
+	 * @Title: listCardApp
+	 * @Description: 显示卡片上指定条件的应用
+	 * @param req
+	 * @param resp
+	 */
+	@RequestMapping
+	public @ResponseBody
+	JsonResult searchAppsForAdminByCustomerCardId(HttpServletRequest request, @RequestParam Long ccid) {
+		JsonResult result = new JsonResult();
+		try {
+				Page<CardApplication> page = SpringMVCUtils.getPage(request);
+				List<Map<String, Object>> resultList = cardApplicationManager.getCardApplicationsByCustomerCardId(ccid, page);
+				result.setResult(resultList);
+		} catch (PlatformException e) {
+			e.printStackTrace();
+			result.setSuccess(Boolean.FALSE);
+			result.setMessage(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(Boolean.FALSE);
+			result.setMessage(e.getMessage());
+		}
+		return result;
+	}
 
 }

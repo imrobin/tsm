@@ -60,7 +60,7 @@ public class CustomerCardController {
 
 	@Autowired
 	private CardApplicationManager cardApplicationManager;
- 
+
 	@Autowired
 	private ApplicationManager applicationManager;
 
@@ -69,7 +69,7 @@ public class CustomerCardController {
 
 	@Autowired
 	private CardInfoManager cardManager;
-	
+
 	@Autowired
 	private FeeStatManager feeStatManager;
 
@@ -136,16 +136,16 @@ public class CustomerCardController {
 					ApplicationClientInfo j2meacTemp = null;
 					for (Iterator<ApplicationClientInfo> it = acs.iterator(); it.hasNext();) {
 						ApplicationClientInfo ac = (ApplicationClientInfo) it.next();
-						if (mt.getOriginalOsKey().equals(ac.getSysRequirment())) { 
+						if (mt.getOriginalOsKey().equals(ac.getSysRequirment())) {
 							// 应用详情-下载客户端：当同一手机型号对应了多个版本的Android客户端时
-							//，应该下载当前手机型号对应的最高版本的客户端，以版本号来判断，而不是上传时间。
-							if (androidTemp == null || SpringMVCUtils.compareVersion(ac.getVersion(), androidTemp.getVersion())){
+							// ，应该下载当前手机型号对应的最高版本的客户端，以版本号来判断，而不是上传时间。
+							if (androidTemp == null || SpringMVCUtils.compareVersion(ac.getVersion(), androidTemp.getVersion())) {
 								mappedApplication.put("clientAndroidUrl", ac.getFileUrl());
 								androidTemp = ac;
 							}
 						} else if (mt.getJ2meKey().equals(ac.getSysRequirment())) {
-							if ((j2meacTemp == null || SpringMVCUtils.compareVersion(ac.getVersion(),j2meacTemp.getVersion())) && 
-									ac.getFileUrl().endsWith(".jad")){
+							if ((j2meacTemp == null || SpringMVCUtils.compareVersion(ac.getVersion(), j2meacTemp.getVersion()))
+									&& ac.getFileUrl().endsWith(".jad")) {
 								mappedApplication.put("clientJ2MEUrl", ac.getFileUrl());
 								j2meacTemp = ac;
 							}
@@ -337,7 +337,7 @@ public class CustomerCardController {
 		JsonMessage message = new JsonMessage();
 		try {
 			customerCardInfoManager.doCustomerCardInfoLost(ccId);
-			//TODO 循环发送每个应用的业务平台说明此终端已经挂失应在事务外面做
+			// TODO 循环发送每个应用的业务平台说明此终端已经挂失应在事务外面做
 		} catch (PlatformException e) {
 			e.printStackTrace();
 			message.setSuccess(Boolean.FALSE);
@@ -443,7 +443,7 @@ public class CustomerCardController {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * @Title: listCardSD
 	 * @Description: 显示卡终端的安全域列表
@@ -660,8 +660,8 @@ public class CustomerCardController {
 			if (!success) {
 				message.setSuccess(Boolean.FALSE);
 				message.setMessage("请检查您的激活码");
-			}else{
-				feeStatManager.genPerStatRecord(cci.getMobileNo(),cci.getCard().getCardNo());
+			} else {
+				feeStatManager.genPerStatRecord(cci.getMobileNo(), cci.getCard().getCardNo());
 			}
 		} catch (PlatformException e) {
 			e.printStackTrace();
@@ -1069,10 +1069,10 @@ public class CustomerCardController {
 		}
 		return result;
 	}
-	
+
 	@RequestMapping
 	public @ResponseBody
-	JsonMessage checkCancelTermCardApp(HttpServletRequest request,@RequestParam Long ccId) {
+	JsonMessage checkCancelTermCardApp(HttpServletRequest request, @RequestParam Long ccId) {
 		JsonMessage message = new JsonMessage();
 		try {
 			boolean flag = customerCardInfoManager.checkCancelTermCardApp(ccId);
@@ -1088,16 +1088,15 @@ public class CustomerCardController {
 		}
 		return message;
 	}
-	
-	
+
 	@RequestMapping
 	public @ResponseBody
-	JsonMessage checkMobileNoLocation(HttpServletRequest request,@RequestParam String cardNo,@RequestParam Long appId) {
+	JsonMessage checkMobileNoLocation(HttpServletRequest request, @RequestParam String cardNo, @RequestParam Long appId) {
 		JsonMessage message = new JsonMessage();
-		Map<String,Object> forceMap = new HashMap<String,Object>();
+		Map<String, Object> forceMap = new HashMap<String, Object>();
 		try {
-			boolean flag = customerCardInfoManager.checkMobileNoLocation(cardNo,appId,forceMap);
-			if(!flag){
+			boolean flag = customerCardInfoManager.checkMobileNoLocation(cardNo, appId, forceMap);
+			if (!flag) {
 				message.setSuccess(false);
 				forceMap.put("force", false);
 				message.setMessage(forceMap);
@@ -1117,7 +1116,7 @@ public class CustomerCardController {
 		}
 		return message;
 	}
-	
+
 	/**
 	 * @Title: listCardApp
 	 * @Description: 显示卡片上指定条件的应用
@@ -1148,6 +1147,7 @@ public class CustomerCardController {
 		return result;
 	}
 	
+
 	@RequestMapping
 	public @ResponseBody
 	JsonMessage adminbindcard(HttpServletRequest request) {
@@ -1164,7 +1164,7 @@ public class CustomerCardController {
 			// 获得建立好的关联关系
 			Long customerCardId = customerCardInfoManager.bindCardWithMobileType(paramMap, false);
 			CustomerCardInfo cci = customerCardInfoManager.load(customerCardId);
-			feeStatManager.genPerStatRecord(cci.getMobileNo(),cci.getCard().getCardNo());
+			feeStatManager.genPerStatRecord(cci.getMobileNo(), cci.getCard().getCardNo());
 		} catch (PlatformException e) {
 			e.printStackTrace();
 			message.setSuccess(Boolean.FALSE);
@@ -1176,7 +1176,7 @@ public class CustomerCardController {
 		}
 		return message;
 	}
-	
+
 	@RequestMapping
 	public @ResponseBody
 	JsonMessage getAllCardAppListByUser(HttpServletRequest request) {
@@ -1196,7 +1196,7 @@ public class CustomerCardController {
 		}
 		return message;
 	}
-	
+
 	@RequestMapping
 	public @ResponseBody
 	JsonMessage getAllAppListByUser(HttpServletRequest request) {
@@ -1216,14 +1216,14 @@ public class CustomerCardController {
 		}
 		return message;
 	}
-	
+
 	@RequestMapping
 	public @ResponseBody
-	JsonMessage getCardApplicationByUserAndAppId(HttpServletRequest request,@RequestParam Long appId) {
+	JsonMessage getCardApplicationByUserAndAppId(HttpServletRequest request, @RequestParam Long appId) {
 		JsonMessage message = new JsonMessage();
 		try {
 			String userName = SpringSecurityUtils.getCurrentUserName();
-			List<Map<String, Object>> resultList = customerCardInfoManager.getCardApplicationByUserAndAppId(userName,appId);
+			List<Map<String, Object>> resultList = customerCardInfoManager.getCardApplicationByUserAndAppId(userName, appId);
 			message.setMessage(resultList);
 		} catch (PlatformException e) {
 			e.printStackTrace();
@@ -1235,5 +1235,32 @@ public class CustomerCardController {
 			message.setMessage(e.getMessage());
 		}
 		return message;
+	}
+
+	/**
+	 * 根据手机号获取非注销状态的终端列表
+	 * 
+	 * @param request
+	 * @param mobileNo
+	 * @return
+	 */
+	@RequestMapping
+	public @ResponseBody
+	JsonResult findCustoemrCardInfoByMobileNo(HttpServletRequest request, @RequestParam String moibleNo) {
+		JsonResult result = new JsonResult();
+		try {
+			Page<CustomerCardInfo> page = SpringMVCUtils.getPage(request);
+			page = customerCardInfoManager.getByMobileNoAllAndPage(page, moibleNo);
+			result.setPage(page,null,"mobileType.brandChs mobileType.type");
+		} catch (PlatformException e) {
+			e.printStackTrace();
+			result.setSuccess(Boolean.FALSE);
+			result.setMessage(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setSuccess(Boolean.FALSE);
+			result.setMessage(e.getMessage());
+		}
+		return result;
 	}
 }

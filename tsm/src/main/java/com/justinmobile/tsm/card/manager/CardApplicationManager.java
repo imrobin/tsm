@@ -131,4 +131,12 @@ public interface CardApplicationManager extends EntityManager<CardApplication> {
 	 * @return
 	 */
 	List<CardApplication> getByCardAndApplication(CardInfo card, Application application);
+
+	/**
+	 * 分页查找此卡片的关联记录
+	 * @param ccid
+	 * @param page
+	 * @return
+	 */
+	List<Map<String, Object>> getCardApplicationsByCustomerCardId(Long ccid, Page<CardApplication> page);
 }
