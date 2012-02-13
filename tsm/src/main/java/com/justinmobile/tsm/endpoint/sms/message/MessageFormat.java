@@ -1,4 +1,4 @@
-package com.justinmobile.tsm.endpoint.sms.cmpp.message;
+package com.justinmobile.tsm.endpoint.sms.message;
 
 public enum MessageFormat {
 	
