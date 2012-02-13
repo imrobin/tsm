@@ -74,6 +74,16 @@ public class AppInfo {
 	@XmlElement(namespace = NameSpace.CM,name = "ClientID")
 	private String clientId;
 	
+	@XmlElement(namespace = NameSpace.CM,name = "ClientSize")
+	private String clientSize;
+	
+	public String getClientSize() {
+		return clientSize;
+	}
+
+	public void setClientSize(String clientSize) {
+		this.clientSize = clientSize;
+	}
 	@XmlElement(namespace = NameSpace.CM)
 	private String remark;
 	
@@ -338,6 +348,7 @@ public class AppInfo {
 			ApplicationClientInfo client = appVersion.getClient(sysType);
 			if (client != null) {
 				this.setClientID(String.valueOf(client.getId()));
+				this.setClientSize(String.valueOf(client.getSize()));
 			}
 		}
 		//目前只有一种应用样式
