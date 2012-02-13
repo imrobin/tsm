@@ -9,4 +9,9 @@ import com.justinmobile.tsm.endpoint.domain.PushSms;
 @Repository("pushSmsDao")
 public class PushSmsDaoHibernate extends EntityDaoHibernate<PushSms, Long> implements PushSmsDao {
 
+	@Override
+	public PushSms getByPushSerial(String pushSerial) {
+		String hql = "from " + PushSms.class.getName() + " where serial = ?";
+		return findUniqueEntity(hql, pushSerial);
+	}
 }

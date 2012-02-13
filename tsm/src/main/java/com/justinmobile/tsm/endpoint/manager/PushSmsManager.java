@@ -8,4 +8,6 @@ import com.justinmobile.tsm.endpoint.domain.PushSms;
 @Transactional
 public interface PushSmsManager extends EntityManager<PushSms> {
 
+	PushSms getByPushSerial(String pushSerial);
+
 }
