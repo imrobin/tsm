@@ -38,10 +38,10 @@
 			<dl>
 				<dd>
 					<span style='color: red;'>*</span>卡号: <input name="cardNo" maxlength="20" type="text" />
-				</dd>
+				输入卡号后，点击下面的清除数据即可</dd>
 				<br />
-
-				<a id="submit" href="#">提交请求</a>
+                
+				<a id="submit" href="#">清除数据</a>
 
 
 			</dl>
