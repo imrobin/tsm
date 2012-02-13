@@ -27,6 +27,7 @@ import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
 import org.hibernate.type.EnumType;
 
+import com.justinmobile.core.dao.support.EnumPersistentable;
 import com.justinmobile.core.dao.support.EnumUserType;
 import com.justinmobile.core.domain.AbstractEntity;
 import com.justinmobile.core.domain.DateFormat;
@@ -220,7 +221,7 @@ public class LocalTransaction extends AbstractEntity {
 
 	}
 
-	public enum Operation {
+	public enum Operation implements EnumPersistentable {
 		/** 创建安全域 */
 		CREATE_SD(1, "mocamCreateSdProcessor", "100103", SessionType.SD_CREATE),
 		/** 删除安全域 */
@@ -275,10 +276,12 @@ public class LocalTransaction extends AbstractEntity {
 		REPLACE_MOBILE_NO(25, "replaceMobileNoProcessor", "100116", SessionType.REPLACE_MOBILE_NO),
 		/** 通知业务平台更换手机号 */
 		NOTIFY_REPLACE_MOBILE_NO(26, "personalizeAppProcessor", "", SessionType.REPLACE_MOBILE_NO),
-		/** 更新TOKEN  */
-		CHANGE_TOKEN(27,"changeTokenProcessor","100008",SessionType.OTHER),
+		/** 更新TOKEN */
+		CHANGE_TOKEN(27, "changeTokenProcessor", "100008", SessionType.OTHER),
 		/** 未知操作 */
 		UNKNOWN(-1, "", "", SessionType.OTHER);
+
+		public static final String NAME = "com.justinmobile.tsm.transaction.domain.LocalTransaction$Operation";
 
 		private int type;
 
@@ -329,6 +332,11 @@ public class LocalTransaction extends AbstractEntity {
 				}
 			}
 			return null;
+		}
+
+		@Override
+		public int getValue() {
+			return this.type;
 		}
 	}
 
