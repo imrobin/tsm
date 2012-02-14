@@ -24,6 +24,8 @@ import com.justinmobile.tsm.card.manager.CardApplicationManager;
 import com.justinmobile.tsm.card.manager.CardInfoManager;
 import com.justinmobile.tsm.card.manager.CardLoadFileManager;
 import com.justinmobile.tsm.card.manager.CardSecurityDomainManager;
+import com.justinmobile.tsm.endpoint.sms.SmsEndpoint;
+import com.justinmobile.tsm.endpoint.sms.message.MessageFormat;
 import com.justinmobile.tsm.endpoint.webservice.ProviderCallTsmWebService;
 import com.justinmobile.tsm.endpoint.webservice.dto.Status;
 import com.justinmobile.tsm.transaction.domain.LocalTransaction.CommType;
@@ -42,8 +44,8 @@ public class TestWebServiceController {
 	private CardApplicationManager caManager;
 	@Autowired
 	private CardSecurityDomainManager csdManager;
-    
-	@RequestMapping
+    @Autowired
+	private SmsEndpoint smsEndpoint;
 	public @ResponseBody
 	JsonMessage subscribe(HttpServletRequest request) {
 		JsonMessage message = new JsonMessage();
@@ -106,6 +108,24 @@ public class TestWebServiceController {
 					csdManager.saveOrUpdate(csd);
 				}
 			}
+		} catch (PlatformException e) {
+			e.printStackTrace();
+			message.setSuccess(Boolean.FALSE);
+			message.setMessage(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			message.setSuccess(Boolean.FALSE);
+			message.setMessage(e.getMessage());
+		}
+		return message;
+	}
+	@RequestMapping
+	public @ResponseBody
+	JsonMessage sendPush(HttpServletRequest request) {
+		JsonMessage message = new JsonMessage();
+		try {
+			String mobileNo = ServletRequestUtils.getStringParameter(request, "mobileNo");
+			smsEndpoint.pushMessage(mobileNo, MessageFormat.MSG_FORMAT_TYPE_BYTE.getValue(), "6666","6666", "22", "12000004000000100006", "12345678");
 		} catch (PlatformException e) {
 			e.printStackTrace();
 			message.setSuccess(Boolean.FALSE);
