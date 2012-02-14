@@ -34,6 +34,14 @@
 			<li><button>菜单管理</button></li>
 		</ul>
 	</div>
+	<h3><a href="#section2">业务管理</a></h3>
+	<div>
+		<ul id="selectable">
+			<li><button>提供商管理</button></li>
+			<li><button>应用管理</button></li>
+			<li><button>安全域管理</button></li>
+		</ul>
+	</div>
 </div>
 </div>
 <div class="ui-layout-center">
