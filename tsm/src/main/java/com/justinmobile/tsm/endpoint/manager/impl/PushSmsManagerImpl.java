@@ -5,6 +5,7 @@ import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.justinmobile.core.dao.OracleSequenceDao;
 import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
 import com.justinmobile.core.manager.EntityManagerImpl;
@@ -28,19 +29,22 @@ import com.justinmobile.tsm.utils.SystemConfigUtils;
 public class PushSmsManagerImpl extends EntityManagerImpl<PushSms, PushSmsDao> implements PushSmsManager {
 
 	@Autowired
-	PushSmsDao pushSmsDao;
+	private PushSmsDao pushSmsDao;
 	
 	@Autowired
-	CustomerCardInfoDao cciDao;
+	private CustomerCardInfoDao cciDao;
 	
 	@Autowired
-	CardInfoDao cardInfoDao;
+	private CardInfoDao cardInfoDao;
 	
 	@Autowired
-	ApplicationClientInfoDao aciDao;
+	private ApplicationClientInfoDao aciDao;
 	
 	@Autowired
-	ApplicationVersionDao appVerDao;
+	private ApplicationVersionDao appVerDao;
+	
+	@Autowired
+	private OracleSequenceDao oracleSequenceDao;
 	
 	@Autowired
 	private SmsEndpoint smsEndpoint;
@@ -72,7 +76,7 @@ public class PushSmsManagerImpl extends EntityManagerImpl<PushSms, PushSmsDao> i
 			 ps.setOperation(operation);
 			 String srcPort = SystemConfigUtils.getPushSrcPort();
 			 String destPort = SystemConfigUtils.getPushDestPort();
-			 String serial = RandomStringUtils.randomNumeric(12);
+			 String serial = oracleSequenceDao.getNextSerialNo("pushSerial", 12);
 			 //根据应用版本获取 clientId
 			 String osVersion = cci.getMobileType().getOriginalOsKey();
 			 ApplicationClientInfo aci = aciDao.getByApplicationVersionTypeVersionFileType(appVer, ApplicationClientInfo.SYS_TYPE_Android, osVersion, ApplicationClientInfo.FILE_TYPE_APK);
