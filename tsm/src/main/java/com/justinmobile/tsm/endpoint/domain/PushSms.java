@@ -99,5 +99,9 @@ public class PushSms extends AbstractEntity {
 	public Operation getOperation() {
 		return operation;
 	}
+	
+	public void setOperation(Operation operation) {
+		this.operation = operation;
+	}
 
 }
