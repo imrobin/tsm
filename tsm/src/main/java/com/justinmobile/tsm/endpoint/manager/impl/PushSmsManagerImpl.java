@@ -1,6 +1,5 @@
 package com.justinmobile.tsm.endpoint.manager.impl;
 
-import org.apache.commons.lang.RandomStringUtils;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,8 +71,9 @@ public class PushSmsManagerImpl extends EntityManagerImpl<PushSms, PushSmsDao> i
 			 PushSms ps = new PushSms();
 			 ps.setAid(aid);
 			 ps.setCardNo(cardNo);
+			 ps.setVersion(version);
 			 ps.setMobileNo(cci.getMobileNo());
-			 ps.setOperation(operation);
+			 ps.setOperate(operation);
 			 String srcPort = SystemConfigUtils.getPushSrcPort();
 			 String destPort = SystemConfigUtils.getPushDestPort();
 			 String serial = oracleSequenceDao.getNextSerialNo("pushSerial", 12);
@@ -84,7 +84,7 @@ public class PushSmsManagerImpl extends EntityManagerImpl<PushSms, PushSmsDao> i
 			 ps.setSerial(serial);
 			 pushSmsDao.saveOrUpdate(ps);
 			 smsEndpoint.pushMessage(cci.getMobileNo(), MessageFormat.MSG_FORMAT_TYPE_GBK.getValue(), destPort, srcPort, clientId, cci.getCard().getCardNo(), serial);
-			
+			 System.out.println("success");
 		 }catch (PlatformException e) {
 				throw e;
 			} catch (HibernateException e) {

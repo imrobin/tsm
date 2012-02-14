@@ -42,7 +42,7 @@ public class PushSms extends AbstractEntity {
 	private String version;
 
 	/** */
-	private Operation operation;
+	private Operation operate;
 
 	@Id
 	@GeneratedValue(generator = "sequence")
@@ -96,12 +96,12 @@ public class PushSms extends AbstractEntity {
 	}
 
 	@Type(type = EnumUserType.NAME, parameters = @Parameter(name = EnumType.ENUM, value = Operation.NAME))
-	public Operation getOperation() {
-		return operation;
+	public Operation getOperate() {
+		return operate;
 	}
 	
-	public void setOperation(Operation operation) {
-		this.operation = operation;
+	public void setOperate(Operation operate) {
+		this.operate = operate;
 	}
 
 }

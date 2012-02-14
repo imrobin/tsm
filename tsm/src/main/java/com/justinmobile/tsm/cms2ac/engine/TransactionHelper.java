@@ -232,7 +232,7 @@ public class TransactionHelper implements ApplicationContextAware {
 			if (StringUtils.isNotBlank(pushSerial)) {// 如果有push短信的序列号，组建相应的操作
 				PushSms pushSms = pushSmsManager.getByPushSerial(pushSerial);
 				LocalTransaction trans = buildTransaction(cardNo, commonType, pushSms.getAid(), pushSms.getVersion(),
-						pushSms.getOperation(), customerCard);
+						pushSms.getOperate(), customerCard);
 				task.addTransaction(trans);
 			}
 
