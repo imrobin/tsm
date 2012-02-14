@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
+import com.justinmobile.core.message.PlatformMessage;
 import com.justinmobile.core.utils.ConvertUtils;
 import com.justinmobile.tsm.card.domain.CardInfo;
 import com.justinmobile.tsm.cms2ac.SessionStatus;
@@ -11,6 +12,7 @@ import com.justinmobile.tsm.cms2ac.domain.ApduCommand;
 import com.justinmobile.tsm.cms2ac.domain.Cms2acParam;
 import com.justinmobile.tsm.cms2ac.exception.ApduException;
 import com.justinmobile.tsm.cms2ac.response.GetDataReadTokenResponse;
+import com.justinmobile.tsm.customer.domain.CustomerCardInfo;
 import com.justinmobile.tsm.process.mocam.MocamResult;
 import com.justinmobile.tsm.process.mocam.MocamResult.ApduName;
 import com.justinmobile.tsm.transaction.domain.LocalTransaction;
@@ -21,6 +23,12 @@ public class LoginProcessor extends PublicOperationProcessor {
 
 	public MocamResult processTrans(LocalTransaction localTransaction) {
 		MocamResult result = null;
+		CustomerCardInfo cci = customerCardInfoManager.getByCardNoThatNormalOrLosted(localTransaction.getCardNo());
+		if (cci.getInBlack() == CustomerCardInfo.INBLACK){
+			localTransaction.setSessionStatus(SessionStatus.TERMINATE);
+			localTransaction.setResult(PlatformMessage.MOBILE_IN_BLACK_LIST);
+			localTransaction.setExecutionStatus(LocalTransaction.STATUS_EXECUTION_EXEUTED);
+		}
 		switch (localTransaction.getSessionStatus()) {
 		case SessionStatus.INIT:
 			result = startup(localTransaction);
