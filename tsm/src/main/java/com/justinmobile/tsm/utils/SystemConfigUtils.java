@@ -57,4 +57,12 @@ public class SystemConfigUtils {
 	public static String getMockIsdFileAid() {
 		return resourceBundle.getString("mock.isd.fileAid");
 	}
+	
+	public static String getPushSrcPort(){
+		return resourceBundle.getString("push.srcPort");
+	}
+	
+	public static String getPushDestPort(){
+		return resourceBundle.getString("push.destPort");
+	}
 }
