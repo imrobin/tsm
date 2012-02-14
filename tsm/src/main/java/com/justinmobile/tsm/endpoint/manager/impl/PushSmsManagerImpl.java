@@ -76,7 +76,7 @@ public class PushSmsManagerImpl extends EntityManagerImpl<PushSms, PushSmsDao> i
 			 ps.setOperate(operation);
 			 String srcPort = SystemConfigUtils.getPushSrcPort();
 			 String destPort = SystemConfigUtils.getPushDestPort();
-			 String serial = oracleSequenceDao.getNextSerialNo("pushSerial", 12);
+			 String serial = oracleSequenceDao.getNextSerialNo("PUSHSERIAL", 12);
 			 //根据应用版本获取 clientId
 			 String osVersion = cci.getMobileType().getOriginalOsKey();
 			 ApplicationClientInfo aci = aciDao.getByApplicationVersionTypeVersionFileType(appVer, ApplicationClientInfo.SYS_TYPE_Android, osVersion, ApplicationClientInfo.FILE_TYPE_APK);
