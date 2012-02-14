@@ -27,9 +27,11 @@ import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
 import com.justinmobile.core.utils.ByteUtils;
 import com.justinmobile.core.utils.ConvertUtils;
+import com.justinmobile.core.utils.LvObject;
 import com.justinmobile.core.utils.MutilTagTlvObject;
 import com.justinmobile.core.utils.MutilTagTlvObject.ValueEntry;
 import com.justinmobile.core.utils.TlvObject;
+import com.justinmobile.core.utils.security.Sha1Utils;
 import com.justinmobile.tsm.application.domain.Applet;
 import com.justinmobile.tsm.application.domain.Application;
 import com.justinmobile.tsm.application.domain.ApplicationVersion;
@@ -1877,21 +1879,32 @@ public class ApduEngine {
 
 		// 首先使用tk对进行个人化指令的报文进行解密
 		String plaintextHexString = fileContent;
-		if (SystemConfigUtils.isPersoSecurityEnable()) {// 如果启用了个人化指令安全机制，对报文进行解密并去掉填充值
+		if (SystemConfigUtils.needPersoPackageDecrypt()) {// 如果需要使用TK对报文解密，执行解密
 			byte[] plaintext = scp02Service.decryptPersoData(ConvertUtils.hexString2ByteArray(fileContent), application);
 			plaintextHexString = ConvertUtils.byteArray2HexString(plaintext);
 
 			// 处理明文报文
 			int paddingBeginIndex = plaintextHexString.lastIndexOf("80");// 报文中最后一个0x80开始的是填充数据，需要丢弃
 			plaintextHexString = plaintextHexString.substring(0, paddingBeginIndex);
-			int lastSpearatorIndex = plaintextHexString.lastIndexOf(PESON_CMD_SEPARATOR);
-			if (lastSpearatorIndex == plaintextHexString.length() - 1) {// 如果此时报文中是以分隔符结尾，说明业务平台使用了逻辑填充行，填充数据已经丢弃，最后一个分隔符无用，也需丢弃
-				plaintextHexString = plaintextHexString.substring(0, lastSpearatorIndex);
-			}
 		}
 
-		String[] apdus = plaintextHexString.split(PESON_CMD_SEPARATOR);
-		for (String apud : apdus) {
+		if (SystemConfigUtils.needValidateIntegrality()) {
+			byte[] messageWithDigest = ConvertUtils.hexString2ByteArray(plaintextHexString);
+			int digestBeginIndex = messageWithDigest.length - 20;
+			byte[] message = ArrayUtils.subarray(messageWithDigest, 0, digestBeginIndex);
+			byte[] digestInMessage = ArrayUtils.subarray(messageWithDigest, digestBeginIndex, messageWithDigest.length);
+
+			Sha1Utils sha1Utils = new Sha1Utils();
+			byte[] digestCalc = sha1Utils.getDigestOfBytes(message);
+			if (!ArrayUtils.isEquals(digestInMessage, digestCalc)) {
+				// TODO throw a exception
+			}
+
+			plaintextHexString = ConvertUtils.byteArray2HexString(message);
+		}
+
+		List<byte[]> apdus = LvObject.parse(plaintextHexString, 2).getValues();
+		for (byte[] apud : apdus) {
 			// 开始处理转加密
 			MutilTagTlvObject tlv = MutilTagTlvObject.parse(apud);
 			List<ValueEntry> cipherDatas = tlv.getByTag(PESON_CMD_CIPHER_TAG);
@@ -1899,10 +1912,9 @@ public class ApduEngine {
 			for (ValueEntry cipherData : cipherDatas) {
 				byte[] value = cipherData.getValue();
 				byte[] transformedValue = value;
-				if (SystemConfigUtils.isPersoSecurityEnable()) {// 如果启用了个人化指令安全机制，对敏感数据进行转加密
-					transformedValue = scp02Service.transformEncrypt(value, application, cms2acParam);
+				if (SystemConfigUtils.needTransformEncrypt()) {// 如果需要使用KEK对敏感数据进行转加密，执行转加密
+					cipherData.setValue(transformedValue);
 				}
-				cipherData.setValue(transformedValue);
 			}
 
 			List<ValueEntry> plainDatas = tlv.getByTag(PESON_CMD_PLAIN_TAG);

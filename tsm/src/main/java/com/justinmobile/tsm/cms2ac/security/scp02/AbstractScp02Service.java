@@ -224,17 +224,15 @@ public abstract class AbstractScp02Service implements Scp02Service {
 		Key tkKey = new Key();
 		tkKey.addKeyProfile("tk", application.getTk());
 		tkKey.setAlgorithm(application.getPersoCmdTransferSecureAlgorithm());
-		byte[] plaintext = internalDecryptPersoData(ciphertext, tkKey);
 
-		return plaintext;
+		return internalDecryptPersoData(ciphertext, tkKey);
+
 	}
 
 	protected abstract byte[] internalDecryptPersoData(byte[] ciphertext, Key tk);
 
 	@Override
 	public byte[] transformEncrypt(byte[] ciphertext, Application application, Cms2acParam cms2acParam) {
-		byte[] plaintext = ciphertext;
-
 		Key dekKey = new Dek();
 		dekKey.setDisperseFactor(getScp02FullDisperseFactor(cms2acParam, KeyProfile.SCP02_DEK_TYPE));
 		dekKey.setSessionSalt(disperseKeyHelper.getScp02DekSessionSalt(cms2acParam));
@@ -244,8 +242,7 @@ public abstract class AbstractScp02Service implements Scp02Service {
 		kekKey.addKeyProfile("kek", application.getKek());
 		kekKey.setAlgorithm(application.getPersoCmdSensitiveDataSecureAlgorithm());
 
-		plaintext = internalTransformEncrypt(ciphertext, kekKey, dekKey);
-		return plaintext;
+		return internalTransformEncrypt(ciphertext, kekKey, dekKey);
 	}
 
 	protected abstract byte[] internalTransformEncrypt(byte[] ciphertext, Key kek, Key dek);
