@@ -38,8 +38,18 @@ public class SystemConfigUtils {
 		return Boolean.parseBoolean(resourceBundle.getString("application.isEncryptKey"));
 	}
 
-	public static boolean isPersoSecurityEnable() {
-		return Boolean.parseBoolean(resourceBundle.getString("application.isPersoSecurityEnable"));
+	public static boolean needPersoPackageDecrypt() {
+		return Boolean.parseBoolean(resourceBundle.getString("application.needPersoPackageDecrypt"));
+	}
+
+	public static boolean needValidateIntegrality() {
+		return Boolean.parseBoolean(resourceBundle.getString("application.needValidateIntegrality"));
+
+	}
+
+	public static boolean needTransformEncrypt() {
+		return Boolean.parseBoolean(resourceBundle.getString("application.needTransformEncrypt"));
+
 	}
 
 	public static String getServiceUrl() {
@@ -57,12 +67,12 @@ public class SystemConfigUtils {
 	public static String getMockIsdFileAid() {
 		return resourceBundle.getString("mock.isd.fileAid");
 	}
-	
-	public static String getPushSrcPort(){
+
+	public static String getPushSrcPort() {
 		return resourceBundle.getString("push.srcPort");
 	}
-	
-	public static String getPushDestPort(){
+
+	public static String getPushDestPort() {
 		return resourceBundle.getString("push.destPort");
 	}
 }
