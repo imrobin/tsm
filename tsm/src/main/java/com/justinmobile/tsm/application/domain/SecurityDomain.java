@@ -668,4 +668,15 @@ public class SecurityDomain extends AbstractEntity {
 
 		return space;
 	}
+
+	/**
+	 * 为当前安全域添加一个密钥配置信息，建立双向关联
+	 * 
+	 * @param keyProfile
+	 *            密钥配置信息
+	 */
+	public void addKeyProfile(KeyProfile keyProfile) {
+		keyProfiles.add(keyProfile);
+		keyProfile.setSecurityDomain(this);
+	}
 }
