@@ -52,7 +52,7 @@ public class CardApplicationManagerImpl extends EntityManagerImpl<CardApplicatio
 
 	@Autowired
 	private CardBaseApplicationDao cardBaseApplicationDao;
-	
+
 	@Override
 	public CardApplication getByCardNoAid(String cardNo, String aid) {
 		try {
@@ -352,7 +352,7 @@ public class CardApplicationManagerImpl extends EntityManagerImpl<CardApplicatio
 	@Override
 	public List<CardApplication> getByCardAndApplication(CardInfo card, Application application) {
 		try {
-			return cardApplicationDao.getByCardAndApplication(card,application);
+			return cardApplicationDao.getByCardAndApplication(card, application);
 		} catch (PlatformException e) {
 			throw e;
 		} catch (HibernateException e) {
@@ -367,78 +367,69 @@ public class CardApplicationManagerImpl extends EntityManagerImpl<CardApplicatio
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 		try {
 			CustomerCardInfo cci = customerCardManager.load(ccid);
-					List<PropertyFilter> filters = new ArrayList<PropertyFilter>();
-					filters.add(new PropertyFilter("cardInfo", JoinType.I, "id", MatchType.EQ, PropertyType.L, String.valueOf(cci.getCard().getId())));
-					Page<CardApplication> cardAppList = cardApplicationDao.findPage(page, filters);
-					for (CardApplication ca : cardAppList.getResult()) {
-						CardInfo card = ca.getCardInfo();
-						// 对是否采取默认规则进行判断
-						boolean showRule = false;
-						boolean show = true;
+			List<PropertyFilter> filters = new ArrayList<PropertyFilter>();
+			filters.add(new PropertyFilter("cardInfo", JoinType.I, "id", MatchType.EQ, PropertyType.L, String.valueOf(cci.getCard().getId())));
+			Page<CardApplication> cardAppList = cardApplicationDao.findPage(page, filters);
+			for (CardApplication ca : cardAppList.getResult()) {
+				CardInfo card = ca.getCardInfo();
+				// 对是否采取默认规则进行判断
+				boolean showRule = false;
+				boolean show = true;
+				if (ca.getStatus().intValue() == CardApplication.STATUS_DOWNLOADED) {
+					CardBaseApplication checkCBA = cardBaseApplicationManager.getByCardBaseAndApplicationThatPreset(card.getCardBaseInfo(),
+							ca.getApplicationVersion().getApplication());
+					if (null == checkCBA) {
+						showRule = false;
+					} else {
+						showRule = true;
+						show = false;
+					}
+				} else if (ca.getStatus().intValue() == CardApplication.STATUS_INSTALLED) {
+					CardBaseApplication checkCBA = cardBaseApplicationManager.getByCardBaseAndApplicationThatPreset(card.getCardBaseInfo(),
+							ca.getApplicationVersion().getApplication());
+					if (null == checkCBA) {
+						showRule = false;
+					} else {
+						showRule = true;
+						if (checkCBA.getPresetMode().intValue() == CardBaseApplication.MODE_CREATE) {
+							showRule = true;
+							show = true;
+						} else {
+							show = false;
+						}
+					}
+				}
+
+				if (!showRule) {
+					if (ca.getStatus().intValue() != CardApplication.STATUS_UNDOWNLOAD) {
 						if (ca.getStatus().intValue() == CardApplication.STATUS_DOWNLOADED) {
-							CardBaseApplication checkCBA = cardBaseApplicationManager.getByCardBaseAndApplicationThatPreset(
-									card.getCardBaseInfo(), ca.getApplicationVersion().getApplication());
-							if (null == checkCBA) {
-								showRule = false;
-							} else {
-								showRule = true;
-								show = false;
+							CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
+							CardBaseApplication cba = cardBaseApplicationDao.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
+							Application app = ca.getApplicationVersion().getApplication();
+							if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
+									&& app.getDeleteRule().intValue() == Application.DELETE_RULE_DELETE_ALL) {
+								Map<String, Object> map = buildAppMap(ca);
+								map.put("cciName", cci.getName());
+								map.put("userName", cci.getCustomer().getSysUser().getUserName());
+								map.put("cciId", cci.getId());
+								list.add(map);
 							}
 						} else if (ca.getStatus().intValue() == CardApplication.STATUS_INSTALLED) {
-							CardBaseApplication checkCBA = cardBaseApplicationManager.getByCardBaseAndApplicationThatPreset(
-									card.getCardBaseInfo(), ca.getApplicationVersion().getApplication());
-							if (null == checkCBA) {
-								showRule = false;
-							} else {
-								showRule = true;
-								if (checkCBA.getPresetMode().intValue() == CardBaseApplication.MODE_CREATE) {
-									showRule = true;
-									show = true;
-								} else {
-									show = false;
-								}
+							CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
+							CardBaseApplication cba = cardBaseApplicationDao.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
+							if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
+									&& ca.getApplicationVersion().getApplication().getDeleteRule().intValue() == Application.DELETE_RULE_CAN_NOT) {
+								continue;
 							}
-						}
-
-						if (!showRule) {
-							if (ca.getStatus().intValue() != CardApplication.STATUS_UNDOWNLOAD) {
-								if (ca.getStatus().intValue() == CardApplication.STATUS_DOWNLOADED) {
-									CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
-									CardBaseApplication cba = cardBaseApplicationDao.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
-									Application app = ca.getApplicationVersion().getApplication();
-									if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
-											&& app.getDeleteRule().intValue() == Application.DELETE_RULE_DELETE_ALL) {
-										Map<String, Object> map = buildAppMap(ca);
-										map.put("cciName", cci.getName());
-										map.put("userName", cci.getCustomer().getSysUser().getUserName());
-										map.put("cciId", cci.getId());
-										list.add(map);
-									}
-								} else if (ca.getStatus().intValue() == CardApplication.STATUS_INSTALLED) {
-									CardBaseInfo cbi = ca.getCardInfo().getCardBaseInfo();
-									CardBaseApplication cba = cardBaseApplicationDao
-											.getByCardBaseAndAppver(cbi, ca.getApplicationVersion());
-									if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
-											&& ca.getApplicationVersion().getApplication().getDeleteRule().intValue() == Application.DELETE_RULE_CAN_NOT) {
-										continue;
-									}
-									if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
-											|| cba.getPresetMode().intValue() == CardBaseApplication.MODE_CREATE) {
-										Map<String, Object> map = buildAppMap(ca);
-										map.put("cciName", cci.getName());
-										map.put("userName", cci.getCustomer().getSysUser().getUserName());
-										map.put("cciId", cci.getId());
-										list.add(map);
-									}
-								} else {
-									Map<String, Object> map = buildAppMap(ca);
-									map.put("cciName", cci.getName());
-									map.put("userName", cci.getCustomer().getSysUser().getUserName());
-									map.put("cciId", cci.getId());
-									list.add(map);
-								}
+							if (cba.getPresetMode().intValue() == CardBaseApplication.MODE_EMPTY
+									|| cba.getPresetMode().intValue() == CardBaseApplication.MODE_CREATE) {
+								Map<String, Object> map = buildAppMap(ca);
+								map.put("cciName", cci.getName());
+								map.put("userName", cci.getCustomer().getSysUser().getUserName());
+								map.put("cciId", cci.getId());
+								list.add(map);
 							}
-						} else if (showRule && show) {
+						} else {
 							Map<String, Object> map = buildAppMap(ca);
 							map.put("cciName", cci.getName());
 							map.put("userName", cci.getCustomer().getSysUser().getUserName());
@@ -446,6 +437,14 @@ public class CardApplicationManagerImpl extends EntityManagerImpl<CardApplicatio
 							list.add(map);
 						}
 					}
+				} else if (showRule && show) {
+					Map<String, Object> map = buildAppMap(ca);
+					map.put("cciName", cci.getName());
+					map.put("userName", cci.getCustomer().getSysUser().getUserName());
+					map.put("cciId", cci.getId());
+					list.add(map);
+				}
+			}
 		} catch (PlatformException pe) {
 			throw pe;
 		} catch (HibernateException e) {

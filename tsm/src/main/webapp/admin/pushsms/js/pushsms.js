@@ -4,6 +4,17 @@ PushSms = new Class({
 	options : {},
 	initialize : function(options){
 		this.setOptions(options);
+		this.getConstants();
+	},
+	getConstants : function() {
+		new Request.JSON({
+			url : ctx + "/html/localtransaction/?m=exportConstant",
+			onSuccess : function(json) {
+				if (json.success) {
+					this.transConstant = json.message;
+				}
+			}.bind(this)
+		}).get();
 	},
 	doQuery : function (ccid) {
 		var ps = this;
@@ -18,7 +29,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/down.png',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.downApp(this.selectIds);
+							ps.getApplictionVer(downGrid.selectIds[0]);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -73,7 +84,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/delete.png',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.delApp(this.selectIds, this);
+							ps.optCardApplication(optGrid.selectIds[0], ps.transConstant.DELETE_APP);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -83,7 +94,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/lock.png',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.lockApp(this.selectIds, this);
+							ps.optCardApplication(optGrid.selectIds[0], ps.transConstant.LOCK_APP);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -93,7 +104,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/unlock.png',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.unlockApp(this.selectIds, this);
+							ps.optCardApplication(optGrid.selectIds[0], ps.transConstant.UNLOCK_APP);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -103,7 +114,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/down.png',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.personalApp(this.selectIds, this);
+							ps.optCardApplication(optGrid.selectIds[0], ps.transConstant.PERSONALIZE_APP);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -113,7 +124,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/update.jpg',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.updateApp(this.selectIds, this);
+							ps.optCardApplication(optGrid.selectIds[0], ps.transConstant.UPDATE_APP);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -154,7 +165,42 @@ PushSms = new Class({
 			$('managerApp').setStyle('display','');
 		});
 	},
-	delApp : function (caId, ps) {
-		
+	optCardApplication : function (caid, operation) {
+		var ps = this;
+		new Request.JSON({
+			url : ctx + '/html/cardApp/?m=optCardApplication',
+			onSuccess : function(json) {
+				if (json.success) {
+					new LightFace.MessageBox().info("短信PUSH成功");
+				} else {
+					new LightFace.MessageBox().error(json.message);
+				}
+			}
+		}).post({
+			'ccId' : ps.ccid,
+			'caId' : caid,
+			'opt' : operation
+		});
+	},
+	downApplication : function(appId,ver) {
+		var ps = this;
+		new Request.JSON({
+			url : ctx + '/html/cardApp/?m=downApplication',
+			onSuccess : function(json) {
+				if (json.success) {
+					new LightFace.MessageBox().info("短信PUSH成功");
+				} else {
+					new LightFace.MessageBox().error(json.message);
+				}
+			}
+		}).post({
+			'appId' : appId,
+			'appVerId' : ver,
+			'ccId' : ps.ccid
+		});
+	},
+	getApplictionVer : function (appId) {
+		var ps = this;
+		ps.downApplication(appId,'');
 	}
 });
