@@ -93,5 +93,12 @@
 </div>
 <div id="footer" class="clear"><p class="right">Copyright©2011 Just In Mobile Corporation. All rights reserved</p></div>
 </div>
+<div id="appVerDiv" style="display:none">
+	<a class="butt2" href="#" id="goDown">
+		<span>确定</span>
+	</a>
+	<select id="appverSel">
+	</select>
+</div>
 </body>
 </html>

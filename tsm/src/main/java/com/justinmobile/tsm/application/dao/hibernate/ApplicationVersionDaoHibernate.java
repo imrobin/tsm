@@ -202,4 +202,13 @@ public class ApplicationVersionDaoHibernate extends
 		}
 		return findPage(page,hql);
 	}
+
+	@Override
+	public List<ApplicationVersion> getByAppIdWithPublish(Application app) {
+		String hql = "from "
+				+ ApplicationVersion.class.getName()
+				+ " as av where av.application = ? and av.status  = ?";
+
+		return this.find(hql, app, ApplicationVersion.STATUS_PULISHED);
+	}
 }

@@ -734,4 +734,17 @@ public class ApplicationVersionManagerImpl extends EntityManagerImpl<Application
 			throw new PlatformException(PlatformErrorCode.CARD_BASE_IS_REPORT);
 		}
 	}
+
+	@Override
+	public List<ApplicationVersion> getByAppIdWithPublish(Application app) {
+		try {
+			return applicationVersionDao.getByAppIdWithPublish(app);
+		} catch (PlatformException e) {
+			throw e;
+		} catch (HibernateException e) {
+			throw new PlatformException(PlatformErrorCode.DB_ERROR, e);
+		} catch (Exception e) {
+			throw new PlatformException(PlatformErrorCode.UNKNOWN_ERROR, e);
+		}
+	}
 }

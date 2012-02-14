@@ -1,5 +1,6 @@
 package com.justinmobile.tsm.application.manager;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -190,4 +191,11 @@ public interface ApplicationVersionManager extends EntityManager<ApplicationVers
 	Page<ApplicationVersion> getDownTestFileAppver(Page<ApplicationVersion> page, String appName);
 
 	void saveReport(ApplicationVersionTestReport testReport, Long appverId, Long cardBaseId);
+
+	/**
+	 * 根据应用来获取应用版本,同时要求是已发布能使用的
+	 * @param app 属于的应用
+	 * @return
+	 */
+	List<ApplicationVersion> getByAppIdWithPublish(Application app);
 }

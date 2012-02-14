@@ -20,8 +20,8 @@ PushSms = new Class({
 		var ps = this;
 		ps.ccid = ccid;
 		$('downDiv').setStyle('display','');
-		if(!$chk(downGrid)) {
-			var downGrid = new JIM.UI.Grid('downApp', {
+		if(!$chk(ps.downGrid)) {
+			ps.downGrid = new JIM.UI.Grid('downApp', {
 				url :ctx +  '/html/application/?m=index&search_EQI_status=1&search_ALIAS_spL_NEI_inBlack=1&search_ALIAS_spL_EQI_status=1',
 				multipleSelection : false,
 				buttons : [ {
@@ -29,7 +29,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/down.png',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.getApplictionVer(downGrid.selectIds[0]);
+							ps.getApplictionVer(ps.downGrid.selectIds[0]);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -73,9 +73,8 @@ PushSms = new Class({
 				headerText : '下载应用'
 			});
 		}
-		var optGrid;
-		if(!$chk(optGrid)) {
-			optGrid = 	new JIM.UI.Grid('managerApp', {
+		if(!$chk(ps.optGrid)) {
+			ps.optGrid = 	new JIM.UI.Grid('managerApp', {
 				url : ctx + '/html/cardApp/?m=searchAppsForAdminByCustomerCardId&ccid=' +ccid ,
 				multipleSelection : false,
 				order : false,
@@ -84,7 +83,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/delete.png',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.optCardApplication(optGrid.selectIds[0], ps.transConstant.DELETE_APP);
+							ps.optCardApplication(ps.optGrid.selectIds[0], ps.transConstant.DELETE_APP);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -94,7 +93,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/lock.png',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.optCardApplication(optGrid.selectIds[0], ps.transConstant.LOCK_APP);
+							ps.optCardApplication(ps.optGrid.selectIds[0], ps.transConstant.LOCK_APP);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -104,7 +103,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/unlock.png',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.optCardApplication(optGrid.selectIds[0], ps.transConstant.UNLOCK_APP);
+							ps.optCardApplication(ps.optGrid.selectIds[0], ps.transConstant.UNLOCK_APP);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -114,7 +113,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/down.png',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.optCardApplication(optGrid.selectIds[0], ps.transConstant.PERSONALIZE_APP);
+							ps.optCardApplication(ps.optGrid.selectIds[0], ps.transConstant.PERSONALIZE_APP);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -124,7 +123,7 @@ PushSms = new Class({
 					icon : ctx + '/admin/images/update.jpg',
 					handler : function() {
 						if (this.selectIds != '') {
-							ps.optCardApplication(optGrid.selectIds[0], ps.transConstant.UPDATE_APP);
+							ps.optCardApplication(ps.optGrid.selectIds[0], ps.transConstant.UPDATE_APP);
 						} else {
 							new LightFace.MessageBox().error("请先选择一条记录");
 						}
@@ -152,15 +151,15 @@ PushSms = new Class({
 			});
 		} else {
 			this.options.url =  ctx + '/html/cardApp/?m=searchAppsForAdminByCustomerCardId&ccid=' +ccid ;
-			optGrid.load();
+			ps.optGrid.load();
 		}
-		$('showDown').addEvent('click',function(e){
-			e.stop();
+		$('showDown').addEvent('click',function(event){
+			event.stop();
 			$('managerApp').setStyle('display', 'none');
 			$('downApp').setStyle('display', '');
 		});
-		$('showOpt').addEvent('click',function(e){
-			e.stop();
+		$('showOpt').addEvent('click',function(event){
+			event.stop();
 			$('downApp').setStyle('display', 'none');
 			$('managerApp').setStyle('display','');
 		});
@@ -171,7 +170,8 @@ PushSms = new Class({
 			url : ctx + '/html/cardApp/?m=optCardApplication',
 			onSuccess : function(json) {
 				if (json.success) {
-					new LightFace.MessageBox().info("短信PUSH成功");
+					ps.optGrid.load();
+					new LightFace.MessageBox().info("短信PUSH已经发送");
 				} else {
 					new LightFace.MessageBox().error(json.message);
 				}
@@ -182,13 +182,14 @@ PushSms = new Class({
 			'opt' : operation
 		});
 	},
-	downApplication : function(appId,ver) {
+	downApplication : function(appId,ver,appVerList) {
 		var ps = this;
 		new Request.JSON({
 			url : ctx + '/html/cardApp/?m=downApplication',
 			onSuccess : function(json) {
 				if (json.success) {
-					new LightFace.MessageBox().info("短信PUSH成功");
+					appVerList.close();
+					new LightFace.MessageBox().info("短信PUSH已经发送");
 				} else {
 					new LightFace.MessageBox().error(json.message);
 				}
@@ -201,6 +202,53 @@ PushSms = new Class({
 	},
 	getApplictionVer : function (appId) {
 		var ps = this;
-		ps.downApplication(appId,'');
+		new Request.JSON({
+			url : ctx + '/html/appVer/?m=getByAppIdWithPublish',
+			onSuccess : function(json) {
+				if (json.success) {
+					var appVerDiv = $('appVerDiv').get('html');
+					var appVerList = new LightFace({
+						draggable : true,
+						initDraw : true,
+						title : '选择应用版本',
+						content : appVerDiv,
+						onClose : function() {
+						},
+						buttons : [ {
+							title : '关 闭',
+							color : 'blue',
+							event : function() {
+								this.close();
+							}
+						} ]
+					});
+					//处理SELECT
+					var appVerSel = appVerList.messageBox.getElement('[id="appverSel"]');
+					var autoOption = new Option('自动','');
+					appVerSel.options.add(autoOption);
+					Array.each(json.message,function(item,index){
+						var temp = new Option(item.avName,item.avId);
+						appVerSel.options.add(temp);
+					});
+					var appVer = '';
+					appVerSel.addEvent('change',function(){
+						appVer = this.value;
+					});
+					//处理确定按钮
+					var goDown = appVerList.messageBox.getElement('[id="goDown"]');
+					goDown.addEvent('click',function(event){
+						event.stop();
+						ps.downApplication(appId,appVer,appVerList);
+					});
+					appVerList.open();
+					
+				} else {
+					new LightFace.MessageBox().error(json.message);
+				}
+			}
+		}).post({
+			'appId' : appId
+		});
+		
 	}
 });

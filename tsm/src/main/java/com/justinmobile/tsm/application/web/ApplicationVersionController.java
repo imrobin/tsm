@@ -1,6 +1,7 @@
 package com.justinmobile.tsm.application.web;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -153,6 +154,33 @@ public class ApplicationVersionController {
 			result.setMessage(e.getMessage());
 		}
 		return result;
+	}
+	
+	@RequestMapping
+	public @ResponseBody
+	JsonMessage getByAppIdWithPublish(HttpServletRequest request, @RequestParam Long appId) {
+		JsonMessage message = new JsonMessage();
+		try {
+			Application app = appManager.load(appId);
+			List<Map<String,Object>> mapList = new ArrayList<Map<String,Object>>();
+			List<ApplicationVersion> avList = applicationVersionManager.getByAppIdWithPublish(app);
+			for(ApplicationVersion av : avList) {
+				Map<String,Object> avMap = new HashMap<String,Object>();
+				avMap.put("avId", av.getId());
+				avMap.put("avName", av.getVersionNo());
+				mapList.add(avMap);
+			}
+			message.setMessage(mapList);
+		} catch (PlatformException e) {
+			e.printStackTrace();
+			message.setSuccess(Boolean.FALSE);
+			message.setMessage(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			message.setSuccess(Boolean.FALSE);
+			message.setMessage(e.getMessage());
+		}
+		return message;
 	}
 
 	/**
