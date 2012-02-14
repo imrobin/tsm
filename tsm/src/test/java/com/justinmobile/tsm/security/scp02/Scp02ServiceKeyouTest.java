@@ -17,6 +17,7 @@ import com.justinmobile.tsm.application.domain.SecurityDomain;
 import com.justinmobile.tsm.application.manager.ApplicationManager;
 import com.justinmobile.tsm.application.manager.SecurityDomainManager;
 import com.justinmobile.tsm.application.utils.ApplicationUtils;
+import com.justinmobile.tsm.application.utils.SecurityDomainUtils;
 import com.justinmobile.tsm.cms2ac.domain.ApplicationKeyProfile;
 import com.justinmobile.tsm.cms2ac.domain.Cms2acParam;
 import com.justinmobile.tsm.cms2ac.domain.HsmkeyConfig;
@@ -39,11 +40,11 @@ public class Scp02ServiceKeyouTest extends BaseAbstractTest {
 
 	private Scp02ServiceLocal scp02ServiceLocal;
 
-	private final String keyPlantext = "404142434445464748494A4B4C4D4E4F";
+	private final String KEY_PLANITEXT_16 = "0123456789ABCDEF0123456789ABCDEF";
 
-	private final String keyCiphertext = "6A4F4C591884A4A0ED0CDB3B6AF947A9";
+	private final String KEY_CIPHERTEXT_16 = "6A4F4C591884A4A0ED0CDB3B6AF947A9";
 
-	private final int keyIndex = 16;
+	private final int KEY_INDEX_16 = 16;
 
 	private final Logger log = LogUtils.getL7dLogger(Scp02ServiceKeyouTest.class);
 
@@ -261,12 +262,12 @@ public class Scp02ServiceKeyouTest extends BaseAbstractTest {
 		byte[] ciphertext = ConvertUtils.hexString2ByteArray("000102030405060708090A0B0C0D0E0F");
 
 		ApplicationKeyProfile applicationKeyProfile = new ApplicationKeyProfile();
-		applicationKeyProfile.setKeyValue(keyPlantext);
+		applicationKeyProfile.setKeyValue(KEY_PLANITEXT_16);
 		applicationKeyProfile.setKeyType(ApplicationKeyProfile.TYPE_TK);
 
 		HsmkeyConfig hsmkeyConfig = new HsmkeyConfig();
-		hsmkeyConfig.setIndex(keyIndex);
-		hsmkeyConfig.setCiphertext(keyCiphertext);
+		hsmkeyConfig.setIndex(KEY_INDEX_16);
+		hsmkeyConfig.setCiphertext(KEY_CIPHERTEXT_16);
 		hsmkeyConfig.setVendor(EncryptorVendor.KEYOU.getValue());
 		hsmkeyConfig.setVersion(0);
 
@@ -299,12 +300,12 @@ public class Scp02ServiceKeyouTest extends BaseAbstractTest {
 		byte[] ciphertext = ConvertUtils.hexString2ByteArray("000102030405060708090A0B0C0D0E0F");
 
 		ApplicationKeyProfile applicationKeyProfile = new ApplicationKeyProfile();
-		applicationKeyProfile.setKeyValue(keyPlantext);
+		applicationKeyProfile.setKeyValue(KEY_PLANITEXT_16);
 		applicationKeyProfile.setKeyType(ApplicationKeyProfile.TYPE_TK);
 
 		HsmkeyConfig hsmkeyConfig = new HsmkeyConfig();
-		hsmkeyConfig.setIndex(keyIndex);
-		hsmkeyConfig.setCiphertext(keyCiphertext);
+		hsmkeyConfig.setIndex(KEY_INDEX_16);
+		hsmkeyConfig.setCiphertext(KEY_CIPHERTEXT_16);
 		hsmkeyConfig.setVendor(EncryptorVendor.KEYOU.getValue());
 		hsmkeyConfig.setVersion(0);
 
@@ -340,12 +341,12 @@ public class Scp02ServiceKeyouTest extends BaseAbstractTest {
 		byte[] ciphertext = ConvertUtils.hexString2ByteArray("000102030405060708090A0B0C0D0E0F");
 
 		ApplicationKeyProfile applicationKeyProfile = new ApplicationKeyProfile();
-		applicationKeyProfile.setKeyValue(keyPlantext);
+		applicationKeyProfile.setKeyValue(KEY_PLANITEXT_16);
 		applicationKeyProfile.setKeyType(ApplicationKeyProfile.TYPE_TK);
 
 		HsmkeyConfig hsmkeyConfig = new HsmkeyConfig();
-		hsmkeyConfig.setIndex(keyIndex);
-		hsmkeyConfig.setCiphertext(keyCiphertext);
+		hsmkeyConfig.setIndex(KEY_INDEX_16);
+		hsmkeyConfig.setCiphertext(KEY_CIPHERTEXT_16);
 		hsmkeyConfig.setVendor(EncryptorVendor.KEYOU.getValue());
 		hsmkeyConfig.setVersion(0);
 
@@ -381,12 +382,12 @@ public class Scp02ServiceKeyouTest extends BaseAbstractTest {
 		byte[] ciphertext = ConvertUtils.hexString2ByteArray("000102030405060708090A0B0C0D0E0F");
 
 		ApplicationKeyProfile applicationKeyProfile = new ApplicationKeyProfile();
-		applicationKeyProfile.setKeyValue(keyPlantext);
+		applicationKeyProfile.setKeyValue(KEY_PLANITEXT_16);
 		applicationKeyProfile.setKeyType(ApplicationKeyProfile.TYPE_TK);
 
 		HsmkeyConfig hsmkeyConfig = new HsmkeyConfig();
-		hsmkeyConfig.setIndex(keyIndex);
-		hsmkeyConfig.setCiphertext(keyCiphertext);
+		hsmkeyConfig.setIndex(KEY_INDEX_16);
+		hsmkeyConfig.setCiphertext(KEY_CIPHERTEXT_16);
 		hsmkeyConfig.setVendor(EncryptorVendor.KEYOU.getValue());
 		hsmkeyConfig.setVersion(0);
 
@@ -415,12 +416,12 @@ public class Scp02ServiceKeyouTest extends BaseAbstractTest {
 	public void testExportKeyAndCheckValue() {
 		// 开始准备数据
 		KeyProfile keyProfile = new KeyProfile();
-		keyProfile.setValue(keyPlantext);
+		keyProfile.setValue(KEY_PLANITEXT_16);
 		keyProfile.setType(KeyProfile.SCP02_DEK_TYPE);
 
 		HsmkeyConfig hsmkeyConfig = new HsmkeyConfig();
-		hsmkeyConfig.setIndex(keyIndex);
-		hsmkeyConfig.setCiphertext(keyCiphertext);
+		hsmkeyConfig.setIndex(KEY_INDEX_16);
+		hsmkeyConfig.setCiphertext(KEY_CIPHERTEXT_16);
 		hsmkeyConfig.setVendor(EncryptorVendor.KEYOU.getValue());
 		hsmkeyConfig.setVersion(0);
 		keyProfile.addHsmkeyConfig(hsmkeyConfig);
@@ -447,12 +448,12 @@ public class Scp02ServiceKeyouTest extends BaseAbstractTest {
 
 		// 开始准备KEK密钥
 		ApplicationKeyProfile applicationKeyProfile = new ApplicationKeyProfile();
-		applicationKeyProfile.setKeyValue(keyPlantext);
+		applicationKeyProfile.setKeyValue(KEY_PLANITEXT_16);
 		applicationKeyProfile.setKeyType(ApplicationKeyProfile.TYPE_KEK);
 
 		HsmkeyConfig hsmkeyConfig = new HsmkeyConfig();
-		hsmkeyConfig.setIndex(keyIndex);
-		hsmkeyConfig.setCiphertext(keyCiphertext);
+		hsmkeyConfig.setIndex(KEY_INDEX_16);
+		hsmkeyConfig.setCiphertext(KEY_CIPHERTEXT_16);
 		hsmkeyConfig.setVendor(EncryptorVendor.KEYOU.getValue());
 		hsmkeyConfig.setVersion(0);
 
@@ -480,7 +481,45 @@ public class Scp02ServiceKeyouTest extends BaseAbstractTest {
 
 	private Cms2acParam getCms2acParam() {
 		Cms2acParam cms2acParam = new Cms2acParam();
-		SecurityDomain securityDomain = securityDomainManager.getIsd();
+		SecurityDomain securityDomain = SecurityDomainUtils.createDefult();
+
+		HsmkeyConfig hsmkeyConfig = new HsmkeyConfig();
+		hsmkeyConfig.setVendor(EncryptorVendor.KEYOU.getValue());
+		hsmkeyConfig.setIndex(KEY_INDEX_16);
+		hsmKeyConfigManager.saveOrUpdate(hsmkeyConfig);
+		{
+			KeyProfile keyProfile = new KeyProfile();
+			keyProfile.setIndex(KeyProfile.INDEX_MAC);
+			keyProfile.setValue(KEY_PLANITEXT_16);
+
+			securityDomain.addKeyProfile(keyProfile);
+			keyProfile.addHsmkeyConfig(hsmkeyConfig);
+
+			keyProfileManager.saveOrUpdate(keyProfile);
+		}
+		{
+			KeyProfile keyProfile = new KeyProfile();
+			keyProfile.setIndex(KeyProfile.INDEX_ENC);
+			keyProfile.setValue(KEY_PLANITEXT_16);
+			securityDomain.addKeyProfile(keyProfile);
+
+			securityDomain.addKeyProfile(keyProfile);
+			keyProfile.addHsmkeyConfig(hsmkeyConfig);
+
+			keyProfileManager.saveOrUpdate(keyProfile);
+		}
+		{
+			KeyProfile keyProfile = new KeyProfile();
+			keyProfile.setIndex(KeyProfile.INDEX_DEK);
+			keyProfile.setValue(KEY_PLANITEXT_16);
+
+			securityDomain.addKeyProfile(keyProfile);
+			keyProfile.addHsmkeyConfig(hsmkeyConfig);
+
+			keyProfileManager.saveOrUpdate(keyProfile);
+		}
+
+		securityDomainManager.saveOrUpdate(securityDomain);
 		cms2acParam.setCurrentSecurityDomain(securityDomain);
 		cms2acParam.setScp02Counter(0x01);
 
@@ -488,7 +527,7 @@ public class Scp02ServiceKeyouTest extends BaseAbstractTest {
 		localTransaction.setCardNo("4906202893098760");
 		cms2acParam.setLocalTransaction(localTransaction);
 
-		cms2acParam.setKid(securityDomain.getMacKey());
+		cms2acParam.setKid(securityDomain.getEncKey());
 		cms2acParam.setKic(securityDomain.getEncKey());
 		cms2acParam.setDek(securityDomain.getDekKey());
 		return cms2acParam;
