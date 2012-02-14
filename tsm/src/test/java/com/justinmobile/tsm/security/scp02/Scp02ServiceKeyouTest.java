@@ -431,8 +431,14 @@ public class Scp02ServiceKeyouTest extends BaseAbstractTest {
 		// 开始准备cms2ac
 		Cms2acParam cms2acParam = getCms2acParam();
 
-		byte[] localExportKey = getScp02ServiceLocal().exportEncKeyAndCheckValue(keyProfile, cms2acParam);
-		byte[] keyouExportKey = getScp02ServiceKeyou().exportEncKeyAndCheckValue(keyProfile, cms2acParam);
+		scp02ServiceLocal = getScp02ServiceLocal();
+		scp02ServiceKeyou = getScp02ServiceKeyou();
+
+		scp02ServiceLocal.setDisperseLevel(AbstractScp02Service.THREE_LEVEL_DISPERSE);
+		scp02ServiceKeyou.setDisperseLevel(AbstractScp02Service.THREE_LEVEL_DISPERSE);
+
+		byte[] localExportKey = scp02ServiceLocal.exportEncKeyAndCheckValue(keyProfile, cms2acParam);
+		byte[] keyouExportKey = scp02ServiceKeyou.exportEncKeyAndCheckValue(keyProfile, cms2acParam);
 
 		log.info("localExportKey");
 		log.info(ConvertUtils.byteArray2HexString(localExportKey));
