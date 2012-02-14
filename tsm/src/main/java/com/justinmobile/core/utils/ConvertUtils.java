@@ -133,16 +133,25 @@ public class ConvertUtils {
 			throw new PlatformException(PlatformErrorCode.DEFAULT);
 		}
 
-		String hex = Integer.toHexString(i);
-		if (0 != (hex.length() % 2)) {
-			hex = "0" + hex;
-		}
+		String hex = int2HexStingWithNecessaryEvenLength(i);
 
 		StringBuffer sb = new StringBuffer();
 		for (int loop = hex.length(); loop < stringLength; loop++) {
 			sb.append('0');
 		}
 		return sb.append(hex).toString().toUpperCase();
+	}
+
+	/**
+	 * 将int转换为指定的hexString<br />
+	 * 长度由i的值决定，保证为偶数长度（最高位可能为0）
+	 * 
+	 * @param i
+	 *            int
+	 * @return hexString，长度由i的值决定，保证为偶数长度（最高位可能为0），英文字符均为大写
+	 */
+	public static String int2HexStingWithNecessaryEvenLength(int i) {
+		return long2HexStingWithNecessaryEvenLength(i);
 	}
 
 	/**
@@ -167,16 +176,29 @@ public class ConvertUtils {
 			throw new PlatformException(PlatformErrorCode.DEFAULT);
 		}
 
-		String hex = Long.toHexString(l);
-		if (0 != (hex.length() % 2)) {
-			hex = "0" + hex;
-		}
+		String hex = long2HexStingWithNecessaryEvenLength(l);
 
 		StringBuffer sb = new StringBuffer();
 		for (int loop = hex.length(); loop < stringLength; loop++) {
 			sb.append('0');
 		}
 		return sb.append(hex).toString().toUpperCase();
+	}
+
+	/**
+	 * 将long转换为指定的hexString<br />
+	 * 长度由i的值决定，保证为偶数长度（最高位可能为0）
+	 * 
+	 * @param l
+	 *            long
+	 * @return hexString，长度由l的值决定，保证为偶数长度（最高位可能为0），英文字符均为大写
+	 */
+	public static String long2HexStingWithNecessaryEvenLength(long l) {
+		String hex = Long.toHexString(l);
+		if (0 != (hex.length() % 2)) {
+			hex = "0" + hex;
+		}
+		return hex;
 	}
 
 	/**
