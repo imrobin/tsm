@@ -8,6 +8,8 @@ import com.justinmobile.core.dao.OracleSequenceDao;
 import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
 import com.justinmobile.core.manager.EntityManagerImpl;
+import com.justinmobile.core.utils.ConvertUtils;
+import com.justinmobile.core.utils.HexUtils;
 import com.justinmobile.tsm.application.dao.ApplicationClientInfoDao;
 import com.justinmobile.tsm.application.dao.ApplicationVersionDao;
 import com.justinmobile.tsm.application.domain.ApplicationClientInfo;
@@ -83,6 +85,7 @@ public class PushSmsManagerImpl extends EntityManagerImpl<PushSms, PushSmsDao> i
 			 String clientId = "";
 			 if(aci!=null){
 			   clientId = String.valueOf(aci.getId());
+			   ConvertUtils.long2HexString(aci.getId(), 8);
 			 }
 			 ps.setSerial(serial);
 			 pushSmsDao.saveOrUpdate(ps);
