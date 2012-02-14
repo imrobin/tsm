@@ -80,7 +80,10 @@ public class PushSmsManagerImpl extends EntityManagerImpl<PushSms, PushSmsDao> i
 			 //根据应用版本获取 clientId
 			 String osVersion = cci.getMobileType().getOriginalOsKey();
 			 ApplicationClientInfo aci = aciDao.getByApplicationVersionTypeVersionFileType(appVer, ApplicationClientInfo.SYS_TYPE_Android, osVersion, ApplicationClientInfo.FILE_TYPE_APK);
-			 String clientId = String.valueOf(aci.getId());
+			 String clientId = "";
+			 if(aci!=null){
+			   clientId = String.valueOf(aci.getId());
+			 }
 			 ps.setSerial(serial);
 			 pushSmsDao.saveOrUpdate(ps);
 			 smsEndpoint.pushMessage(cci.getMobileNo(), MessageFormat.MSG_FORMAT_TYPE_GBK.getValue(), destPort, srcPort, clientId, cci.getCard().getCardNo(), serial);
