@@ -36,7 +36,7 @@
 	</div>
 	<h3><a href="#section2">业务管理</a></h3>
 	<div>
-		<ul id="selectable">
+		<ul id="selectable2">
 			<li><button>提供商管理</button></li>
 			<li><button>应用管理</button></li>
 			<li><button>安全域管理</button></li>
