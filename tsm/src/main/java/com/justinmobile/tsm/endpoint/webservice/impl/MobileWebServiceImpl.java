@@ -294,15 +294,15 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 获取分页参数
 		Page<Application> page = buildPage(req);
 		Map<String, ?> filters = null;
-
-		if (req.getQueryCondition() != null && req.getQueryCondition().equals("topDownload")) {
-			page.setOrderBy("downloadCount");
-			page.setOrder("desc");
-			filters = new HashMap<String, Object>();
-			page.setPageSize(5);
-		} else {
+//
+//		if (req.getQueryCondition() != null && req.getQueryCondition().equals("topDownload")) {
+//			page.setOrderBy("downloadCount");
+//			page.setOrder("desc");
+//			filters = new HashMap<String, Object>();
+//			page.setPageSize(5);
+//		} else {
 			filters = buildMapFilter(req);
-		}
+	//	}
 		page = applicationManager.getDownloadableApps(page, req.getCardNo(), filters);
 		AppInfoList appInfoList = new AppInfoList();
 		// 将得到的结果转换成dto
@@ -313,7 +313,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
 		// }
 		int nextPage = page.getNextPage();
-		if (req.getQueryCondition() != null && req.getQueryCondition().equals("topDownload")) {
+		if (req.getListOrder() != null && req.getListOrder() == 1) {
 			nextPage = 0;
 		} else {
 			sortList(req, appInfos);
@@ -483,6 +483,11 @@ public class MobileWebServiceImpl implements MobileWebService {
 		}
 		Page<X> page = new Page<X>(pageSize);
 		page.setPageNo(pageNumber);
+		Integer listOrder = req.getListOrder();
+		if (listOrder != null && listOrder == 1){//	1，按应用下载次数从高到低排序
+			page.setOrder("desc");
+			page.setOrderBy("downloadCount");
+		}
 		return page;
 	}
 

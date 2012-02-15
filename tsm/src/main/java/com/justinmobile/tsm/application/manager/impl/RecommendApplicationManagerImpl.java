@@ -79,7 +79,8 @@ public class RecommendApplicationManagerImpl extends EntityManagerImpl<Recommend
 		try {
 			CardInfo cardInfo = cardInfoManager.getByCardNo(cardNo);
 			SysUser sysUser = userManager.getUserByMobile(cardInfo.getMobileNo());
-			return recommendApplicationDao.recommendAppListForMobile(page, cardNo, sysUser);
+			Customer customer = customerManager.getCustomerByUserName(sysUser.getUserName());
+			return recommendApplicationDao.recommendAppListForMobile(page, cardNo, sysUser, customer);
 		} catch (PlatformException e) {
 			throw e;
 		} catch (HibernateException e) {

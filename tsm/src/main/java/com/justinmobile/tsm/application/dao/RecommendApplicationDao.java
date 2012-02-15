@@ -24,5 +24,5 @@ public interface RecommendApplicationDao extends EntityDao<RecommendApplication,
 	 */
 	List<RecommendApplication> getByApplication(Application application);
 
-	Page<RecommendApplication> recommendAppListForMobile(Page<RecommendApplication> page, String cardNo, SysUser sysUser);
+	Page<RecommendApplication> recommendAppListForMobile(Page<RecommendApplication> page, String cardNo, SysUser sysUser, Customer customer);
 }
