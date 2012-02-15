@@ -1124,6 +1124,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 	private void setClientId(String aid, AppInfo info, String cardNo, String appVersion) {
 		if (cardNo != null) {
 			CustomerCardInfo cci = customerCardInfoManager.getByCardNo(cardNo);
+			if(cci != null) {
 			ApplicationVersion applicationVersion = applicationVersionManager.getByAidAndVersionNo(aid, appVersion);
 			boolean hasSysRequirment = customerCardInfoManager.hasSysRequirmentForMobile(cci, applicationVersion);
 			if (!hasSysRequirment) {
@@ -1144,6 +1145,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 						}
 					}
 				}
+			}
 			}
 		}
 	}
