@@ -178,19 +178,21 @@ public class MobileWebServiceImpl implements MobileWebService {
 		res.setCommandID(req.getCommandID());
 		Integer isDownloaded = req.getIsDownloaded();
 		try {
-			if (req.getQueryCondition() != null && req.getQueryCondition().equals("commendApp")) {
-				listRecommendApp(req, res);
-				// isDownload=0是未下载，1是已下载，2是所有应用
-			} else if (isDownloaded.intValue() == 2) {
+			// isDownload=0是未下载，1是已下载，2是所有应用
+			if(isDownloaded.intValue() == 2){
 				listApps(req, res);
-			} else {
-				if (isDownloaded.intValue() == 0 || (req.getQueryCondition() != null && req.getQueryCondition().equals("topDownload"))) {
-					listNotCardApps(req, res);
-				} else {
-					listCardApps(req, res);
+			}else if(isDownloaded.intValue() == 1){
+				listCardApps(req, res);
+			}else if(isDownloaded.intValue() == 0){
+				if(null != req.getQueryCondition() && req.getQueryCondition().equals("commandApp")){
+					listRecommendApp(req, res);
 				}
+			    else{
+				    listNotCardApps(req,res);
+			    }
 			}
-		} catch (PlatformException e) {
+		}
+	    catch (PlatformException e) {
 			e.printStackTrace();
 			status.setStatusCode(e.getErrorCode().getErrorCode());
 			status.setStatusDescription(e.getMessage());
@@ -380,7 +382,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 获取分页参数
 		Page<Application> page = buildPage(req);
 		// 获取过滤条件
-		List<PropertyFilter> filters = buildFilter(req);
+		List<PropertyFilter> filters = new ArrayList<PropertyFilter>();
 		// 应用的状态为已发布状态
 		filters.add(new PropertyFilter("EQI_status", String.valueOf(Application.STATUS_PUBLISHED)));
 		// page = applicationManager.findPage(page, filters);
@@ -402,8 +404,13 @@ public class MobileWebServiceImpl implements MobileWebService {
 			}
 			ApplicationVersion applicationVersion = applicationVersionManager.getByAidAndVersionNo(aid, appVersion);
 			appInfoList.addMyAppInfo(applicationVersion, sysType);
-		} else {
+		} else if(null != req.getQueryCondition() && req.getQueryCondition().startsWith("like=")){
+			String value = StringUtils.substringAfter(req.getQueryCondition(),"=");
+			filters.add(new PropertyFilter("LIKES_name",value));
 			page = applicationManager.findPage(page, filters);
+			appInfoList.addAll(page.getResult(), sysType, null);
+		} else{
+			page = applicationManager.findPage(page,filters);
 			appInfoList.addAll(page.getResult(), sysType, null);
 		}
 		// 设置返回结果
