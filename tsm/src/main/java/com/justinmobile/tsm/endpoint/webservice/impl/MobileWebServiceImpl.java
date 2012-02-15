@@ -184,10 +184,9 @@ public class MobileWebServiceImpl implements MobileWebService {
 			}else if(isDownloaded.intValue() == 1){
 				listCardApps(req, res);
 			}else if(isDownloaded.intValue() == 0){
-				if(null != req.getQueryCondition() && req.getQueryCondition().equals("commandApp")){
+				if(null != req.getQueryCondition() && req.getQueryCondition().equals("commendApp")){
 					listRecommendApp(req, res);
-				}
-			    else{
+				} else {
 				    listNotCardApps(req,res);
 			    }
 			}
@@ -294,15 +293,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 获取分页参数
 		Page<Application> page = buildPage(req);
 		Map<String, ?> filters = null;
-//
-//		if (req.getQueryCondition() != null && req.getQueryCondition().equals("topDownload")) {
-//			page.setOrderBy("downloadCount");
-//			page.setOrder("desc");
-//			filters = new HashMap<String, Object>();
-//			page.setPageSize(5);
-//		} else {
-			filters = buildMapFilter(req);
-	//	}
+		filters = buildMapFilter(req);
 		page = applicationManager.getDownloadableApps(page, req.getCardNo(), filters);
 		AppInfoList appInfoList = new AppInfoList();
 		// 将得到的结果转换成dto
