@@ -83,6 +83,6 @@ $(document).ready(function () {
 	//删除多余内容
     $("#" + grid[0].id + "_toppager_center").empty();
     $("#" + grid[0].id + "_toppager_right").empty();
-    $("#" + grid[0].id + "_left").empty();
+    $("#" + grid[0].id + "Page_left").empty();
 
 });
