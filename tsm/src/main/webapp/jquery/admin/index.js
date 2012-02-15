@@ -65,7 +65,7 @@ $(document).ready(function () {
 	});
 	
 	function addTab(title) {
-		var url = ctx + '/jquery/lib/jquery-ui-1.8.17.custom/index.html';
+		var url = ctx + '/jquery/security/jsp/user.jsp';
 		$tabs.tabs( "add", url, title );
 	}
 	
