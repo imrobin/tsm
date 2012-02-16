@@ -4,7 +4,6 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -763,7 +762,6 @@ public class MobileWebServiceImpl implements MobileWebService {
 	}
 
 	@Override
-	@OpenSession
 	public BasicResponse postAppComment(ReqAppComment reqAppComment) {
 		BasicResponse basicResponse = new BasicResponse();
 		basicResponse.setCommandID(reqAppComment.getCommandID());
