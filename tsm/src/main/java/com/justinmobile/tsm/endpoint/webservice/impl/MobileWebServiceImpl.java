@@ -381,6 +381,8 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 将得到的结果转换成dto
 		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
 		if (null != req.getQueryCondition() && req.getQueryCondition().startsWith("EQS_aid=")) {
+			String aid = StringUtils.substringAfter(req.getQueryCondition(),"=");
+			filters.add(new PropertyFilter("EQS_aid", aid));
 			page = applicationManager.findPage(page, filters);
 			appInfoList.addAllFullInfo(page.getResult(), sysType, null,req.getCardNo(), applicationManager);
 		} else if (null != req.getQueryCondition() && req.getQueryCondition().startsWith("EQS_appVersion=")) { // 我的应用，查看下载的版本
