@@ -144,8 +144,13 @@ public class ApplicationCommentManagerImpl extends
 	@Override
 	public void upComment(long commentId) throws PlatformException {
 		try {
-			ApplicationComment appCom = applicationCommentDao.findUniqueByProperty("id", commentId);
-			appCom.setUp(appCom.getUp().intValue()+1);
+			ApplicationComment appCom = applicationCommentDao
+					.findUniqueByProperty("id", commentId);
+			if (appCom.getUp() == null) {
+				appCom.setUp(1);
+			} else {
+				appCom.setUp(appCom.getUp().intValue() + 1);
+			}
 			applicationCommentDao.saveOrUpdate(appCom);
 
 		} catch (PlatformException e) {
@@ -161,8 +166,13 @@ public class ApplicationCommentManagerImpl extends
 	@Override
 	public void downComment(long commentId) throws PlatformException {
 		try {
-			ApplicationComment appCom = applicationCommentDao.findUniqueByProperty("id", commentId);
-			appCom.setDown(appCom.getDown().intValue()+1);
+			ApplicationComment appCom = applicationCommentDao
+					.findUniqueByProperty("id", commentId);
+			if (appCom.getDown() == null) {
+				appCom.setDown(1);
+			} else {
+				appCom.setDown(appCom.getDown().intValue() + 1);
+			}
 			applicationCommentDao.saveOrUpdate(appCom);
 		} catch (PlatformException e) {
 			throw e;
