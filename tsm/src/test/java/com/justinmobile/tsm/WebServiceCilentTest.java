@@ -227,16 +227,16 @@ public class WebServiceCilentTest  extends BaseAbstractTest{
 		System.out.println(response.getStatus().getStatusDescription());
 	}
 
-   // @Test //给应用提交评论pass
+    @Test //给应用提交评论pass
 	public void testPostComment100301() throws Exception {
 		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
 		factory.setServiceClass(MobileWebService.class);
-		factory.setAddress("http://218.206.179.214:8080/tsm/services/MobileWebService?wsdl");
+		factory.setAddress("http://localhost:8080/tsm/services/MobileWebService?wsdl");
 		MobileWebService client = (MobileWebService) factory.create();
 		ReqAppComment request = new ReqAppComment();
 		request.setCommandID("100401");
 		AppComment comment = new AppComment();
-		comment.setCommentId(23L);
+		comment.setCommentId(46L);
 		comment.setUp(1);
 	    request.setComment(comment);
 		request.setSessionID("1111002054123000001");
@@ -425,7 +425,7 @@ public class WebServiceCilentTest  extends BaseAbstractTest{
 		 String serial = lv2.build();
 		 String port = ByteUtils.toHexString("6666".getBytes());
 		 System.out.println("clientId="+clientId+" seId="+cardNo);
-		 smsEndpoint.pushMessage("15867175330", MessageFormat.MSG_FORMAT_TYPE_BYTE.getValue(), port,port, clientId,cardNo,serial);
+		 smsEndpoint.pushMessage("15881053926", MessageFormat.MSG_FORMAT_TYPE_BYTE.getValue(), port,port, clientId,cardNo,serial);
 		/*ProxyServiceFactory factory = new ProxyServiceFactory(
 				"http://218.206.179.214:8080/tsm/services/OuterWebService?wsdl", "OuterWebService",
 				"http://www.chinamobile.com");
