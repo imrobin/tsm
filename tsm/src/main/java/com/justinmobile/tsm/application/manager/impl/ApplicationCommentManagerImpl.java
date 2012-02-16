@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
@@ -20,7 +21,7 @@ import com.justinmobile.tsm.application.manager.ApplicationManager;
 import com.justinmobile.tsm.application.manager.GradeStatisticsManager;
 import com.justinmobile.tsm.customer.domain.Customer;
 import com.justinmobile.tsm.customer.manager.CustomerManager;
-
+@Transactional
 @Service("applicationCommentManager")
 public class ApplicationCommentManagerImpl extends
 		EntityManagerImpl<ApplicationComment, ApplicationCommentDao> implements
@@ -146,15 +147,14 @@ public class ApplicationCommentManagerImpl extends
 	@Override
 	public void upComment(long commentId) throws PlatformException {
 		try {
-			ApplicationComment appCom = applicationCommentDao
-					.findUniqueByProperty("id", commentId);
+			ApplicationComment appCom = applicationCommentDao.load(commentId);
+			
 			if (appCom.getUp() == null) {
-				appCom.setUp(1);
+				appCom.setUp(new Integer(1));
 			} else {
 				appCom.setUp(appCom.getUp().intValue() + 1);
 			}
 			applicationCommentDao.saveOrUpdate(appCom);
-
 		} catch (PlatformException e) {
 			throw e;
 		} catch (HibernateException e) {
@@ -168,10 +168,9 @@ public class ApplicationCommentManagerImpl extends
 	@Override
 	public void downComment(long commentId) throws PlatformException {
 		try {
-			ApplicationComment appCom = applicationCommentDao
-					.findUniqueByProperty("id", commentId);
+			ApplicationComment appCom = applicationCommentDao.load(commentId);
 			if (appCom.getDown() == null) {
-				appCom.setDown(1);
+				appCom.setDown(new Integer(1));
 			} else {
 				appCom.setDown(appCom.getDown().intValue() + 1);
 			}
