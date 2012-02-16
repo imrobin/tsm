@@ -81,7 +81,9 @@ public class ApplicationCommentManagerImpl extends
 		if (ac.getGrade() == -1) { // =-1表明没有打星的权限
 			ac.setGrade(null);
 		}
-
+		//默認頂和踩都為0次
+        ac.setUp(0);
+        ac.setDown(0);
 		super.saveOrUpdate(ac);
 		// 修改 GRADE_STATISTICS表, 打分人数加1, 修改评论的话要把以前的星减下来
 		if (application.getStatistics() == null) {
