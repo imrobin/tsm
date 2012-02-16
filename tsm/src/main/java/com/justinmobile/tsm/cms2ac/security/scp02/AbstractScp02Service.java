@@ -2,6 +2,9 @@ package com.justinmobile.tsm.cms2ac.security.scp02;
 
 import static com.justinmobile.core.utils.ByteUtils.subArray;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
 import com.justinmobile.core.utils.ConvertUtils;
@@ -16,6 +19,8 @@ import com.justinmobile.tsm.cms2ac.engine.SecureUtil;
 import com.justinmobile.tsm.cms2ac.exception.CryptoException;
 
 public abstract class AbstractScp02Service implements Scp02Service {
+	
+	protected static final Logger log = LoggerFactory.getLogger(AbstractScp02Service.class);
 
 	public static final int ZERO_LEVEL_DISPERSE = 0;
 

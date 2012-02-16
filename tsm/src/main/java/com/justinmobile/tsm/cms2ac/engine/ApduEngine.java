@@ -1913,6 +1913,7 @@ public class ApduEngine {
 				byte[] value = cipherData.getValue();
 				byte[] transformedValue = value;
 				if (SystemConfigUtils.needTransformEncrypt()) {// 如果需要使用KEK对敏感数据进行转加密，执行转加密
+					transformedValue = scp02Service.transformEncrypt(value, application, cms2acParam);
 					cipherData.setValue(transformedValue);
 				}
 			}

@@ -67,6 +67,10 @@ public class Scp02ServiceLocal extends AbstractScp02Service {
 	private byte[] internalEncryptSensitiveData(byte[] encSource, byte[] keyValue, byte[] fullDisperseFactor, byte[] sessionSalt)
 			throws CryptoException {
 		byte[] dekSessionKey = generateDekSessionKey(fullDisperseFactor, sessionSalt, keyValue);
+
+		log.debug("\n" + "disperse factor: " + ConvertUtils.byteArray2HexString(fullDisperseFactor) + "\n" + "session salt: "
+				+ ConvertUtils.byteArray2HexString(sessionSalt) + "\n" + "session key: " + ConvertUtils.byteArray2HexString(dekSessionKey));
+
 		byte[] kap = subArray(dekSessionKey, 0, 8);
 		byte[] kbp = subArray(dekSessionKey, 8, 16);
 
@@ -268,8 +272,12 @@ public class Scp02ServiceLocal extends AbstractScp02Service {
 
 		// 使用dek密钥进行转加密
 		KeyProfile dekKeyProfile = dek.getKeyProfile("dek");
-		return internalEncryptSensitiveData(plaintext, ConvertUtils.hexString2ByteArray(dekKeyProfile.getValue()), dek.getDisperseFactor(),
-				dek.getSessionSalt());
+		byte[] transformedChiphertxt = internalEncryptSensitiveData(plaintext, ConvertUtils.hexString2ByteArray(dekKeyProfile.getValue()),
+				dek.getDisperseFactor(), dek.getSessionSalt());
+
+		log.debug("\n" + ConvertUtils.byteArray2HexString(ciphertext) + "-->" + ConvertUtils.byteArray2HexString(plaintext) + "-->"
+				+ ConvertUtils.byteArray2HexString(transformedChiphertxt));
+		return transformedChiphertxt;
 	}
 
 	@Override
