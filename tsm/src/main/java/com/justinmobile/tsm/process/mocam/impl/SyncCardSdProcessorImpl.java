@@ -228,7 +228,7 @@ public class SyncCardSdProcessorImpl extends PublicOperationProcessor implements
 			} else {
 				isdAid = SystemConfigUtils.getMockIsdAppAid();
 			}
-			platHas.remove(isdAid);
+			platHas.remove(securityDomainManager.getIsd().getAid());
 			cardHas.remove(isdAid);
 			
 			if (CollectionUtils.isNotEmpty(platHas)) {// 如果平台有记录，但是卡上没有实例，则删除平台上的记录
