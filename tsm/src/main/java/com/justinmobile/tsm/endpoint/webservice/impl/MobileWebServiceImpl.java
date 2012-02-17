@@ -42,14 +42,12 @@ import com.justinmobile.tsm.application.domain.ApplicationComment;
 import com.justinmobile.tsm.application.domain.ApplicationVersion;
 import com.justinmobile.tsm.application.domain.RecommendApplication;
 import com.justinmobile.tsm.application.domain.SecurityDomain;
-import com.justinmobile.tsm.application.domain.SpecialMobile;
 import com.justinmobile.tsm.application.manager.ApplicationClientInfoManager;
 import com.justinmobile.tsm.application.manager.ApplicationCommentManager;
 import com.justinmobile.tsm.application.manager.ApplicationManager;
 import com.justinmobile.tsm.application.manager.ApplicationVersionManager;
 import com.justinmobile.tsm.application.manager.RecommendApplicationManager;
 import com.justinmobile.tsm.card.domain.CardApplication;
-import com.justinmobile.tsm.card.domain.CardBaseApplication;
 import com.justinmobile.tsm.card.domain.CardBaseInfo;
 import com.justinmobile.tsm.card.domain.CardBaseSecurityDomain;
 import com.justinmobile.tsm.card.domain.CardClient;
@@ -93,7 +91,6 @@ import com.justinmobile.tsm.endpoint.webservice.dto.mocam.ReqApplicationList;
 import com.justinmobile.tsm.endpoint.webservice.dto.mocam.ReqExecAPDU;
 import com.justinmobile.tsm.endpoint.webservice.dto.mocam.ReqGetApplicationInfo;
 import com.justinmobile.tsm.endpoint.webservice.dto.mocam.ReqSdList;
-
 import com.justinmobile.tsm.endpoint.webservice.dto.mocam.ResApplicationList;
 import com.justinmobile.tsm.endpoint.webservice.dto.mocam.ResExecAPDU;
 import com.justinmobile.tsm.endpoint.webservice.dto.mocam.ResListComment;
@@ -178,19 +175,18 @@ public class MobileWebServiceImpl implements MobileWebService {
 		Integer isDownloaded = req.getIsDownloaded();
 		try {
 			// isDownload=0是未下载，1是已下载，2是所有应用
-			if(isDownloaded.intValue() == 2){
+			if (isDownloaded.intValue() == 2) {
 				listApps(req, res);
-			}else if(isDownloaded.intValue() == 1){
+			} else if (isDownloaded.intValue() == 1) {
 				listCardApps(req, res);
-			}else if(isDownloaded.intValue() == 0){
-				if(null != req.getQueryCondition() && req.getQueryCondition().equals("commendApp")){
+			} else if (isDownloaded.intValue() == 0) {
+				if (null != req.getQueryCondition() && req.getQueryCondition().equals("commendApp")) {
 					listRecommendApp(req, res);
 				} else {
-				    listNotCardApps(req,res);
-			    }
+					listNotCardApps(req, res);
+				}
 			}
-		}
-	    catch (PlatformException e) {
+		} catch (PlatformException e) {
 			e.printStackTrace();
 			status.setStatusCode(e.getErrorCode().getErrorCode());
 			status.setStatusDescription(e.getMessage());
@@ -206,18 +202,12 @@ public class MobileWebServiceImpl implements MobileWebService {
 	private void listCardApps(ReqApplicationList req, ResApplicationList res) {
 		// 获取分页参数
 		Page<CardApplication> page = buildPage(req);
-		// 是否有用有更新
-		CustomerCardInfo cci = customerCardInfoManager.getByCardNo(req.getCardNo());
-		CardInfo cardInfo = cci.getCard();
-		List<CardBaseApplication> cardBaseApplications = cardInfo.getCardBaseInfo().getCardBaseApplications();
 		// 获取过滤条件
 		List<PropertyFilter> filters = buildFilter(req);
 		// 加入卡号
 		filters.add(new PropertyFilter("ALIAS_cardInfoI_EQS_cardNo", req.getCardNo()));
 		filters.add(new PropertyFilter("INI_status", new Integer[] { CardApplication.STATUS_AVAILABLE, CardApplication.STATUS_PERSONALIZED,
-				CardApplication.STATUS_LOCKED,
-				CardApplication.STATUS_DELETEING
-				}));
+				CardApplication.STATUS_LOCKED, CardApplication.STATUS_DELETEING }));
 
 		page = cardApplicationManager.findPage(page, filters);
 
@@ -228,35 +218,12 @@ public class MobileWebServiceImpl implements MobileWebService {
 		List<CardApplication> result = page.getResult();
 		if (CollectionUtils.isNotEmpty(result)) {
 			for (CardApplication cardApplication : result) {
-				// String cardVersion =
-				// cardApplication.getApplicationVersion().getVersionNo();
-				Application application = cardApplication.getApplicationVersion().getApplication();
-				// String appVersion = application.getLastestVersion();
-				// 是否有用有更新
-				List<ApplicationVersion> versions = application.getVersions();
 				int isUpdate = 0x00;
-				// 在application.version中存在更高版本，status=3，且card_base_application有该终端对应批次的记录。就显示
-				for (ApplicationVersion av : versions) {
-					if (av.getStatus().intValue() == ApplicationVersion.STATUS_PULISHED
-							&& SpringMVCUtils.compareVersion(av.getVersionNo(), cardApplication.getApplicationVersion().getVersionNo())) {
-						for (int i = 0; i < cardBaseApplications.size(); i++) {
-							CardBaseApplication cba = (CardBaseApplication) cardBaseApplications.get(i);
-							if (av.getId() == cba.getApplicationVersion().getId()) {
-								Set<SpecialMobile> speicalMobiles = av.getSpeicalMobiles();
-								if (speicalMobiles.size() != 0) {// 不为空表示当前版本有特定手机限制
-									for (SpecialMobile sm : speicalMobiles) { // 如果在特定手机里，可以更新
-										if (sm.getMobileNo().equals(cci.getMobileNo())) {
-											isUpdate = 0x01;
-											break;
-										}
-									}
-								} else {
-									isUpdate = 0x01;
-									break;
-								}
-							}
-						}
-					}
+				CustomerCardInfo customerCard = customerCardInfoManager.getByCardNo(req.getCardNo());
+				ApplicationVersion applicationVersion = applicationVersionManager.getLastestAppVersionSupportCard(customerCard.getCard(),
+						cardApplication.getApplicationVersion().getApplication(), customerCard.getMobileNo());
+				if (!cardApplication.getApplicationVersion().equals(applicationVersion)) {
+					isUpdate = 0x01;
 				}
 				apps.put(cardApplication, isUpdate);
 			}
@@ -302,7 +269,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// for (AppInfo appinfo : appInfos) {
 		// this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
 		// }
-		fixAppver(req,appInfos);
+		fixVersionNo(req, appInfos);
 		int nextPage = page.getNextPage();
 		if (req.getListOrder() != null && req.getListOrder() == 1) {
 			nextPage = 0;
@@ -322,20 +289,23 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 获取分页参数
 		Page<RecommendApplication> page = buildPage(req);
 
-		page = recommendApplicationManager.recommendAppListForMobile(page, req.getCardNo());
-		AppInfoList appInfoList = new AppInfoList();
+		String cardNo = req.getCardNo();
+		page = recommendApplicationManager.recommendAppListForMobile(page, cardNo);
 		// 将得到的结果转换成dto
 		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
 		List<Application> appList = new ArrayList<Application>();
 		for (RecommendApplication ra : page.getResult()) {
 			appList.add(ra.getApplication());
 		}
+
+		AppInfoList appInfoList = new AppInfoList();
 		appInfoList.addAll(appList, sysType, null);
+		// appInfoList.addAll(appList, sysType, null);
 		List<AppInfo> appInfos = appInfoList.getAppInfo();
 		// for (AppInfo appinfo : appInfos) {
 		// this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
 		// }
-		fixAppver(req,appInfos);
+		fixVersionNo(req, appInfos);
 		sortList(req, appInfos);
 		// 设置返回结果
 		int nextPage = page.getNextPage();
@@ -383,7 +353,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		String sysType = StringUtils.substringBefore(StringUtils.substringAfter(req.getCommonType(), "-"), "-");
 		if (null != req.getQueryCondition() && req.getQueryCondition().startsWith("EQS_aid=")) {
 			page = applicationManager.findPage(page, filters);
-			appInfoList.addAllFullInfo(page.getResult(), sysType, null,req.getCardNo(), applicationManager);
+			appInfoList.addAllFullInfo(page.getResult(), sysType, null, req.getCardNo(), applicationManager);
 		} else if (null != req.getQueryCondition() && req.getQueryCondition().startsWith("EQS_appVersion=")) { // 我的应用，查看下载的版本
 			String aid = "";
 			String appVersion = "";
@@ -396,22 +366,22 @@ public class MobileWebServiceImpl implements MobileWebService {
 			}
 			ApplicationVersion applicationVersion = applicationVersionManager.getByAidAndVersionNo(aid, appVersion);
 			appInfoList.addMyAppInfo(applicationVersion, sysType);
-		} else if(null != req.getQueryCondition() && req.getQueryCondition().startsWith("like=")){
-			String value = StringUtils.substringAfter(req.getQueryCondition(),"=");
-			filters.add(new PropertyFilter("LIKES_name",value));
+		} else if (null != req.getQueryCondition() && req.getQueryCondition().startsWith("like=")) {
+			String value = StringUtils.substringAfter(req.getQueryCondition(), "=");
+			filters.add(new PropertyFilter("LIKES_name", value));
 			page = applicationManager.findPage(page, filters);
 			appInfoList.addAll(page.getResult(), sysType, null);
-		} else{
-			page = applicationManager.findPage(page,filters);
+		} else {
+			page = applicationManager.findPage(page, filters);
 			appInfoList.addAll(page.getResult(), sysType, null);
 		}
 		// 设置返回结果
 		List<AppInfo> appInfos = appInfoList.getAppInfo();
 		for (AppInfo appinfo : appInfos) {
-			//查找正确支持的版本,再次放入
+			// 查找正确支持的版本,再次放入
 			this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo(), appinfo.getAppVersion());
 		}
-		fixAppver(req,appInfos);
+		fixVersionNo(req, appInfos);
 		sortList(req, appInfos);
 		int nextPage = page.getNextPage();
 		if (!page.isHasNext()) {
@@ -424,17 +394,21 @@ public class MobileWebServiceImpl implements MobileWebService {
 
 	/**
 	 * 修复应用版本号
+	 * 
 	 * @param req
 	 * @param appInfos
 	 */
-	private void fixAppver(ReqApplicationList req, List<AppInfo> appInfos) {
+	private void fixVersionNo(ReqApplicationList req, List<AppInfo> appInfos) {
 		CustomerCardInfo cci = customerCardInfoManager.getByCardNo(req.getCardNo());
-		for(AppInfo appInfo : appInfos) {
+		for (AppInfo appInfo : appInfos) {
 			Application app = applicationManager.getByAid(appInfo.getAppAid());
 			ApplicationVersion appver = applicationVersionManager.getLastestAppVersionSupportCard(cci.getCard(), app, cci.getMobileNo());
-			appInfo.setAppVersion(appver.getVersionNo());
+			if (null != appver) {
+				appInfo.setAppVersion(appver.getVersionNo());
+			} else {
+				appInfo.setAppVersion("");
+			}
 		}
-		
 	}
 
 	private List<PropertyFilter> buildFilter(PageRequest req) {
@@ -493,7 +467,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		Page<X> page = new Page<X>(pageSize);
 		page.setPageNo(pageNumber);
 		Integer listOrder = req.getListOrder();
-		if (listOrder != null && listOrder == 1){//	1，按应用下载次数从高到低排序
+		if (listOrder != null && listOrder == 1) {// 1，按应用下载次数从高到低排序
 			page.setOrder("desc");
 			page.setOrderBy("downloadCount");
 		}
@@ -1141,28 +1115,28 @@ public class MobileWebServiceImpl implements MobileWebService {
 	private void setClientId(String aid, AppInfo info, String cardNo, String appVersion) {
 		if (cardNo != null) {
 			CustomerCardInfo cci = customerCardInfoManager.getByCardNo(cardNo);
-			if(cci != null) {
-			ApplicationVersion applicationVersion = applicationVersionManager.getByAidAndVersionNo(aid, appVersion);
-			boolean hasSysRequirment = customerCardInfoManager.hasSysRequirmentForMobile(cci, applicationVersion);
-			if (!hasSysRequirment) {
-				// mappedApplication.put("clientStatusStr",
-				// PlatformErrorCode.NOT_DOWN_CLINET.getDefaultMessage());
-			} else {
-				MobileType mt = cci.getMobileType();
-				Set<ApplicationClientInfo> acs = applicationVersion.getClients();
-				ApplicationClientInfo androidTemp = null;
-				for (Iterator<ApplicationClientInfo> it = acs.iterator(); it.hasNext();) {
-					ApplicationClientInfo ac = (ApplicationClientInfo) it.next();
-					if (mt.getOriginalOsKey().equals(ac.getSysRequirment())) {
-						// 应用详情-下载客户端：当同一手机型号对应了多个版本的Android客户端时
-						// ，应该下载当前手机型号对应的最高版本的客户端，以版本号来判断，而不是上传时间。
-						if (androidTemp == null || SpringMVCUtils.compareVersion(ac.getVersion(), androidTemp.getVersion())) {
-							info.setClientID(String.valueOf(ac.getId()));
-							androidTemp = ac;
+			if (cci != null) {
+				ApplicationVersion applicationVersion = applicationVersionManager.getByAidAndVersionNo(aid, appVersion);
+				boolean hasSysRequirment = customerCardInfoManager.hasSysRequirmentForMobile(cci, applicationVersion);
+				if (!hasSysRequirment) {
+					// mappedApplication.put("clientStatusStr",
+					// PlatformErrorCode.NOT_DOWN_CLINET.getDefaultMessage());
+				} else {
+					MobileType mt = cci.getMobileType();
+					Set<ApplicationClientInfo> acs = applicationVersion.getClients();
+					ApplicationClientInfo androidTemp = null;
+					for (Iterator<ApplicationClientInfo> it = acs.iterator(); it.hasNext();) {
+						ApplicationClientInfo ac = (ApplicationClientInfo) it.next();
+						if (mt.getOriginalOsKey().equals(ac.getSysRequirment())) {
+							// 应用详情-下载客户端：当同一手机型号对应了多个版本的Android客户端时
+							// ，应该下载当前手机型号对应的最高版本的客户端，以版本号来判断，而不是上传时间。
+							if (androidTemp == null || SpringMVCUtils.compareVersion(ac.getVersion(), androidTemp.getVersion())) {
+								info.setClientID(String.valueOf(ac.getId()));
+								androidTemp = ac;
+							}
 						}
 					}
 				}
-			}
 			}
 		}
 	}

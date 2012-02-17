@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.justinmobile.tsm.application.domain.Application;
 import com.justinmobile.tsm.application.domain.ApplicationVersion;

@@ -426,7 +426,7 @@ public class ApplicationVersion extends AbstractEntity {
 		Set<ApplicationClientInfo> clients = this.getClients();
 		if (CollectionUtils.isNotEmpty(clients)) {
 			for (ApplicationClientInfo applicationClientInfo : clients) {
-				if (StringUtils.startsWithIgnoreCase(sysRequirment, applicationClientInfo.getSysRequirment())
+				if (StringUtils.startsWithIgnoreCase(sysRequirment,applicationClientInfo.getSysRequirment())
 						&& applicationClientInfo.getStatus() == ApplicationClientInfo.STATUS_RELEASE.intValue()) {
 					return applicationClientInfo;
 				}
