@@ -273,6 +273,10 @@ public class MobileWebServiceImpl implements MobileWebService {
 					status = 1;
 				}
 				info.setAppStatus(status);
+				//查找正确支持的版本,再次放入
+				Application app = entry.getKey().getApplicationVersion().getApplication();
+				ApplicationVersion appver = applicationVersionManager.getLastestAppVersionSupportCard(entry.getKey().getCardInfo(), app, cci.getMobileNo());
+				info.setAppVersion(appver.getVersionNo());
 				// this.setClientId(info.getAppAid(), info, req.getCardNo());
 				appInfoList.add(info);
 			}
