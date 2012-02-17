@@ -36,7 +36,7 @@ public class LvObject {
 	}
 
 	public static LvObject parse(String plaintextHexString, int lLength) {
-		return parse(ConvertUtils.hexString2ByteArray(plaintextHexString));
+		return parse(ConvertUtils.hexString2ByteArray(plaintextHexString), lLength);
 	}
 
 	public static LvObject parse(byte[] src, final int lLength) {
