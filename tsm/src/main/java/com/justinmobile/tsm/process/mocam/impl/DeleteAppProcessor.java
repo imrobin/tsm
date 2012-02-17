@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 import com.justinmobile.core.exception.PlatformErrorCode;
 import com.justinmobile.core.exception.PlatformException;
 import com.justinmobile.tsm.application.domain.Application;
+import com.justinmobile.tsm.application.domain.ApplicationVersion;
 import com.justinmobile.tsm.card.domain.CardApplication;
 import com.justinmobile.tsm.card.domain.CardInfo;
+import com.justinmobile.tsm.cms2ac.SessionStatus;
 import com.justinmobile.tsm.endpoint.webservice.dto.mocam.ReqExecAPDU;
 import com.justinmobile.tsm.process.mocam.MocamProcessor;
 import com.justinmobile.tsm.process.mocam.MocamResult;
@@ -35,7 +37,10 @@ public class DeleteAppProcessor extends PublicOperationProcessor {
 		String aid = localTransaction.getAid();
 		CardApplication cardApplication = cardApplicationManager.getByCardNoAid(cardNo, aid);
 		if (cardApplication == null) {
-			throw new PlatformException(PlatformErrorCode.INVALID_CARD_APP_STATUS);
+			ApplicationVersion applicationVersion = applicationVersionManager.getLastestAppVersionSupportCard(
+					cardInfoManager.getByCardNo(cardNo), applicationManager.getByAid(aid), localTransaction.getMobileNo());
+			localTransaction.setAppVersion(applicationVersion.getVersionNo());
+			localTransaction.setSessionStatus(SessionStatus.COMPLETED);
 		}
 
 		CardInfo card = cardInfoManager.getByCardNo(cardNo);

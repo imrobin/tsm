@@ -322,7 +322,8 @@ public abstract class PublicOperationProcessor extends AbstractMocamProcessor {
 		return result;
 	}
 
-	protected MocamResult buildMocamMessage(LocalTransaction trans, Cms2acParam cms2acParam, List<ApduCommand> commands, int sessionStatus) {
+	protected MocamResult buildMocamMessage(LocalTransaction trans, Cms2acParam cms2acParam, List<ApduCommand> commands,
+			int sessionStatus) {
 		if (sessionStatus != SessionStatus.DUPLICATE_STATUS) {
 			trans.setSessionStatus(sessionStatus);
 			trans.increaseExecuteNo();
@@ -367,7 +368,8 @@ public abstract class PublicOperationProcessor extends AbstractMocamProcessor {
 	}
 
 	protected MocamResult launchSelectSdForSynCardSpace(LocalTransaction localTransaction, SecurityDomain sd, int sessionStatus) {
-		if ((SecurityDomain.MODEL_ISD == sd.getModel().intValue()) || ((SecurityDomain.UNFIXABLE_SPACE == sd.getSpaceRule().intValue()))) {
+		if ((SecurityDomain.MODEL_ISD == sd.getModel().intValue())
+				|| ((SecurityDomain.UNFIXABLE_SPACE == sd.getSpaceRule().intValue()))) {
 			sd = securityDomainManager.getIsd();
 		}
 
@@ -676,8 +678,10 @@ public abstract class PublicOperationProcessor extends AbstractMocamProcessor {
 	 */
 	protected void changeCardApplicationStatus(String cardNo, String appAid, Integer status) {
 		CardApplication cardApp = cardApplicationManager.getByCardNoAid(cardNo, appAid);
-		cardApp.setStatus(status);
-		cardApplicationManager.saveOrUpdate(cardApp);
+		if (null != cardApp) {
+			cardApp.setStatus(status);
+			cardApplicationManager.saveOrUpdate(cardApp);
+		}
 	}
 
 	/**
@@ -754,7 +758,8 @@ public abstract class PublicOperationProcessor extends AbstractMocamProcessor {
 
 	protected MocamResult launchSelectSd(LocalTransaction localTransaction, SecurityDomain sd, int sessionStatus) {
 		CardSecurityDomain cardSd = cardSecurityDomainManager.getByCardNoAid(localTransaction.getCardNo(), sd.getAid());
-		if ((null == cardSd.getCurrentKeyVersion()) || sd.getCurrentKeyVersion().intValue() != cardSd.getCurrentKeyVersion().intValue()) {
+		if ((null == cardSd.getCurrentKeyVersion())
+				|| sd.getCurrentKeyVersion().intValue() != cardSd.getCurrentKeyVersion().intValue()) {
 
 			buildSubTransaction(localTransaction, sd.getAid(), Operation.UPDATE_KEY);
 
@@ -792,7 +797,8 @@ public abstract class PublicOperationProcessor extends AbstractMocamProcessor {
 		cms2acParam.getApduCommands().add(apduCommand);
 	}
 
-	protected List<ApduCommand> serializeApduCmdBatch(Cms2acParam cms2acParam, List<ApduCommand> cmdBatch, int perBatchCmdBytesLength) {
+	protected List<ApduCommand> serializeApduCmdBatch(Cms2acParam cms2acParam, List<ApduCommand> cmdBatch,
+			int perBatchCmdBytesLength) {
 		cms2acParam.increaseBatchNo();
 		cmdBatch = batchApduCommand(cmdBatch, perBatchCmdBytesLength, cms2acParam.getCommandBatchNo());
 		List<ApduCommand> exeCmdBatch = getExeCmdBatch(cmdBatch, cms2acParam.getCommandBatchNo());

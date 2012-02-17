@@ -170,7 +170,8 @@ public abstract class AbstractMocamProcessor implements MocamProcessor {
 	 *            子流程的操作类型
 	 * @return
 	 */
-	protected LocalTransaction buildSubTransaction(LocalTransaction localTransaction, String aid, String versionNo, Operation operation) {
+	protected LocalTransaction buildSubTransaction(LocalTransaction localTransaction, String aid, String versionNo,
+			Operation operation) {
 		LocalTransaction subTransaction = transactionHelper.buildTransaction(localTransaction.getCardNo(),
 				CommType.getNameByType(localTransaction.getCommType()), aid, versionNo, operation.getType());
 		localTransaction.addSubTransaction(subTransaction);
@@ -215,7 +216,8 @@ public abstract class AbstractMocamProcessor implements MocamProcessor {
 
 			result = processor.process(subTransactionToExcute, reqExecAPDU);// 执行子流程
 			if (subTransactionToExcute.isComplete()) {// 如果子流程执行完成
-				log.debug("\n" + "子流程执行完成：" + subTransactionToExcute.getAid() + "，" + subTransactionToExcute.getProcedureName() + "\n");
+				log.debug("\n" + "子流程执行完成：" + subTransactionToExcute.getAid() + "，" + subTransactionToExcute.getProcedureName()
+						+ "\n");
 
 				subTransactionToExcute.setEndTime(Calendar.getInstance());
 				if (!localTransaction.isComplete()) {// 如果当前流程没有执行完成，执行当前流程。（子流程终止会导致父流程同步终止）
@@ -280,7 +282,7 @@ public abstract class AbstractMocamProcessor implements MocamProcessor {
 
 		// 完成计费
 		if (!SystemConfigUtils.isTestRuntimeEnvironment()) {
-			feeStatManager.genStatRecord(localTransaction);
+			// feeStatManager.genStatRecord(localTransaction);
 		}
 
 		// 组建MocamResult的空对象
