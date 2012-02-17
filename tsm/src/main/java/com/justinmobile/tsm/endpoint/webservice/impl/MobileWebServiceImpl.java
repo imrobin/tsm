@@ -273,10 +273,6 @@ public class MobileWebServiceImpl implements MobileWebService {
 					status = 1;
 				}
 				info.setAppStatus(status);
-				//查找正确支持的版本,再次放入
-				Application app = entry.getKey().getApplicationVersion().getApplication();
-				ApplicationVersion appver = applicationVersionManager.getLastestAppVersionSupportCard(entry.getKey().getCardInfo(), app, cci.getMobileNo());
-				info.setAppVersion(appver.getVersionNo());
 				// this.setClientId(info.getAppAid(), info, req.getCardNo());
 				appInfoList.add(info);
 			}
@@ -306,6 +302,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// for (AppInfo appinfo : appInfos) {
 		// this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
 		// }
+		fixAppver(req,appInfos);
 		int nextPage = page.getNextPage();
 		if (req.getListOrder() != null && req.getListOrder() == 1) {
 			nextPage = 0;
@@ -338,6 +335,7 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// for (AppInfo appinfo : appInfos) {
 		// this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo());
 		// }
+		fixAppver(req,appInfos);
 		sortList(req, appInfos);
 		// 设置返回结果
 		int nextPage = page.getNextPage();
@@ -410,8 +408,10 @@ public class MobileWebServiceImpl implements MobileWebService {
 		// 设置返回结果
 		List<AppInfo> appInfos = appInfoList.getAppInfo();
 		for (AppInfo appinfo : appInfos) {
+			//查找正确支持的版本,再次放入
 			this.setClientId(appinfo.getAppAid(), appinfo, req.getCardNo(), appinfo.getAppVersion());
 		}
+		fixAppver(req,appInfos);
 		sortList(req, appInfos);
 		int nextPage = page.getNextPage();
 		if (!page.isHasNext()) {
@@ -420,6 +420,21 @@ public class MobileWebServiceImpl implements MobileWebService {
 		res.setNextPageNumber(nextPage);
 		res.setTotalPage(page.getTotalPages());
 		res.setAppInfoList(appInfoList);
+	}
+
+	/**
+	 * 修复应用版本号
+	 * @param req
+	 * @param appInfos
+	 */
+	private void fixAppver(ReqApplicationList req, List<AppInfo> appInfos) {
+		CustomerCardInfo cci = customerCardInfoManager.getByCardNo(req.getCardNo());
+		for(AppInfo appInfo : appInfos) {
+			Application app = applicationManager.getByAid(appInfo.getAppAid());
+			ApplicationVersion appver = applicationVersionManager.getLastestAppVersionSupportCard(cci.getCard(), app, cci.getMobileNo());
+			appInfo.setAppVersion(appver.getVersionNo());
+		}
+		
 	}
 
 	private List<PropertyFilter> buildFilter(PageRequest req) {
