@@ -131,14 +131,16 @@ public abstract class AbstractDeleteAppProcessor extends PublicOperationProcesso
 		ApplicationVersion applicationVersion = applicationVersionManager.getByAidAndVersionNo(localTransaction.getAid(),
 				localTransaction.getAppVersion());
 
-		if (null == applicationVersion.getApplication().getNeedSubscribe() || !applicationVersion.getApplication().getNeedSubscribe()) {// 如果应用不需要单独订购/退订，则删除使用即为退订，添加退订记录
+		if (null != applicationVersion
+				&& (null == applicationVersion.getApplication().getNeedSubscribe() || !applicationVersion.getApplication()
+						.getNeedSubscribe())) {// 如果应用不需要单独订购/退订，则删除使用即为退订，添加退订记录
 			subscribeHistoryManager.unsubscribeApplication(card, applicationVersion);
 		}
 
 		// 删除终端上客户端记录
 		List<CardClient> cardClients = cardClientManager.getByCardAndApplication(card, applicationVersion.getApplication());
 		if (null != cardClients) {
-			for (CardClient cardClient : cardClients){
+			for (CardClient cardClient : cardClients) {
 				cardClientManager.remove(cardClient);
 			}
 		}
